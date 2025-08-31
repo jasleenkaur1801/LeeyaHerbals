@@ -1,0 +1,216 @@
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import './App.css'
+
+const ALL_PRODUCTS = [
+  { id: 1, name: 'Vitamin C Glow Serum', price: 699, category: 'serum', rating: 4.7, tag: 'Bestseller', image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=800&auto=format&fit=crop', description: 'Brightening serum with natural Vitamin C extracts for radiant, even-toned skin.' },
+  { id: 2, name: 'Gentle Foam Face Wash', price: 349, category: 'facewash', rating: 4.5, tag: 'New', image: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?q=80&w=800&auto=format&fit=crop', description: 'Gentle foaming cleanser that removes impurities without stripping natural oils.' },
+  { id: 3, name: 'Hydra Balance Toner', price: 299, category: 'toner', rating: 4.4, image: 'https://images.unsplash.com/photo-1571781923300-5c41ce3d9a2c?q=80&w=800&auto=format&fit=crop', description: 'Hydrating toner that balances pH and preps skin for better product absorption.' },
+  { id: 4, name: 'Neem Purify Cleanser', price: 399, category: 'cleanser', rating: 4.3, image: 'https://images.unsplash.com/photo-1610173826124-1d8d2eddf65a?q=80&w=800&auto=format&fit=crop', description: 'Purifying cleanser with neem extracts for acne-prone and oily skin.' },
+  { id: 5, name: 'Clay Detox Face Pack', price: 449, category: 'facepack', rating: 4.6, tag: 'Hot', image: 'https://images.unsplash.com/photo-1619983081563-430f63602796?q=80&w=800&auto=format&fit=crop', description: 'Detoxifying clay mask that draws out impurities and unclogs pores.' },
+  { id: 6, name: 'Targeted Acne Gel', price: 379, category: 'acne', rating: 4.2, image: 'https://images.unsplash.com/photo-1600275669283-5b56309f3a3a?q=80&w=800&auto=format&fit=crop', description: 'Spot treatment gel with natural ingredients to reduce acne and inflammation.' },
+  { id: 7, name: 'Daily Moisture Lotion', price: 499, category: 'lotion', rating: 4.5, image: 'https://images.unsplash.com/photo-1611930022110-0c4e8b4fcb13?q=80&w=800&auto=format&fit=crop', description: 'Lightweight moisturizing lotion for daily hydration without greasiness.' },
+  { id: 8, name: 'Aloe Calm Toner', price: 279, category: 'toner', rating: 4.1, image: 'https://images.unsplash.com/photo-1618477461849-4729ce312e34?q=80&w=800&auto=format&fit=crop', description: 'Soothing aloe-based toner for sensitive and irritated skin.' },
+]
+
+const CATEGORIES = [
+  { key: 'serum', label: 'Serums' },
+  { key: 'cleanser', label: 'Cleansers' },
+  { key: 'toner', label: 'Toners' },
+  { key: 'facewash', label: 'Face Wash' },
+  { key: 'facepack', label: 'Face Packs' },
+  { key: 'acne', label: 'Acne Gel' },
+  { key: 'lotion', label: 'Lotions' },
+]
+
+function StarRating({ value }) {
+  const fullStars = Math.round(value)
+  return (
+    <div className="stars" aria-label={`Rated ${value} out of 5`}>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <span key={i} className={i < fullStars ? 'star filled' : 'star'}>★</span>
+      ))}
+    </div>
+  )
+}
+
+function ProductCard({ product, onAdd }) {
+  const navigate = useNavigate()
+
+  return (
+    <article className="card product" onClick={() => navigate(`/product/${product.id}`)} style={{ cursor: 'pointer' }}>
+      <div className="badge-row">
+        {product.tag ? <span className="badge">{product.tag}</span> : null}
+      </div>
+      <div className="product-image-wrap">
+        <img src={product.image} alt={product.name} className="product-image" loading="lazy" />
+        <button className="wishlist" aria-label="Add to wishlist" onClick={(e) => e.stopPropagation()}>♡</button>
+      </div>
+      <h3 className="product-name">{product.name}</h3>
+      <StarRating value={product.rating} />
+      <div className="product-footer">
+        <span className="price">₹{product.price}</span>
+        <button className="btn small" onClick={(e) => { e.stopPropagation(); onAdd(product) }}>Add to cart</button>
+      </div>
+    </article>
+  )
+}
+
+function ProductPage() {
+  const { productId } = useParams();
+  const navigate = useNavigate();
+  const product = ALL_PRODUCTS.find(p => p.id === parseInt(productId, 10));
+  const [quantity, setQuantity] = useState(1);
+  const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [productId]);
+
+  // Load cart and wishlist from localStorage
+  useEffect(() => {
+    const savedCart = localStorage.getItem('leeya_cart')
+    const savedWishlist = localStorage.getItem('leeya_wishlist')
+    if (savedCart) setCart(JSON.parse(savedCart))
+    if (savedWishlist) setWishlist(JSON.parse(savedWishlist))
+  }, [])
+
+  // Save cart and wishlist to localStorage
+  useEffect(() => {
+    localStorage.setItem('leeya_cart', JSON.stringify(cart))
+  }, [cart])
+  useEffect(() => {
+    localStorage.setItem('leeya_wishlist', JSON.stringify(wishlist))
+  }, [wishlist])
+
+  if (!product) {
+    return (
+      <div className="container product-page" style={{ textAlign: 'center', padding: '4rem 0' }}>
+        <h2>Product not found.</h2>
+        <button className="btn primary" onClick={() => navigate('/')}>Go to Home</button>
+      </div>
+    );
+  }
+
+  const handleAddToCart = () => {
+    setCart(prev => {
+      const found = prev.find(i => i.id === product.id)
+      if (found) {
+        return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + quantity } : i)
+      }
+      return [...prev, { ...product, qty: quantity }]
+    })
+    alert(`${quantity} x ${product.name} added to cart!`);
+  };
+
+  const toggleWishlist = () => {
+    setWishlist(prev => {
+      const found = prev.find(i => i.id === product.id)
+      if (found) {
+        return prev.filter(i => i.id !== product.id)
+      }
+      return [...prev, product]
+    })
+  };
+
+  const isInWishlist = wishlist.some(item => item.id === product.id);
+
+  return (
+    <div className="container product-page">
+      <button className="back-btn" onClick={() => navigate(-1)}>← Back to products</button>
+      <div className="product-details">
+        <div className="product-images">
+          <img src={product.image} alt={product.name} className="main-image" />
+        </div>
+        <div className="product-info">
+          <div className="product-header">
+            <h1 className="product-title">{product.name}</h1>
+            <div className="product-rating">
+              <StarRating value={product.rating} />
+              <span className="rating-text">({product.rating} / 5)</span>
+            </div>
+            <p className="product-category">Category: <span>{product.category}</span></p>
+          </div>
+          <p className="product-description">{product.description}</p>
+          <div className="product-price">₹{product.price}</div>
+          <div className="product-actions">
+            <button 
+              className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}
+              onClick={toggleWishlist}
+              style={{
+                padding: '0.8rem 1.5rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                backgroundColor: isInWishlist ? '#ff4757' : '#f8f9fa',
+                color: isInWishlist ? '#ffffff' : '#495057',
+                border: `2px solid ${isInWishlist ? '#ff4757' : '#dee2e6'}`,
+                borderRadius: '8px',
+                cursor: 'pointer',
+                marginBottom: '1rem',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              {isInWishlist ? '❤️' : '♡'} {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+            </button>
+            <div className="quantity-selector">
+              <label htmlFor="quantity">Quantity:</label>
+              <div className="quantity-controls">
+                <button className="qty-btn" onClick={() => setQuantity(prev => Math.max(1, prev - 1))} disabled={quantity === 1}>-</button>
+                <span className="quantity-value">{quantity}</span>
+                <button className="qty-btn" onClick={() => setQuantity(prev => prev + 1)}>+</button>
+              </div>
+            </div>
+            <button 
+              onClick={handleAddToCart}
+              style={{
+                display: 'block',
+                width: '100%',
+                maxWidth: '300px',
+                padding: '1.2rem 2.5rem',
+                fontSize: '1.2rem',
+                fontWeight: '700',
+                backgroundColor: '#1dbf73',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                marginTop: '1rem',
+                boxShadow: '0 4px 15px rgba(24,167,99,.3)',
+                transition: 'all 0.3s ease',
+                opacity: '1',
+                visibility: 'visible',
+                position: 'relative',
+                zIndex: '10'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-3px)';
+                e.target.style.boxShadow = '0 10px 30px rgba(24,167,99,.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 15px rgba(24,167,99,.3)';
+              }}
+            >
+              Add to Cart - ₹{product.price * quantity}
+            </button>
+          </div>
+          <div className="product-features">
+            <h3>Key Benefits</h3>
+            <ul>
+              <li>Natural ingredients</li>
+              <li>Dermatologically tested</li>
+              <li>Cruelty-free</li>
+              <li>Suitable for all skin types</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ProductPage

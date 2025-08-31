@@ -1,0 +1,19 @@
+npm run :-moz-drag-over:root {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1a1b1e;
+  background-color: #ffffff;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root { height: 100%; }
+body { margin: 0; }
+
+a { color: inherit; text-decoration: none; }
+
+#root { display: flex; flex-direction: column; }
+
+html { scroll-behavior: smooth; }
