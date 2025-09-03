@@ -5,390 +5,26 @@ import ProductPage from './ProductPage'
 import SearchResultsPage from './SearchResultsPage'
 import AuthModal from './AuthModal'
 import UserProfile from './UserProfile'
-import Chatbot from './Chatbot'
-function AuthRedirect() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    alert('Please login or signup to use AI chatbot.');
-    navigate('/');
-  }, []);
-  return null;
-}
-
 
 const CATEGORIES = [
   { key: 'serum', label: 'Serums' },
   { key: 'cleanser', label: 'Cleansers' },
   { key: 'toner', label: 'Toners' },
   { key: 'facewash', label: 'Face Wash' },
-  { key: 'facemask', label: 'Face Masks' },
+  { key: 'facepack', label: 'Face Packs' },
   { key: 'acne', label: 'Acne Gel' },
   { key: 'lotion', label: 'Lotions' },
 ]
 
 const ALL_PRODUCTS = [
-  {
-    id: 33,
-    name: 'Pimple & Pore Minimizing Face Wash Gel',
-    price: 325,
-    category: 'facewashgel',
-    weight: '100ml',
-    image: '/items/facewashgel/pimple & pore.png',
-    rating: 5,
-    description: 'Minimizes pimples and pores. For all skin types.'
-  },
-  {
-    id: 34,
-    name: 'Pigment Lightening Face Wash Gel',
-    price: 299,
-    category: 'facewashgel',
-    weight: '100ml',
-    image: '/items/facewashgel/pigment lightening.png',
-    rating: 4,
-    description: 'Lightens pigmentation. For all skin types.'
-  },
-  {
-    id: 35,
-    name: 'Pollution & Blackheads Removing Face Wash Gel',
-    price: 299,
-    category: 'facewashgel',
-    weight: '100ml',
-    image: '/items/facewashgel/pollution & blackheads.png',
-    rating: 4,
-    description: 'Removes pollution and blackheads. For all skin types.'
-  },
-  {
-    id: 36,
-    name: 'Vitamin C & Orange Skin Whitening Face Wash Gel',
-    price: 299,
-    category: 'facewashgel',
-    weight: '100ml',
-    image: '/items/facewashgel/vitamin c & orange.png',
-    rating: 4,
-    description: 'Vitamin C & orange for skin whitening. For all skin types.'
-  },
-  {
-    id: 27,
-    name: 'Sandal Face Wash',
-    price: 190,
-    category: 'facewash',
-    weight: '100ml',
-    image: '/items/facewash/sandal facewash.png',
-    rating: 4,
-    description: 'For brightening & glowing skin. For all skin types.'
-  },
-  {
-    id: 28,
-    name: 'De-Tan Face Wash',
-    price: 190,
-    category: 'facewash',
-    weight: '100ml',
-    image: '/items/facewash/De-tan facewash.png',
-    rating: 4,
-    description: 'For tan removal & glowing skin. For all skin types.'
-  },
-  {
-    id: 29,
-    name: 'Papaya Face Wash',
-    price: 190,
-    category: 'facewash',
-    weight: '100ml',
-    image: '/items/facewash/papaya.png',
-    rating: 3,
-    description: 'Enriched with papaya & liquorice extracts. For all skin types.'
-  },
-  {
-    id: 30,
-    name: 'Haldi Chandan Face Wash',
-    price: 190,
-    category: 'facewash',
-    weight: '100ml',
-    image: '/items/facewash/haldi chandan.png',
-    rating: 4,
-    description: 'Haldi chandan for glowing skin. For all skin types.'
-  },
-  {
-    id: 31,
-    name: 'Tea Tree Face Wash',
-    price: 190,
-    category: 'facewash',
-    weight: '100ml',
-    image: '/items/facewash/tea tree.png',
-    rating: 5,
-    description: 'Tea tree for clear skin. For all skin types.'
-  },
-  {
-    id: 32,
-    name: 'Coffee Hydrating Face Wash',
-    price: 190,
-    category: 'facewash',
-    weight: '100ml',
-    image: '/items/facewash/coffee.png',
-    rating: 4,
-    description: 'Hydrating coffee face wash. For all skin types.'
-  },
-  {
-    id: 24,
-    name: 'Instant Tan Remover Face Mask (Jasmine)',
-    price: 899,
-    category: 'facemask',
-    weight: '600gm',
-    image: '/items/facemask/tan removal jasmine.jpeg',
-    rating: 5,
-    description: 'Jasmine fragrance. For instant de-tanning. Paraben free.'
-  },
-  {
-    id: 25,
-    name: 'Instant Tan Remover Face Mask (Lavender)',
-    price: 899,
-    category: 'facemask',
-    weight: '600gm',
-    image: '/items/facemask/tan removal lavender.jpeg',
-    rating: 4,
-    description: 'Lavender fragrance. For instant de-tanning. Paraben free.'
-  },
-  {
-    id: 26,
-    name: 'Instant Tan Remover Face Mask',
-    price: 225,
-    category: 'facemask',
-    weight: '80gm',
-    image: '/items/facemask/instant tan removal facemask.png',
-    rating: 4,
-    description: 'For instant de-tanning. Paraben free. 80gm pack.'
-  },
-  {
-    id: 23,
-    name: 'Under Eye Gel',
-    price: 125,
-    category: 'eyegel',
-    weight: '20gm',
-    image: '/items/eyegel/under eye gel.png',
-    rating: 4,
-    description: 'For treatment of dark circles. Suitable for all skin types.'
-  },
-  // Bleach Creams (small box, 300gm, 349)
-  {
-    id: 10,
-    name: 'Vitamin-C Bleach Cream',
-    price: 349,
-    category: 'bleachcream',
-    weight: '300gm',
-    image: '/items/bleech cream/vitamin c bleach cream.png',
-    rating: 4,
-    description: 'Vitamin-C enriched bleach cream for radiant skin.'
-  },
-  {
-    id: 11,
-    name: 'D-Tan Bleach Cream',
-    price: 349,
-    category: 'bleachcream',
-    weight: '300gm',
-    image: '/items/bleech cream/D tan bleach cream.png',
-    rating: 4,
-    description: 'Removes tan and brightens skin.'
-  },
-  {
-    id: 12,
-    name: 'Haldi Chandan Bleach Cream',
-    price: 349,
-    category: 'bleachcream',
-    weight: '300gm',
-    image: '/items/bleech cream/haldi chandan bleach cream.png',
-    rating: 4,
-    description: 'Haldi and chandan for glowing skin.'
-  },
-  {
-    id: 13,
-    name: 'Mango Bleach Cream',
-    price: 349,
-    category: 'bleachcream',
-    weight: '300gm',
-    image: '/items/bleech cream/mango bleach cream.png',
-    rating: 3,
-    description: 'Mango extract for soft, bright skin.'
-  },
-  // Bleach Creams (jars, 1kg, 849)
-  {
-    id: 14,
-    name: 'Charcoal Bleach Cream',
-    price: 849,
-    category: 'bleachcream',
-    weight: '1kg',
-    image: '/items/bleech cream/charcoal bleach cream.png',
-    rating: 4,
-    description: 'Charcoal for deep cleansing and detox.'
-  },
-  {
-    id: 15,
-    name: 'OXY Bleach Cream',
-    price: 849,
-    category: 'bleachcream',
-    weight: '1kg',
-    image: '/items/bleech cream/oxy bleach cream.png',
-    rating: 4,
-    description: 'Oxygen boost for brighter skin.'
-  },
-  {
-    id: 16,
-    name: 'Diamond Bleach Cream',
-    price: 849,
-    category: 'bleachcream',
-    weight: '1kg',
-    image: '/items/bleech cream/diamond bleach cream.png',
-    rating: 5,
-    description: 'Diamond dust for glowing skin.'
-  },
-  {
-    id: 17,
-    name: 'Red Wine Bleach Cream',
-    price: 849,
-    category: 'bleachcream',
-    weight: '1kg',
-    image: '/items/bleech cream/red wine bleach cream.png',
-    rating: 4,
-    description: 'Red wine extract for anti-aging.'
-  },
-  {
-    id: 18,
-    name: 'Skin Whitening Bleach Cream',
-    price: 849,
-    category: 'bleachcream',
-    weight: '1kg',
-    image: '/items/bleech cream/skin whitening bleach cream.png',
-    rating: 3,
-    description: 'Whitening formula for even skin tone.'
-  },
-  {
-    id: 19,
-    name: 'Vitamin-C Bleach Cream (1kg)',
-    price: 849,
-    category: 'bleachcream',
-    weight: '1kg',
-    image: '/items/bleech cream/vitamin c bleach.png',
-    rating: 4,
-    description: 'Vitamin-C enriched bleach cream for radiant skin (1kg jar).'
-  },
-  {
-    id: 20,
-    name: 'Gold Bleach Cream',
-    price: 849,
-    category: 'bleachcream',
-    weight: '1kg',
-    image: '/items/bleech cream/gold bleach cream.png',
-    rating: 5,
-    description: 'Gold particles for glowing skin.'
-  },
-  {
-    id: 21,
-    name: 'Haldi & Chandan Bleach Cream',
-    price: 849,
-    category: 'bleachcream',
-    weight: '1kg',
-    image: '/items/bleech cream/haldi & chandan bleach cream.png',
-    rating: 4,
-    description: 'Haldi and chandan for glowing skin (1kg jar).'
-  },
-  {
-    id: 22,
-    name: 'De-Tan Bleach Cream',
-    price: 849,
-    category: 'bleachcream',
-    weight: '1kg',
-    image: '/items/bleech cream/De-tan bleach.png',
-    rating: 4,
-    description: 'Removes tan and brightens skin (1kg jar).'
-  },
-  {
-    id: 5,
-    name: 'Anti Blemish Cream',
-    price: 299,
-    category: 'cream',
-    weight: '30gm',
-    image: '/items/cream/anti blemish cream.png',
-    rating: 4,
-    description: 'Reduces blemishes and evens skin tone. With Vitamin C, Vitamin B3, and herbal extracts.'
-  },
-  {
-    id: 6,
-    name: 'Wrinkle Lift Anti Ageing Cream',
-    price: 425,
-    category: 'cream',
-    weight: '30gm',
-    image: '/items/cream/wrinkle lift anti ageing.png',
-    rating: 5,
-    description: 'Reduces wrinkles and firms skin. With Vitamin C, Ginseng, and herbal actives.'
-  },
-  {
-    id: 7,
-    name: 'Shea Butter Nourishing Cream',
-    price: 175,
-    category: 'cream',
-    weight: '30gm',
-    image: '/items/cream/shea butter nourishing cream.png',
-    rating: 4,
-    description: 'Deeply nourishes and hydrates skin. Enriched with shea butter and almond oil.'
-  },
-  {
-    id: 8,
-    name: 'Skin Whitening Cream',
-    price: 225,
-    category: 'cream',
-    weight: '30gm',
-    image: '/items/cream/skin whiteing.png',
-    rating: 3,
-    description: 'Brightens and evens skin tone. With Vitamin E and herbal actives.'
-  },
-  {
-    id: 9,
-    name: 'Dark Spot & Marks Removing Cream',
-    price: 269,
-    category: 'cream',
-    weight: '75gm',
-    image: '/items/cream/dark spot & marks removing.png',
-    rating: 4,
-    description: 'Removes dark spots and marks. With SPF 20, mushrooms, mulethi, and tulsi.'
-  },
-  {
-    id: 1,
-    name: 'Clove & Basil Acne & Oil Control Gel',
-    price: 299,
-    category: 'acneoilgel',
-    weight: '100ml',
-    image: '/items/acneoilgel/acneoilcontrolgel.png',
-    rating: 5,
-    description: 'Clove & Basil Acne & Oil Control Gel helps control excess oil and acne. Paraben free. Suitable for all skin types.'
-  },
-  {
-    id: 2,
-    name: 'Fairness Cleanser',
-    price: 245,
-    category: 'cleanser',
-    weight: '100gm',
-    image: '/items/cleanser/fairness cleanser.png',
-    rating: 4,
-    description: 'Handmade Ayurvedic Fairness Cleanser Soap with herbs. Paraben free.'
-  },
-  {
-    id: 3,
-    name: 'Glow Cleanser',
-    price: 245,
-    category: 'cleanser',
-    weight: '100gm',
-    image: '/items/cleanser/glow cleanser.png',
-    rating: 3,
-    description: 'Handmade Ayurvedic Glow Cleanser Soap with herbs. Paraben free.'
-  },
-  {
-    id: 4,
-    name: 'Cleaning Milk',
-    price: 325,
-    category: 'cleansingmilk',
-    weight: '1 Litre',
-    image: '/items/cleansing milk/cleaning milk.png',
-    rating: 4,
-    description: 'Leeya Cleaning Milk for gentle and effective cleansing. Suitable for all skin types.'
-  },
+  { id: 1, name: 'Vitamin C Glow Serum', price: 699, category: 'serum', rating: 4.7, tag: 'Bestseller', image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=800&auto=format&fit=crop' },
+  { id: 2, name: 'Gentle Foam Face Wash', price: 349, category: 'facewash', rating: 4.5, tag: 'New', image: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?q=80&w=800&auto=format&fit=crop' },
+  { id: 3, name: 'Hydra Balance Toner', price: 299, category: 'toner', rating: 4.4, image: 'https://images.unsplash.com/photo-1571781923300-5c41ce3d9a2c?q=80&w=800&auto=format&fit=crop' },
+  { id: 4, name: 'Neem Purify Cleanser', price: 399, category: 'cleanser', rating: 4.3, image: 'https://images.unsplash.com/photo-1610173826124-1d8d2eddf65a?q=80&w=800&auto=format&fit=crop' },
+  { id: 5, name: 'Clay Detox Face Pack', price: 449, category: 'facepack', rating: 4.6, tag: 'Hot', image: 'https://images.unsplash.com/photo-1619983081563-430f63602796?q=80&w=800&auto=format&fit=crop' },
+  { id: 6, name: 'Targeted Acne Gel', price: 379, category: 'acne', rating: 4.2, image: 'https://images.unsplash.com/photo-1600275669283-5b56309f3a3a?q=80&w=800&auto=format&fit=crop' },
+  { id: 7, name: 'Daily Moisture Lotion', price: 499, category: 'lotion', rating: 4.5, image: 'https://images.unsplash.com/photo-1611930022110-0c4e8b4fcb13?q=80&w=800&auto=format&fit=crop' },
+  { id: 8, name: 'Aloe Calm Toner', price: 279, category: 'toner', rating: 4.1, image: 'https://images.unsplash.com/photo-1618477461849-4729ce312e34?q=80&w=800&auto=format&fit=crop' },
 ]
 
 function StarRating({ value }) {
@@ -538,18 +174,6 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
           
           <div className="user-actions">
             <button 
-              className="chat-btn" 
-              aria-label="Chatbot"
-              title="Ask Leeya Guide"
-              onClick={() => {
-                if (!isAuthenticated) {
-                  onOpenAuth();
-                } else {
-                  navigate('/chat');
-                }
-              }}
-            >💬</button>
-            <button 
               className={`wishlist ${!isAuthenticated ? 'auth-required' : ''}`} 
               aria-label={isAuthenticated ? "Wishlist" : "Login to view wishlist"} 
               onClick={() => {
@@ -609,8 +233,8 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                 <a href="#cat-cleanser">Cleansers</a>
                 <a href="#cat-toner">Toners</a>
                 <a href="#cat-facepack">Face Packs</a>
-                <a href="#cat-acne">Acne Care</a>
-                <a href="#cat-lotion">Lotions</a>
+                <a href="#cat-facewashgel">Face Wash Gel</a>
+                <a href="#cat-acneoilgel">Acne Oil Gel</a>
               </div>
             </div>
             
@@ -647,6 +271,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                 <a href="#gift-sets">Gift Sets</a>
                 <a href="#travel-kits">Travel Kits</a>
                 <a href="#seasonal">Seasonal Collections</a>
+                <a href="#reviews" onClick={(e)=>{ e.preventDefault(); navigate('/reviews') }}>Reviews</a>
               </div>
             </div>
             
@@ -685,9 +310,12 @@ function Hero() {
 
 function CircleCategories({ onChoose }) {
   const items = [
-    { label: 'Skin', image: 'https://images.unsplash.com/photo-1601042879364-f3947d3f9c36?q=80&w=800&auto=format&fit=crop' },
-    { label: 'Hair', image: 'https://images.unsplash.com/photo-1510414696678-2415ad8474aa?q=80&w=800&auto=format&fit=crop' },
-    { label: 'Bath & Body', image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800&auto=format&fit=crop' },
+    { label: 'Cleansers', icon: '🫧', color: '#a7f3d0' },
+    { label: 'Serums', icon: '💧', color: '#bfdbfe' },
+    { label: 'Toners', icon: '🌸', color: '#fecaca' },
+    { label: 'Masks', icon: '🧖‍♀️', color: '#fde68a' },
+    { label: 'Natural Oils', icon: '🌿', color: '#bbf7d0' },
+    { label: 'Lotions', icon: '🧴', color: '#e9d5ff' },
   ]
   return (
     <section className="section">
@@ -695,7 +323,9 @@ function CircleCategories({ onChoose }) {
       <div className="container circle-grid">
         {items.map((it) => (
           <button key={it.label} className="circle-card" onClick={() => { onChoose('all'); location.hash = '#shop' }}>
-            <span className="circle-wrap"><img src={it.image} alt={it.label} /></span>
+            <span className="circle-wrap" style={{ background: `radial-gradient(120px 120px at 50% 40%, ${it.color}, transparent)` }}>
+              <span className="big-emoji" aria-hidden>{it.icon}</span>
+            </span>
             <span className="circle-title">{it.label}</span>
           </button>
         ))}
@@ -705,11 +335,29 @@ function CircleCategories({ onChoose }) {
 }
 
 function CategoryPills({ selected, onSelect }) {
+  const iconByKey = {
+    serum: '💧',
+    cleanser: '🫧',
+    toner: '🌸',
+    facewash: '🧼',
+    facewashgel: '🧴',
+    facemask: '🎭',
+    acneoilgel: '✨',
+    facialkit: '🧖‍♀️',
+    moisturzinglotion: '🧴',
+    rosewater: '🌹',
+    scalpoil: '🌿',
+    scrub: '🧽',
+    skinconditioner: '🪄',
+    sunscreenlotion: '🌞'
+  }
   return (
     <div className="pills" role="tablist" aria-label="Product categories">
       <button className={selected === 'all' ? 'pill active' : 'pill'} onClick={() => onSelect('all')}>All</button>
       {CATEGORIES.map(c => (
-        <button key={c.key} className={selected === c.key ? 'pill active' : 'pill'} onClick={() => onSelect(c.key)} id={`cat-${c.key}`}>{c.label}</button>
+        <button key={c.key} className={selected === c.key ? 'pill active' : 'pill'} onClick={() => onSelect(c.key)} id={`cat-${c.key}`}>
+          <span style={{ marginRight: 6 }}>{iconByKey[c.key] || '🛍️'}</span>{c.label}
+        </button>
       ))}
     </div>
   )
@@ -769,8 +417,8 @@ function ProductsGrid({ products, onAdd, onWishlist, wishlist, isAuthenticated, 
     <section id="shop" className="section">
       <div className="container">
         <div className="section-head">
-          <h2>Featured products</h2>
-          <p>Clean, cruelty-free skincare for every skin type.</p>
+          <h2>Shop by category</h2>
+          <p>Find the perfect ritual for your skin</p>
         </div>
         <div className="grid products">
           {products.map(p => (
@@ -1209,6 +857,18 @@ function App() {
     });
   }, [category, search]);
 
+  // Featured: show one product of each category
+  const featuredByCategory = useMemo(() => {
+    const seen = new Set();
+    const result = [];
+    for (const p of ALL_PRODUCTS) {
+      if (!seen.has(p.category)) {
+        seen.add(p.category);
+        result.push(p);
+      }
+    }
+    return result;
+  }, []);
 
 
   return (
@@ -1261,7 +921,7 @@ function App() {
                 <div className="benefit"><span>🌿</span><div><strong>100% Herbal</strong><p>Toxin-free, plant-powered formulas</p></div></div>
                 <div className="benefit"><span>🚚</span><div><strong>Free Shipping</strong><p>On orders above ₹799</p></div></div>
                 <div className="benefit"><span>🛡️</span><div><strong>Dermat Tested</strong><p>Safe for all skin types</p></div></div>
-                <div className="benefit"><span>↩️</span><div><strong>Easy Returns</strong><p>7-day hassle-free returns</p></div></div>
+                <div className="benefit"><span>📦</span><div><strong>Return Damaged Product</strong><p>Quick replacement for damaged deliveries</p></div></div>
               </div>
             </section>
             <section className="section brands">
@@ -1311,7 +971,7 @@ function App() {
               <div className="container section-head"><h2>Featured</h2><p>Best sellers loved by our community</p></div>
               <div className="container carousel" id="featured">
                 <div className="carousel-track">
-                  {ALL_PRODUCTS.slice(0,6).map(p => (
+                  {featuredByCategory.map(p => (
                     <div key={`f-${p.id}`} className="carousel-slide">
                       <ProductCard 
                         key={p.id} 
@@ -1382,7 +1042,6 @@ function App() {
                 ))}
               </div>
             </section>
-            <div className="reveal"><ImageGallery /></div>
             <Newsletter />
             <button className="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Back to top">↑</button>
           </>
@@ -1390,8 +1049,6 @@ function App() {
         <Route path="/search" element={<SearchResultsPage />} />
         <Route path="/product/:productId" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage cart={cart} setCart={setCart} />} />
-        <Route path="/wishlist" element={<WishlistPage wishlist={wishlist} setWishlist={setWishlist} setCart={setCart} />} />
-        <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <AuthRedirect />} />
       </Routes>
       {showCart ? (
         <div className="drawer" role="dialog" aria-label="Cart">

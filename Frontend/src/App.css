@@ -1127,6 +1127,7 @@
 .circle-card { display: grid; justify-items: center; gap: .6rem; background: transparent; border: none; cursor: pointer; }
 .circle-wrap { width: 160px; height: 160px; border-radius: 999px; overflow: hidden; border: 2px solid #d9efe6; box-shadow: 0 8px 24px #18a7631a; display: grid; place-items: center; background: radial-gradient(120px 120px at 50% 40%, #eaf7f1, transparent); }
 .circle-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+.big-emoji { font-size: 64px; filter: drop-shadow(0 10px 20px rgba(0,0,0,.08)); }
 .circle-card:hover .circle-wrap img { transform: scale(1.05); }
 .circle-card:hover .circle-wrap { border-color: #1dbf73; }
 .circle-title { font-weight: 600; color: var(--text); }
@@ -1164,11 +1165,10 @@ body[data-theme="dark"] { --bg: #0e1111; --surface:#111315; --surface-2:#161a1d;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 0.75rem;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   width: 100%;
-  /* Use margin-left instead of padding-left to keep pills inside content boundary */
-  margin-left: 4rem;
+  margin-left: 0;
 }
 .brand-pill {
   display: inline-flex;
