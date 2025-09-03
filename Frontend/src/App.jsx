@@ -5,26 +5,390 @@ import ProductPage from './ProductPage'
 import SearchResultsPage from './SearchResultsPage'
 import AuthModal from './AuthModal'
 import UserProfile from './UserProfile'
+import Chatbot from './Chatbot'
+function AuthRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    alert('Please login or signup to use AI chatbot.');
+    navigate('/');
+  }, []);
+  return null;
+}
+
 
 const CATEGORIES = [
   { key: 'serum', label: 'Serums' },
   { key: 'cleanser', label: 'Cleansers' },
   { key: 'toner', label: 'Toners' },
   { key: 'facewash', label: 'Face Wash' },
-  { key: 'facepack', label: 'Face Packs' },
+  { key: 'facemask', label: 'Face Masks' },
   { key: 'acne', label: 'Acne Gel' },
   { key: 'lotion', label: 'Lotions' },
 ]
 
 const ALL_PRODUCTS = [
-  { id: 1, name: 'Vitamin C Glow Serum', price: 699, category: 'serum', rating: 4.7, tag: 'Bestseller', image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=800&auto=format&fit=crop' },
-  { id: 2, name: 'Gentle Foam Face Wash', price: 349, category: 'facewash', rating: 4.5, tag: 'New', image: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?q=80&w=800&auto=format&fit=crop' },
-  { id: 3, name: 'Hydra Balance Toner', price: 299, category: 'toner', rating: 4.4, image: 'https://images.unsplash.com/photo-1571781923300-5c41ce3d9a2c?q=80&w=800&auto=format&fit=crop' },
-  { id: 4, name: 'Neem Purify Cleanser', price: 399, category: 'cleanser', rating: 4.3, image: 'https://images.unsplash.com/photo-1610173826124-1d8d2eddf65a?q=80&w=800&auto=format&fit=crop' },
-  { id: 5, name: 'Clay Detox Face Pack', price: 449, category: 'facepack', rating: 4.6, tag: 'Hot', image: 'https://images.unsplash.com/photo-1619983081563-430f63602796?q=80&w=800&auto=format&fit=crop' },
-  { id: 6, name: 'Targeted Acne Gel', price: 379, category: 'acne', rating: 4.2, image: 'https://images.unsplash.com/photo-1600275669283-5b56309f3a3a?q=80&w=800&auto=format&fit=crop' },
-  { id: 7, name: 'Daily Moisture Lotion', price: 499, category: 'lotion', rating: 4.5, image: 'https://images.unsplash.com/photo-1611930022110-0c4e8b4fcb13?q=80&w=800&auto=format&fit=crop' },
-  { id: 8, name: 'Aloe Calm Toner', price: 279, category: 'toner', rating: 4.1, image: 'https://images.unsplash.com/photo-1618477461849-4729ce312e34?q=80&w=800&auto=format&fit=crop' },
+  {
+    id: 33,
+    name: 'Pimple & Pore Minimizing Face Wash Gel',
+    price: 325,
+    category: 'facewashgel',
+    weight: '100ml',
+    image: '/items/facewashgel/pimple & pore.png',
+    rating: 5,
+    description: 'Minimizes pimples and pores. For all skin types.'
+  },
+  {
+    id: 34,
+    name: 'Pigment Lightening Face Wash Gel',
+    price: 299,
+    category: 'facewashgel',
+    weight: '100ml',
+    image: '/items/facewashgel/pigment lightening.png',
+    rating: 4,
+    description: 'Lightens pigmentation. For all skin types.'
+  },
+  {
+    id: 35,
+    name: 'Pollution & Blackheads Removing Face Wash Gel',
+    price: 299,
+    category: 'facewashgel',
+    weight: '100ml',
+    image: '/items/facewashgel/pollution & blackheads.png',
+    rating: 4,
+    description: 'Removes pollution and blackheads. For all skin types.'
+  },
+  {
+    id: 36,
+    name: 'Vitamin C & Orange Skin Whitening Face Wash Gel',
+    price: 299,
+    category: 'facewashgel',
+    weight: '100ml',
+    image: '/items/facewashgel/vitamin c & orange.png',
+    rating: 4,
+    description: 'Vitamin C & orange for skin whitening. For all skin types.'
+  },
+  {
+    id: 27,
+    name: 'Sandal Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/sandal facewash.png',
+    rating: 4,
+    description: 'For brightening & glowing skin. For all skin types.'
+  },
+  {
+    id: 28,
+    name: 'De-Tan Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/De-tan facewash.png',
+    rating: 4,
+    description: 'For tan removal & glowing skin. For all skin types.'
+  },
+  {
+    id: 29,
+    name: 'Papaya Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/papaya.png',
+    rating: 3,
+    description: 'Enriched with papaya & liquorice extracts. For all skin types.'
+  },
+  {
+    id: 30,
+    name: 'Haldi Chandan Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/haldi chandan.png',
+    rating: 4,
+    description: 'Haldi chandan for glowing skin. For all skin types.'
+  },
+  {
+    id: 31,
+    name: 'Tea Tree Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/tea tree.png',
+    rating: 5,
+    description: 'Tea tree for clear skin. For all skin types.'
+  },
+  {
+    id: 32,
+    name: 'Coffee Hydrating Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/coffee.png',
+    rating: 4,
+    description: 'Hydrating coffee face wash. For all skin types.'
+  },
+  {
+    id: 24,
+    name: 'Instant Tan Remover Face Mask (Jasmine)',
+    price: 899,
+    category: 'facemask',
+    weight: '600gm',
+    image: '/items/facemask/tan removal jasmine.jpeg',
+    rating: 5,
+    description: 'Jasmine fragrance. For instant de-tanning. Paraben free.'
+  },
+  {
+    id: 25,
+    name: 'Instant Tan Remover Face Mask (Lavender)',
+    price: 899,
+    category: 'facemask',
+    weight: '600gm',
+    image: '/items/facemask/tan removal lavender.jpeg',
+    rating: 4,
+    description: 'Lavender fragrance. For instant de-tanning. Paraben free.'
+  },
+  {
+    id: 26,
+    name: 'Instant Tan Remover Face Mask',
+    price: 225,
+    category: 'facemask',
+    weight: '80gm',
+    image: '/items/facemask/instant tan removal facemask.png',
+    rating: 4,
+    description: 'For instant de-tanning. Paraben free. 80gm pack.'
+  },
+  {
+    id: 23,
+    name: 'Under Eye Gel',
+    price: 125,
+    category: 'eyegel',
+    weight: '20gm',
+    image: '/items/eyegel/under eye gel.png',
+    rating: 4,
+    description: 'For treatment of dark circles. Suitable for all skin types.'
+  },
+  // Bleach Creams (small box, 300gm, 349)
+  {
+    id: 10,
+    name: 'Vitamin-C Bleach Cream',
+    price: 349,
+    category: 'bleachcream',
+    weight: '300gm',
+    image: '/items/bleech cream/vitamin c bleach cream.png',
+    rating: 4,
+    description: 'Vitamin-C enriched bleach cream for radiant skin.'
+  },
+  {
+    id: 11,
+    name: 'D-Tan Bleach Cream',
+    price: 349,
+    category: 'bleachcream',
+    weight: '300gm',
+    image: '/items/bleech cream/D tan bleach cream.png',
+    rating: 4,
+    description: 'Removes tan and brightens skin.'
+  },
+  {
+    id: 12,
+    name: 'Haldi Chandan Bleach Cream',
+    price: 349,
+    category: 'bleachcream',
+    weight: '300gm',
+    image: '/items/bleech cream/haldi chandan bleach cream.png',
+    rating: 4,
+    description: 'Haldi and chandan for glowing skin.'
+  },
+  {
+    id: 13,
+    name: 'Mango Bleach Cream',
+    price: 349,
+    category: 'bleachcream',
+    weight: '300gm',
+    image: '/items/bleech cream/mango bleach cream.png',
+    rating: 3,
+    description: 'Mango extract for soft, bright skin.'
+  },
+  // Bleach Creams (jars, 1kg, 849)
+  {
+    id: 14,
+    name: 'Charcoal Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/charcoal bleach cream.png',
+    rating: 4,
+    description: 'Charcoal for deep cleansing and detox.'
+  },
+  {
+    id: 15,
+    name: 'OXY Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/oxy bleach cream.png',
+    rating: 4,
+    description: 'Oxygen boost for brighter skin.'
+  },
+  {
+    id: 16,
+    name: 'Diamond Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/diamond bleach cream.png',
+    rating: 5,
+    description: 'Diamond dust for glowing skin.'
+  },
+  {
+    id: 17,
+    name: 'Red Wine Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/red wine bleach cream.png',
+    rating: 4,
+    description: 'Red wine extract for anti-aging.'
+  },
+  {
+    id: 18,
+    name: 'Skin Whitening Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/skin whitening bleach cream.png',
+    rating: 3,
+    description: 'Whitening formula for even skin tone.'
+  },
+  {
+    id: 19,
+    name: 'Vitamin-C Bleach Cream (1kg)',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/vitamin c bleach.png',
+    rating: 4,
+    description: 'Vitamin-C enriched bleach cream for radiant skin (1kg jar).'
+  },
+  {
+    id: 20,
+    name: 'Gold Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/gold bleach cream.png',
+    rating: 5,
+    description: 'Gold particles for glowing skin.'
+  },
+  {
+    id: 21,
+    name: 'Haldi & Chandan Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/haldi & chandan bleach cream.png',
+    rating: 4,
+    description: 'Haldi and chandan for glowing skin (1kg jar).'
+  },
+  {
+    id: 22,
+    name: 'De-Tan Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/De-tan bleach.png',
+    rating: 4,
+    description: 'Removes tan and brightens skin (1kg jar).'
+  },
+  {
+    id: 5,
+    name: 'Anti Blemish Cream',
+    price: 299,
+    category: 'cream',
+    weight: '30gm',
+    image: '/items/cream/anti blemish cream.png',
+    rating: 4,
+    description: 'Reduces blemishes and evens skin tone. With Vitamin C, Vitamin B3, and herbal extracts.'
+  },
+  {
+    id: 6,
+    name: 'Wrinkle Lift Anti Ageing Cream',
+    price: 425,
+    category: 'cream',
+    weight: '30gm',
+    image: '/items/cream/wrinkle lift anti ageing.png',
+    rating: 5,
+    description: 'Reduces wrinkles and firms skin. With Vitamin C, Ginseng, and herbal actives.'
+  },
+  {
+    id: 7,
+    name: 'Shea Butter Nourishing Cream',
+    price: 175,
+    category: 'cream',
+    weight: '30gm',
+    image: '/items/cream/shea butter nourishing cream.png',
+    rating: 4,
+    description: 'Deeply nourishes and hydrates skin. Enriched with shea butter and almond oil.'
+  },
+  {
+    id: 8,
+    name: 'Skin Whitening Cream',
+    price: 225,
+    category: 'cream',
+    weight: '30gm',
+    image: '/items/cream/skin whiteing.png',
+    rating: 3,
+    description: 'Brightens and evens skin tone. With Vitamin E and herbal actives.'
+  },
+  {
+    id: 9,
+    name: 'Dark Spot & Marks Removing Cream',
+    price: 269,
+    category: 'cream',
+    weight: '75gm',
+    image: '/items/cream/dark spot & marks removing.png',
+    rating: 4,
+    description: 'Removes dark spots and marks. With SPF 20, mushrooms, mulethi, and tulsi.'
+  },
+  {
+    id: 1,
+    name: 'Clove & Basil Acne & Oil Control Gel',
+    price: 299,
+    category: 'acneoilgel',
+    weight: '100ml',
+    image: '/items/acneoilgel/acneoilcontrolgel.png',
+    rating: 5,
+    description: 'Clove & Basil Acne & Oil Control Gel helps control excess oil and acne. Paraben free. Suitable for all skin types.'
+  },
+  {
+    id: 2,
+    name: 'Fairness Cleanser',
+    price: 245,
+    category: 'cleanser',
+    weight: '100gm',
+    image: '/items/cleanser/fairness cleanser.png',
+    rating: 4,
+    description: 'Handmade Ayurvedic Fairness Cleanser Soap with herbs. Paraben free.'
+  },
+  {
+    id: 3,
+    name: 'Glow Cleanser',
+    price: 245,
+    category: 'cleanser',
+    weight: '100gm',
+    image: '/items/cleanser/glow cleanser.png',
+    rating: 3,
+    description: 'Handmade Ayurvedic Glow Cleanser Soap with herbs. Paraben free.'
+  },
+  {
+    id: 4,
+    name: 'Cleaning Milk',
+    price: 325,
+    category: 'cleansingmilk',
+    weight: '1 Litre',
+    image: '/items/cleansing milk/cleaning milk.png',
+    rating: 4,
+    description: 'Leeya Cleaning Milk for gentle and effective cleansing. Suitable for all skin types.'
+  },
 ]
 
 function StarRating({ value }) {
@@ -174,13 +538,25 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
           
           <div className="user-actions">
             <button 
+              className="chat-btn" 
+              aria-label="Chatbot"
+              title="Ask Leeya Guide"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  onOpenAuth();
+                } else {
+                  navigate('/chat');
+                }
+              }}
+            >💬</button>
+            <button 
               className={`wishlist ${!isAuthenticated ? 'auth-required' : ''}`} 
               aria-label={isAuthenticated ? "Wishlist" : "Login to view wishlist"} 
               onClick={() => {
                 if (!isAuthenticated) {
                   onOpenAuth();
                 } else {
-                  onOpenWishlist();
+                  navigate('/wishlist');
                 }
               }}
               title={isAuthenticated ? "View wishlist" : "Login to view wishlist"}
@@ -667,6 +1043,49 @@ function CartPage({ cart, setCart }) {
   );
 }
 
+function WishlistPage({ wishlist, setWishlist, setCart }) {
+  return (
+    <div className="cart-page-container">
+      <div className="container">
+        <div className="cart-header">
+          <button className="back-btn" onClick={() => window.history.back()}>
+            ← Continue Shopping
+          </button>
+          <h1>Your Wishlist ({wishlist.length} {wishlist.length === 1 ? 'item' : 'items'})</h1>
+        </div>
+        <div className="wishlist-list">
+          {wishlist.length === 0 ? (
+            <p>Your wishlist is empty.</p>
+          ) : (
+            wishlist.map(item => (
+              <div key={item.id} className="wishlist-row">
+                <img src={item.image} alt={item.name} />
+                <div className="wishlist-info">
+                  <div className="wishlist-name">{item.name}</div>
+                  <div className="wishlist-meta">₹{item.price}</div>
+                </div>
+                <div className="wishlist-actions">
+                  <button className="btn small" onClick={() => {
+                    setCart(prev => {
+                      const found = prev.find(i => i.id === item.id);
+                      if (found) {
+                        return prev.map(i => i.id === item.id ? { ...i, qty: i.qty + 1 } : i);
+                      }
+                      return [...prev, { ...item, qty: 1 }];
+                    });
+                    alert(`${item.name} added to cart!`);
+                  }}>Add to Cart</button>
+                  <button className="wishlist-remove" onClick={() => setWishlist(prev => prev.filter(i => i.id !== item.id))}>Remove</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
@@ -690,57 +1109,78 @@ function App() {
   }, [location.pathname])
 
   useEffect(() => { document.body.dataset.theme = dark ? 'dark' : 'light'; }, [dark]);
-  useEffect(() => {
-    const savedCart = localStorage.getItem('leeya_cart');
-    const savedWishlist = localStorage.getItem('leeya_wishlist');
-    if (savedCart) setCart(JSON.parse(savedCart));
-    if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
-  }, []);
-  useEffect(() => { localStorage.setItem('leeya_cart', JSON.stringify(cart)); }, [cart]);
-  useEffect(() => { localStorage.setItem('leeya_wishlist', JSON.stringify(wishlist)); }, [wishlist]);
   
-  // Check for existing authentication on app load
+  // Save cart/wishlist to localStorage for the current user
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const savedUser = localStorage.getItem('user')
-    
+    if (user && user.email) {
+      localStorage.setItem(`leeya_cart_${user.email}`, JSON.stringify(cart));
+    }
+  }, [cart, user]);
+  useEffect(() => {
+    if (user && user.email) {
+      localStorage.setItem(`leeya_wishlist_${user.email}`, JSON.stringify(wishlist));
+    }
+  }, [wishlist, user]);
+
+  // Check for existing authentication on app load and load user-specific cart/wishlist
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
     if (token && savedUser) {
       try {
         const userData = JSON.parse(savedUser);
         setUser(userData);
         setIsAuthenticated(true);
-              } catch (error) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+        // Load cart/wishlist for this user
+        if (userData && userData.email) {
+          const savedCart = localStorage.getItem(`leeya_cart_${userData.email}`);
+          setCart(savedCart ? JSON.parse(savedCart) : []);
+          const savedWishlist = localStorage.getItem(`leeya_wishlist_${userData.email}`);
+          setWishlist(savedWishlist ? JSON.parse(savedWishlist) : []);
         }
+      } catch (error) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     }
-  }, [])
+  }, []);
 
   const handleLoginSuccess = (userData) => {
     setUser(userData)
     setIsAuthenticated(true)
     setShowAuth(false)
+    // Load cart/wishlist for this user
+    if (userData && userData.email) {
+      const savedCart = localStorage.getItem(`leeya_cart_${userData.email}`);
+      setCart(savedCart ? JSON.parse(savedCart) : []);
+      const savedWishlist = localStorage.getItem(`leeya_wishlist_${userData.email}`);
+      setWishlist(savedWishlist ? JSON.parse(savedWishlist) : []);
+    }
   }
 
   const handleLogout = () => {
     setUser(null)
     setIsAuthenticated(false)
     setShowAuth(false)
+    setCart([])
+    setWishlist([])
   }
 
   useEffect(() => {
-    const els = document.querySelectorAll('.reveal')
+    // Always re-apply reveal animation on navigation
+    const els = document.querySelectorAll('.reveal');
+    els.forEach(el => el.classList.remove('visible'));
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) {
-          e.target.classList.add('visible')
-          io.unobserve(e.target)
+          e.target.classList.add('visible');
+          io.unobserve(e.target);
         }
-      })
-    }, { threshold: 0.15 })
-    els.forEach(el => io.observe(el))
-    return () => io.disconnect()
-  }, [])
+      });
+    }, { threshold: 0.15 });
+    els.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, [location.pathname]);
 
   useEffect(() => {
     const carousel = document.querySelector('.carousel .carousel-track')
@@ -853,12 +1293,14 @@ function App() {
                 }}
                 onWishlist={(p) => {
                   setWishlist(prev => {
-                    const found = prev.find(i => i.id === p.id)
+                    const found = prev.find(i => i.id === p.id);
                     if (found) {
-                      return prev.filter(i => i.id !== p.id)
+                      // Remove from wishlist if already present
+                      return prev.filter(i => i.id !== p.id);
                     }
-                    return [...prev, p]
-                  })
+                    // Add to wishlist if not present
+                    return [...prev, p];
+                  });
                 }}
                 wishlist={wishlist}
                 isAuthenticated={isAuthenticated}
@@ -885,12 +1327,14 @@ function App() {
                         }}
                         onWishlist={(p) => {
                           setWishlist(prev => {
-                            const found = prev.find(i => i.id === p.id)
+                            const found = prev.find(i => i.id === p.id);
                             if (found) {
-                              return prev.filter(i => i.id !== p.id)
+                              // Remove from wishlist if already present
+                              return prev.filter(i => i.id !== p.id);
                             }
-                            return [...prev, p]
-                          })
+                            // Add to wishlist if not present
+                            return [...prev, p];
+                          });
                         }}
                         isInWishlist={wishlist.some(item => item.id === p.id)}
                         isAuthenticated={isAuthenticated}
@@ -946,6 +1390,8 @@ function App() {
         <Route path="/search" element={<SearchResultsPage />} />
         <Route path="/product/:productId" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage cart={cart} setCart={setCart} />} />
+        <Route path="/wishlist" element={<WishlistPage wishlist={wishlist} setWishlist={setWishlist} setCart={setCart} />} />
+        <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <AuthRedirect />} />
       </Routes>
       {showCart ? (
         <div className="drawer" role="dialog" aria-label="Cart">
