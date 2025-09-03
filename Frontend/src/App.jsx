@@ -119,102 +119,164 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
       <div className="promo">
         <div className="promo-inner">Free shipping on orders over ₹799 • Use code LEEYA10 for 10% off</div>
       </div>
-      <div className="nav">
-        <div className="container nav-inner">
-          <div className="brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-            <span className="leaf">✿</span>
-            <span>Leeya Herbals</span>
+      
+      {/* Top navbar with branding, search, and user actions */}
+      <div className="nav-top">
+        <div className="container nav-top-inner">
+          <div className="brand-section">
+            <div className="brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+              <span className="leaf">✿</span>
+              <span>Leeya Herbals</span>
+            </div>
           </div>
-          <nav className="nav-links">
+          
+          <div className="search-container" ref={searchRef}>
+            <form onSubmit={handleSearchSubmit} className="search-form">
+              <div className="search-input-wrapper">
+                <span className="search-icon">🔍</span>
+                <input 
+                  className="search" 
+                  placeholder="Search products, categories..." 
+                  value={search} 
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onFocus={() => search.trim() && setShowSuggestions(true)}
+                />
+                <button type="submit" className="search-btn">Search</button>
+              </div>
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="search-suggestions">
+                  {suggestions.map((suggestion, index) => (
+                    <div 
+                      key={index} 
+                      className="suggestion-item"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      <span className="suggestion-icon">
+                        {suggestion.type === 'product' ? '🛍️' : '🏷️'}
+                      </span>
+                      <div className="suggestion-content">
+                        <span className="suggestion-text">{suggestion.text}</span>
+                        {suggestion.type === 'product' && (
+                          <span className="suggestion-meta">
+                            {suggestion.category} • ₹{suggestion.price}
+                          </span>
+                        )}
+                        {suggestion.type === 'category' && (
+                          <span className="suggestion-meta">Category</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </form>
+          </div>
+          
+          <div className="user-actions">
+            <button 
+              className={`wishlist ${!isAuthenticated ? 'auth-required' : ''}`} 
+              aria-label={isAuthenticated ? "Wishlist" : "Login to view wishlist"} 
+              onClick={() => {
+                if (!isAuthenticated) {
+                  onOpenAuth();
+                } else {
+                  onOpenWishlist();
+                }
+              }}
+              title={isAuthenticated ? "View wishlist" : "Login to view wishlist"}
+            >
+              💖
+              {isAuthenticated && wishlistCount > 0 && <span className="wishlist-count">{wishlistCount}</span>}
+            </button>
+            
+            <button 
+              className={`cart ${!isAuthenticated ? 'auth-required' : ''}`} 
+              aria-label={isAuthenticated ? "Cart" : "Login to view cart"} 
+              onClick={() => {
+                if (!isAuthenticated) {
+                  onOpenAuth();
+                } else {
+                  navigate('/cart');
+                }
+              }}
+              title={isAuthenticated ? "View cart" : "Login to view cart"}
+            >
+              🛒
+              {isAuthenticated && cart.length > 0 && (
+                <span className="cart-count">{cart.reduce((total, item) => total + item.qty, 0)}</span>
+              )}
+            </button>
+            
+            {isAuthenticated ? (
+              <UserProfile user={user} onLogout={onLogout} />
+            ) : (
+              <button className="login-btn" aria-label="Login" onClick={onOpenAuth}>👤</button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom navbar with main navigation */}
+      <div className="nav-bottom">
+        <div className="container nav-bottom-inner">
+          <button className="hamburger" aria-label="Menu" onClick={onToggleMenu}>☰</button>
+          
+          <nav className="nav-links-main">
             <a href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>Home</a>
-            <a href="#shop" onClick={(e) => { e.preventDefault(); navigate('/#shop') }}>Shop</a>
-            <a href="#categories" onClick={(e) => { e.preventDefault(); navigate('/#categories') }}>Categories</a>
-            <a href="#about" onClick={(e) => { e.preventDefault(); navigate('/#about') }}>About</a>
-            <a href="#blog" onClick={(e) => { e.preventDefault(); navigate('/#blog') }}>Blog</a>
+            
+            <div className="nav-dropdown">
+              <a href="#categories" onClick={(e) => { e.preventDefault(); navigate('/#categories') }}>
+                Categories <span className="dropdown-arrow">▼</span>
+              </a>
+              <div className="dropdown-content">
+                <a href="#cat-serum">Serums</a>
+                <a href="#cat-cleanser">Cleansers</a>
+                <a href="#cat-toner">Toners</a>
+                <a href="#cat-facepack">Face Packs</a>
+                <a href="#cat-acne">Acne Care</a>
+                <a href="#cat-lotion">Lotions</a>
+              </div>
+            </div>
+            
+            <div className="nav-dropdown">
+              <a href="#bath-body">
+                Bath & Body <span className="dropdown-arrow">▼</span>
+              </a>
+              <div className="dropdown-content">
+                <a href="#body-wash">Body Wash</a>
+                <a href="#body-lotion">Body Lotion</a>
+                <a href="#bath-salts">Bath Salts</a>
+                <a href="#scrubs">Body Scrubs</a>
+              </div>
+            </div>
+            
+            <div className="nav-dropdown">
+              <a href="#skincare">
+                Skin Care <span className="dropdown-arrow">▼</span>
+              </a>
+              <div className="dropdown-content">
+                <a href="#anti-aging">Anti-Aging</a>
+                <a href="#moisturizers">Moisturizers</a>
+                <a href="#sun-protection">Sun Protection</a>
+                <a href="#treatments">Treatments</a>
+              </div>
+            </div>
+            
+            <div className="nav-dropdown">
+              <a href="#collections">
+                Collections <span className="dropdown-arrow">▼</span>
+              </a>
+              <div className="dropdown-content">
+                <a href="#face-kits">Face Care Kits</a>
+                <a href="#gift-sets">Gift Sets</a>
+                <a href="#travel-kits">Travel Kits</a>
+                <a href="#seasonal">Seasonal Collections</a>
+              </div>
+            </div>
+            
+            <a href="#about" onClick={(e) => { e.preventDefault(); navigate('/#about') }}>About Us</a>
             <a href="#contact" onClick={(e) => { e.preventDefault(); navigate('/#contact') }}>Contact</a>
           </nav>
-          <button className="hamburger" aria-label="Menu" onClick={onToggleMenu}>☰</button>
-          <div className="nav-actions">
-            <div className="search-container" ref={searchRef}>
-              <form onSubmit={handleSearchSubmit} className="search-form">
-                <div className="search-input-wrapper">
-                  <span className="search-icon">🔍</span>
-                  <input 
-                    className="search" 
-                    placeholder="Search products, categories..." 
-                    value={search} 
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    onFocus={() => search.trim() && setShowSuggestions(true)}
-                  />
-                  <button type="submit" className="search-btn">Search</button>
-                </div>
-                {showSuggestions && suggestions.length > 0 && (
-                  <div className="search-suggestions">
-                    {suggestions.map((suggestion, index) => (
-                      <div 
-                        key={index} 
-                        className="suggestion-item"
-                        onClick={() => handleSuggestionClick(suggestion)}
-                      >
-                        <span className="suggestion-icon">
-                          {suggestion.type === 'product' ? '🛍️' : '🏷️'}
-                        </span>
-                        <div className="suggestion-content">
-                          <span className="suggestion-text">{suggestion.text}</span>
-                          {suggestion.type === 'product' && (
-                            <span className="suggestion-meta">
-                              {suggestion.category} • ₹{suggestion.price}
-                            </span>
-                          )}
-                          {suggestion.type === 'category' && (
-                            <span className="suggestion-meta">Category</span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </form>
-            </div>
-                          <button 
-                className={`cart ${!isAuthenticated ? 'auth-required' : ''}`} 
-                aria-label={isAuthenticated ? "Cart" : "Login to view cart"} 
-                onClick={() => {
-                  if (!isAuthenticated) {
-                    onOpenAuth();
-                  } else {
-                    // Navigate to cart page instead of opening drawer
-                    navigate('/cart');
-                  }
-                }}
-                title={isAuthenticated ? "View cart" : "Login to view cart"}
-              >
-                🛒
-                {isAuthenticated && cart.length > 0 && (
-                  <span className="cart-count">{cart.reduce((total, item) => total + item.qty, 0)}</span>
-                )}
-              </button>
-              <button 
-                className={`wishlist ${!isAuthenticated ? 'auth-required' : ''}`} 
-                aria-label={isAuthenticated ? "Wishlist" : "Login to view wishlist"} 
-                onClick={() => {
-                  if (!isAuthenticated) {
-                    onOpenAuth();
-                  } else {
-                    onOpenWishlist();
-                  }
-                }}
-                title={isAuthenticated ? "View wishlist" : "Login to view wishlist"}
-              >
-                💖
-                {isAuthenticated && wishlistCount > 0 && <span className="wishlist-count">{wishlistCount}</span>}
-              </button>
-              {isAuthenticated ? (
-                <UserProfile user={user} onLogout={onLogout} />
-              ) : (
-                <button className="cart" aria-label="Login" onClick={onOpenAuth}>👤</button>
-              )}
-          </div>
         </div>
       </div>
     </header>
