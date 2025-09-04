@@ -10,10 +10,10 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const AuthRouter = require('./Routes/AuthRouter');
-const orderRouter = require('./routes/orders');
+const orderRouter = require('./Routes/orders');
 const ProductRouter = require('./Routes/ProductRouter');
-const StripeRouter = require('./routes/stripe');
-
+const StripeRouter = require('./Routes/StripeRouter');  // ✅ merged
+const AdminRouter = require('./Routes/AdminRouter');    // ✅ merged
 
 const PORT = process.env.PORT || 8080;
 require('./Models/db');
@@ -32,7 +32,7 @@ app.use('/auth', AuthRouter);
 app.use('/api/orders', orderRouter);
 app.use('/products', ProductRouter);
 app.use('/api', StripeRouter);
-
+app.use('/admin', AdminRouter);
 
 app.listen(PORT,()=>{
     console.log(`Server is running on ${PORT}`);
