@@ -5,26 +5,441 @@ import ProductPage from './ProductPage'
 import SearchResultsPage from './SearchResultsPage'
 import AuthModal from './AuthModal'
 import UserProfile from './UserProfile'
+import Chatbot from './Chatbot'
+import Reviews from './Reviews'
+function AuthRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    alert('Please login or signup to use AI chatbot.');
+    navigate('/');
+  }, []);
+  return null;
+}
+
 
 const CATEGORIES = [
   { key: 'serum', label: 'Serums' },
   { key: 'cleanser', label: 'Cleansers' },
   { key: 'toner', label: 'Toners' },
   { key: 'facewash', label: 'Face Wash' },
-  { key: 'facepack', label: 'Face Packs' },
-  { key: 'acne', label: 'Acne Gel' },
-  { key: 'lotion', label: 'Lotions' },
+  { key: 'facewashgel', label: 'Face Wash Gel' },
+  { key: 'facemask', label: 'Face Masks' },
+  { key: 'acneoilgel', label: 'Acne Oil Gel' },
+  { key: 'facialkit', label: 'Facial Kits' },
+  { key: 'moisturzinglotion', label: 'Moisturizing Lotion' },
+  { key: 'rosewater', label: 'Rose Water' },
+  { key: 'scalpoil', label: 'Scalp Oil' },
+  { key: 'scrub', label: 'Scrubs' },
+  { key: 'skinconditioner', label: 'Skin Conditioner' },
+  { key: 'sunscreenlotion', label: 'Sunscreen Lotions' }
 ]
 
 const ALL_PRODUCTS = [
-  { id: 1, name: 'Vitamin C Glow Serum', price: 699, category: 'serum', rating: 4.7, tag: 'Bestseller', image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=800&auto=format&fit=crop' },
-  { id: 2, name: 'Gentle Foam Face Wash', price: 349, category: 'facewash', rating: 4.5, tag: 'New', image: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?q=80&w=800&auto=format&fit=crop' },
-  { id: 3, name: 'Hydra Balance Toner', price: 299, category: 'toner', rating: 4.4, image: 'https://images.unsplash.com/photo-1571781923300-5c41ce3d9a2c?q=80&w=800&auto=format&fit=crop' },
-  { id: 4, name: 'Neem Purify Cleanser', price: 399, category: 'cleanser', rating: 4.3, image: 'https://images.unsplash.com/photo-1610173826124-1d8d2eddf65a?q=80&w=800&auto=format&fit=crop' },
-  { id: 5, name: 'Clay Detox Face Pack', price: 449, category: 'facepack', rating: 4.6, tag: 'Hot', image: 'https://images.unsplash.com/photo-1619983081563-430f63602796?q=80&w=800&auto=format&fit=crop' },
-  { id: 6, name: 'Targeted Acne Gel', price: 379, category: 'acne', rating: 4.2, image: 'https://images.unsplash.com/photo-1600275669283-5b56309f3a3a?q=80&w=800&auto=format&fit=crop' },
-  { id: 7, name: 'Daily Moisture Lotion', price: 499, category: 'lotion', rating: 4.5, image: 'https://images.unsplash.com/photo-1611930022110-0c4e8b4fcb13?q=80&w=800&auto=format&fit=crop' },
-  { id: 8, name: 'Aloe Calm Toner', price: 279, category: 'toner', rating: 4.1, image: 'https://images.unsplash.com/photo-1618477461849-4729ce312e34?q=80&w=800&auto=format&fit=crop' },
+  {
+    id: 33,
+    name: 'Pimple & Pore Minimizing Face Wash Gel',
+    price: 325,
+    category: 'facewashgel',
+    weight: '100ml',
+    image: '/items/facewashgel/pimple & pore.png',
+    rating: 5,
+    description: 'Minimizes pimples and pores. For all skin types.'
+  },
+  {
+    id: 34,
+    name: 'Pigment Lightening Face Wash Gel',
+    price: 299,
+    category: 'facewashgel',
+    weight: '100ml',
+    image: '/items/facewashgel/pigment lightening.png',
+    rating: 4,
+    description: 'Lightens pigmentation. For all skin types.'
+  },
+  {
+    id: 35,
+    name: 'Pollution & Blackheads Removing Face Wash Gel',
+    price: 299,
+    category: 'facewashgel',
+    weight: '100ml',
+    image: '/items/facewashgel/pollution & blackheads.png',
+    rating: 4,
+    description: 'Removes pollution and blackheads. For all skin types.'
+  },
+  {
+    id: 36,
+    name: 'Vitamin C & Orange Skin Whitening Face Wash Gel',
+    price: 299,
+    category: 'facewashgel',
+    weight: '100ml',
+    image: '/items/facewashgel/vitamin c & orange.png',
+    rating: 4,
+    description: 'Vitamin C & orange for skin whitening. For all skin types.'
+  },
+  {
+    id: 27,
+    name: 'Sandal Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/sandal facewash.png',
+    rating: 4,
+    description: 'For brightening & glowing skin. For all skin types.'
+  },
+  {
+    id: 28,
+    name: 'De-Tan Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/De-tan facewash.png',
+    rating: 4,
+    description: 'For tan removal & glowing skin. For all skin types.'
+  },
+  {
+    id: 29,
+    name: 'Papaya Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/papaya.png',
+    rating: 3,
+    description: 'Enriched with papaya & liquorice extracts. For all skin types.'
+  },
+  {
+    id: 30,
+    name: 'Haldi Chandan Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/haldi chandan.png',
+    rating: 4,
+    description: 'Haldi chandan for glowing skin. For all skin types.'
+  },
+  {
+    id: 31,
+    name: 'Tea Tree Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/tea tree.png',
+    rating: 5,
+    description: 'Tea tree for clear skin. For all skin types.'
+  },
+  {
+    id: 32,
+    name: 'Coffee Hydrating Face Wash',
+    price: 190,
+    category: 'facewash',
+    weight: '100ml',
+    image: '/items/facewash/coffee.png',
+    rating: 4,
+    description: 'Hydrating coffee face wash. For all skin types.'
+  },
+  {
+    id: 24,
+    name: 'Instant Tan Remover Face Mask (Jasmine)',
+    price: 899,
+    category: 'facemask',
+    weight: '600gm',
+    image: '/items/facemask/tan removal jasmine.jpeg',
+    rating: 5,
+    description: 'Jasmine fragrance. For instant de-tanning. Paraben free.'
+  },
+  {
+    id: 25,
+    name: 'Instant Tan Remover Face Mask (Lavender)',
+    price: 899,
+    category: 'facemask',
+    weight: '600gm',
+    image: '/items/facemask/tan removal lavender.jpeg',
+    rating: 4,
+    description: 'Lavender fragrance. For instant de-tanning. Paraben free.'
+  },
+  {
+    id: 26,
+    name: 'Instant Tan Remover Face Mask',
+    price: 225,
+    category: 'facemask',
+    weight: '80gm',
+    image: '/items/facemask/instant tan removal facemask.png',
+    rating: 4,
+    description: 'For instant de-tanning. Paraben free. 80gm pack.'
+  },
+  {
+    id: 23,
+    name: 'Under Eye Gel',
+    price: 125,
+    category: 'eyegel',
+    weight: '20gm',
+    image: '/items/eyegel/under eye gel.png',
+    rating: 4,
+    description: 'For treatment of dark circles. Suitable for all skin types.'
+  },
+  // Bleach Creams (small box, 300gm, 349)
+  {
+    id: 10,
+    name: 'Vitamin-C Bleach Cream',
+    price: 349,
+    category: 'bleachcream',
+    weight: '300gm',
+    image: '/items/bleech cream/vitamin c bleach cream.png',
+    rating: 4,
+    description: 'Vitamin-C enriched bleach cream for radiant skin.'
+  },
+  {
+    id: 11,
+    name: 'D-Tan Bleach Cream',
+    price: 349,
+    category: 'bleachcream',
+    weight: '300gm',
+    image: '/items/bleech cream/D tan bleach cream.png',
+    rating: 4,
+    description: 'Removes tan and brightens skin.'
+  },
+  {
+    id: 12,
+    name: 'Haldi Chandan Bleach Cream',
+    price: 349,
+    category: 'bleachcream',
+    weight: '300gm',
+    image: '/items/bleech cream/haldi chandan bleach cream.png',
+    rating: 4,
+    description: 'Haldi and chandan for glowing skin.'
+  },
+  {
+    id: 13,
+    name: 'Mango Bleach Cream',
+    price: 349,
+    category: 'bleachcream',
+    weight: '300gm',
+    image: '/items/bleech cream/mango bleach cream.png',
+    rating: 3,
+    description: 'Mango extract for soft, bright skin.'
+  },
+  // Bleach Creams (jars, 1kg, 849)
+  {
+    id: 14,
+    name: 'Charcoal Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/charcoal bleach cream.png',
+    rating: 4,
+    description: 'Charcoal for deep cleansing and detox.'
+  },
+  {
+    id: 15,
+    name: 'OXY Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/oxy bleach cream.png',
+    rating: 4,
+    description: 'Oxygen boost for brighter skin.'
+  },
+  {
+    id: 16,
+    name: 'Diamond Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/diamond bleach cream.png',
+    rating: 5,
+    description: 'Diamond dust for glowing skin.'
+  },
+  {
+    id: 17,
+    name: 'Red Wine Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/red wine bleach cream.png',
+    rating: 4,
+    description: 'Red wine extract for anti-aging.'
+  },
+  {
+    id: 18,
+    name: 'Skin Whitening Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/skin whitening bleach cream.png',
+    rating: 3,
+    description: 'Whitening formula for even skin tone.'
+  },
+  {
+    id: 19,
+    name: 'Vitamin-C Bleach Cream (1kg)',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/vitamin c bleach.png',
+    rating: 4,
+    description: 'Vitamin-C enriched bleach cream for radiant skin (1kg jar).'
+  },
+  {
+    id: 20,
+    name: 'Gold Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/gold bleach cream.png',
+    rating: 5,
+    description: 'Gold particles for glowing skin.'
+  },
+  {
+    id: 21,
+    name: 'Haldi & Chandan Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/haldi & chandan bleach cream.png',
+    rating: 4,
+    description: 'Haldi and chandan for glowing skin (1kg jar).'
+  },
+  {
+    id: 22,
+    name: 'De-Tan Bleach Cream',
+    price: 849,
+    category: 'bleachcream',
+    weight: '1kg',
+    image: '/items/bleech cream/De-tan bleach.png',
+    rating: 4,
+    description: 'Removes tan and brightens skin (1kg jar).'
+  },
+  {
+    id: 5,
+    name: 'Anti Blemish Cream',
+    price: 299,
+    category: 'cream',
+    weight: '30gm',
+    image: '/items/cream/anti blemish cream.png',
+    rating: 4,
+    description: 'Reduces blemishes and evens skin tone. With Vitamin C, Vitamin B3, and herbal extracts.'
+  },
+  {
+    id: 6,
+    name: 'Wrinkle Lift Anti Ageing Cream',
+    price: 425,
+    category: 'cream',
+    weight: '30gm',
+    image: '/items/cream/wrinkle lift anti ageing.png',
+    rating: 5,
+    description: 'Reduces wrinkles and firms skin. With Vitamin C, Ginseng, and herbal actives.'
+  },
+  {
+    id: 7,
+    name: 'Shea Butter Nourishing Cream',
+    price: 175,
+    category: 'cream',
+    weight: '30gm',
+    image: '/items/cream/shea butter nourishing cream.png',
+    rating: 4,
+    description: 'Deeply nourishes and hydrates skin. Enriched with shea butter and almond oil.'
+  },
+  {
+    id: 8,
+    name: 'Skin Whitening Cream',
+    price: 225,
+    category: 'cream',
+    weight: '30gm',
+    image: '/items/cream/skin whiteing.png',
+    rating: 3,
+    description: 'Brightens and evens skin tone. With Vitamin E and herbal actives.'
+  },
+  {
+    id: 9,
+    name: 'Dark Spot & Marks Removing Cream',
+    price: 269,
+    category: 'cream',
+    weight: '75gm',
+    image: '/items/cream/dark spot & marks removing.png',
+    rating: 4,
+    description: 'Removes dark spots and marks. With SPF 20, mushrooms, mulethi, and tulsi.'
+  },
+  {
+    id: 1,
+    name: 'Clove & Basil Acne & Oil Control Gel',
+    price: 299,
+    category: 'acneoilgel',
+    weight: '100ml',
+    image: '/items/acneoilgel/acneoilcontrolgel.png',
+    rating: 5,
+    description: 'Clove & Basil Acne & Oil Control Gel helps control excess oil and acne. Paraben free. Suitable for all skin types.'
+  },
+  {
+    id: 2,
+    name: 'Fairness Cleanser',
+    price: 245,
+    category: 'cleanser',
+    weight: '100gm',
+    image: '/items/cleanser/fairness cleanser.png',
+    rating: 4,
+    description: 'Handmade Ayurvedic Fairness Cleanser Soap with herbs. Paraben free.'
+  },
+  {
+    id: 3,
+    name: 'Glow Cleanser',
+    price: 245,
+    category: 'cleanser',
+    weight: '100gm',
+    image: '/items/cleanser/glow cleanser.png',
+    rating: 3,
+    description: 'Handmade Ayurvedic Glow Cleanser Soap with herbs. Paraben free.'
+  },
+  {
+    id: 4,
+    name: 'Cleaning Milk',
+    price: 325,
+    category: 'cleansingmilk',
+    weight: '1 Litre',
+    image: '/items/cleansing milk/cleaning milk.png',
+    rating: 4,
+    description: 'Leeya Cleaning Milk for gentle and effective cleansing. Suitable for all skin types.'
+  },
+  // Facial Kits
+  { id: 60, name: 'Diamond SPA Facial Kit', price: 1699, category: 'facialkit', weight: '510gm', image: '/items/facial kit/diamond spa.png', rating: 5, description: 'Complete Diamond SPA facial kit for radiant glow.' },
+  { id: 61, name: '24 Carat Gold SPA Facial Kit', price: 1699, category: 'facialkit', weight: '510gm', image: '/items/facial kit/24 carat gold.png', rating: 5, description: 'Gold-infused SPA facial kit for luxurious glow.' },
+  { id: 62, name: 'Papaya Facial Kit', price: 1699, category: 'facialkit', weight: '510gm', image: '/items/facial kit/papaya.png', rating: 4, description: 'Papaya based facial kit for clear and bright skin.' },
+  { id: 63, name: 'Vitamin C Facial Kit', price: 1499, category: 'facialkit', weight: '510gm', image: '/items/facial kit/vitamin C.png', rating: 4, description: 'Vitamin C rich facial kit for glow and brightness.' },
+  { id: 64, name: 'Fairness Treatment Facial Kit', price: 2999, category: 'facialkit', weight: '810gm', image: '/items/facial kit/Fairness treatment.png', rating: 4, description: '9-step fairness facial kit for salon-like results.' },
+  { id: 65, name: 'Oil Free Anti Acne Problematic Skin Facial Kit', price: 1899, category: 'facialkit', weight: '510gm', image: '/items/facial kit/anti acne.png', rating: 4, description: 'Oil-free anti-acne facial kit for problematic skin.' },
+  { id: 66, name: 'Green Tea Facial Kit', price: 1499, category: 'facialkit', weight: '510gm', image: '/items/facial kit/green tea.png', rating: 4, description: 'Refreshing green tea facial kit for balanced skin.' },
+  { id: 67, name: 'Red Wine Facial Kit', price: 1499, category: 'facialkit', weight: '510gm', image: '/items/facial kit/red wine.png', rating: 4, description: 'Red wine extract facial kit for youthful glow.' },
+  { id: 68, name: 'Bridal Glow Facial Kit', price: 1699, category: 'facialkit', weight: '510gm', image: '/items/facial kit/bridal glow.png', rating: 5, description: 'Bridal glow facial kit for special occasions.' },
+  { id: 69, name: 'Platinum Superb Glow Facial Kit', price: 1499, category: 'facialkit', weight: '510gm', image: '/items/facial kit/platinum glow.png', rating: 4, description: 'Platinum superb glow kit for instant radiance.' },
+  { id: 70, name: 'Pearl Glow SPA Facial Kit', price: 1499, category: 'facialkit', weight: '510gm', image: '/items/facial kit/pearl glow.png', rating: 4, description: 'Pearl glow spa facial kit for luminous skin.' },
+  { id: 71, name: 'Aha Fruit Punch SPA Facial Kit', price: 999, category: 'facialkit', weight: '500gm', image: '/items/facial kit/aha fruit punch.png', rating: 4, description: 'Fruit punch AHA facial kit for smooth, glowing skin.' },
+  // Moisturizing Lotion
+  { id: 80, name: 'Green Tea & Acerola Cherry Deep Moisturizing Lotion', price: 299, category: 'moisturzinglotion', weight: '300ml', image: '/items/moisturzinglotion/green tea and acerola cherry.png', rating: 4, description: 'Deep moisturizing lotion for face & body.' },
+  // Rose Water (two sizes)
+  { id: 81, name: 'Rose Water (100ml)', price: 75, category: 'rosewater', weight: '100ml', image: '/items/rosewater/rose water.png', rating: 4, description: 'Pure rose water toner for refreshed skin.' },
+  { id: 82, name: 'Rose Water (500ml)', price: 149, category: 'rosewater', weight: '500ml', image: '/items/rosewater/rose water.png', rating: 4, description: 'Pure rose water toner family pack.' },
+  // Scalp Oil
+  { id: 83, name: 'Ayurvedic Scalp & Roots Therapy Oil', price: 699, category: 'scalpoil', weight: '100ml', image: '/items/scalpoil/scalp & roots oil.png', rating: 5, description: 'Therapy oil for scalp massage with Ayurvedic actives.' },
+  // Scrubs
+  { id: 90, name: 'De-Tan Face Scrub', price: 175, category: 'scrub', weight: '100ml', image: '/items/scrub/De tan face scrub.png', rating: 4, description: 'De-tans and gently exfoliates for smoother skin.' },
+  { id: 91, name: 'Apricot Face Scrub', price: 175, category: 'scrub', weight: '100ml', image: '/items/scrub/apricot.png', rating: 4, description: 'Apricot-based gentle exfoliating face scrub.' },
+  { id: 92, name: 'Instant Tan Remover Soft Scrub (250gm)', price: 659, category: 'scrub', weight: '250gm', image: '/items/scrub/tan removal soft scrub.png', rating: 4, description: 'Soft scrub that removes tan; 250gm pouch.' },
+  { id: 93, name: 'Instant Tan Remover Soft Scrub (600gm)', price: 1299, category: 'scrub', weight: '600gm', image: '/items/scrub/tan removal soft scrub.png', rating: 4, description: 'Soft scrub that removes tan; 600gm jar.' },
+  // Serums
+  { id: 94, name: 'Vitamin-C Face Serum', price: 299, category: 'serum', weight: '30ml', image: '/items/serum/vitaminC face.png', rating: 5, description: 'Brightening Vitamin-C face serum.' },
+  { id: 95, name: '12% Niacinamide Face Serum', price: 299, category: 'serum', weight: '30ml', image: '/items/serum/niacinamide.png', rating: 5, description: 'Niacinamide 12% serum for spots and texture.' },
+  { id: 96, name: '2% Salicylic Acid Face Serum', price: 299, category: 'serum', weight: '30ml', image: '/items/serum/salicylic acid.png', rating: 5, description: '2% salicylic acid serum for acne-prone skin.' },
+  // Skin Conditioner
+  { id: 100, name: 'Pre Treatment Skin Conditioner', price: 445, category: 'skinconditioner', weight: '200ml', image: '/items/skin conditioner/pre treatment.png', rating: 4, description: 'Pre-treatment skin conditioner to prep and calm skin.' },
+  { id: 101, name: 'Post Treatment Skin Soother', price: 545, category: 'skinconditioner', weight: '200ml', image: '/items/skin conditioner/post treatment.png', rating: 4, description: 'Post-treatment skin soother for recovery.' },
+  // Toners (100ml at 99, except Derma 225) + 1L Rose Toner 325
+  { id: 102, name: 'Rose Face Toner', price: 99, category: 'toner', weight: '100ml', image: '/items/toner/rose face.png', rating: 4, description: 'Refreshing rose toner.' },
+  { id: 103, name: 'Cucumber Face Toner', price: 99, category: 'toner', weight: '100ml', image: '/items/toner/cucumber.png', rating: 4, description: 'Cooling cucumber toner.' },
+  { id: 104, name: 'Vitamin C Face Toner', price: 99, category: 'toner', weight: '100ml', image: '/items/toner/vitaminC.png', rating: 4, description: 'Brightening vitamin C toner.' },
+  { id: 105, name: 'Derma Refreshing Toner', price: 225, category: 'toner', weight: '100ml', image: '/items/toner/derma refreshing.png', rating: 4, description: 'Derma refreshing toner for clean skin.' },
+  { id: 106, name: 'Rose Toner (1 Litre)', price: 325, category: 'toner', weight: '1 Litre', image: '/items/toner/rose.png', rating: 4, description: 'Salon pack rose toner 1L.' },
+  // Sunscreen Lotions
+  { id: 110, name: 'Sun Screen Lotion SPF-50 PA++', price: 299, category: 'sunscreenlotion', weight: '100ml', image: '/items/sunscreenlotion/spf50++.png', rating: 4, description: 'SPF-50 PA++ sunscreen lotion.' },
+  { id: 111, name: 'Sun Screen Lotion SPF-70 PA++', price: 325, category: 'sunscreenlotion', weight: '100ml', image: '/items/sunscreenlotion/spf70++.png', rating: 4, description: 'Higher protection SPF-70 PA++ lotion.' },
+  { id: 112, name: 'Sun Block Lotion SPF-30 Matte Finish', price: 475, category: 'sunscreenlotion', weight: '100ml', image: '/items/sunscreenlotion/sun block spf30.png', rating: 4, description: 'Matte finish SPF-30 sun block.' },
+  { id: 113, name: 'Sun Shield SPF Lotion (SPF 30)', price: 315, category: 'sunscreenlotion', weight: '100ml', image: '/items/sunscreenlotion/sun shield spf30.png', rating: 4, description: 'Sun shield SPF 30 lotion.' },
 ]
 
 function StarRating({ value }) {
@@ -174,6 +589,18 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
           
           <div className="user-actions">
             <button 
+              className="chat-btn" 
+              aria-label="Chatbot"
+              title="Ask LeeyaBot"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  onOpenAuth();
+                } else {
+                  navigate('/chat');
+                }
+              }}
+            >💬</button>
+            <button 
               className={`wishlist ${!isAuthenticated ? 'auth-required' : ''}`} 
               aria-label={isAuthenticated ? "Wishlist" : "Login to view wishlist"} 
               onClick={() => {
@@ -208,7 +635,10 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
             </button>
             
             {isAuthenticated ? (
-              <UserProfile user={user} onLogout={onLogout} />
+              <>
+                <button className="profile-btn" aria-label="Profile" onClick={() => navigate('/profile')}>👤</button>
+                <UserProfile user={user} onLogout={onLogout} />
+              </>
             ) : (
               <button className="login-btn" aria-label="Login" onClick={onOpenAuth}>👤</button>
             )}
@@ -223,7 +653,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
           
           <nav className="nav-links-main">
             <a href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>Home</a>
-            
+            <a href="#profile" onClick={(e) => { e.preventDefault(); navigate('/profile') }}>Profile</a>
             <div className="nav-dropdown">
               <a href="#categories" onClick={(e) => { e.preventDefault(); navigate('/#categories') }}>
                 Categories <span className="dropdown-arrow">▼</span>
@@ -237,7 +667,6 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                 <a href="#cat-acneoilgel">Acne Oil Gel</a>
               </div>
             </div>
-            
             <div className="nav-dropdown">
               <a href="#bath-body">
                 Bath & Body <span className="dropdown-arrow">▼</span>
@@ -249,7 +678,6 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                 <a href="#scrubs">Body Scrubs</a>
               </div>
             </div>
-            
             <div className="nav-dropdown">
               <a href="#skincare">
                 Skin Care <span className="dropdown-arrow">▼</span>
@@ -261,7 +689,6 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                 <a href="#treatments">Treatments</a>
               </div>
             </div>
-            
             <div className="nav-dropdown">
               <a href="#collections">
                 Collections <span className="dropdown-arrow">▼</span>
@@ -274,7 +701,6 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                 <a href="#reviews" onClick={(e)=>{ e.preventDefault(); navigate('/reviews') }}>Reviews</a>
               </div>
             </div>
-            
             <a href="#about" onClick={(e) => { e.preventDefault(); navigate('/#about') }}>About Us</a>
             <a href="#contact" onClick={(e) => { e.preventDefault(); navigate('/#contact') }}>Contact</a>
           </nav>
@@ -438,26 +864,140 @@ function ProductsGrid({ products, onAdd, onWishlist, wishlist, isAuthenticated, 
   );
 }
 
-function Testimonials() {
+
+
+
+function StarDisplay({ value }) {
+  return (
+    <span className="stars" aria-label={`Rated ${value} out of 5`}>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <span key={i} className={i < value ? 'star filled' : 'star'}>★</span>
+      ))}
+    </span>
+  );
+}
+
+function ProductReviews({ isAuthenticated, user }) {
+  const defaultReviews = [
+    {
+      name: 'Simran Kaur',
+      product: 'Customer Service',
+      rating: 5,
+      text: 'Leeya Herbals team was so helpful and guided me to the right products for my skin. The support was quick and friendly!',
+      image: '/public/profile-icon.png',
+    },
+    {
+      name: 'Rahul Sharma',
+      product: 'Order Experience',
+      rating: 5,
+      text: 'My order arrived on time and beautifully packed. The products are genuine and the whole process was smooth.',
+      image: '/public/profile-icon.png',
+    },
+    {
+      name: 'Priya Mehta',
+      product: 'Overall Satisfaction',
+      rating: 5,
+      text: 'I love how Leeya Herbals cares for their customers. They answered all my queries and the products really work!',
+      image: '/public/profile-icon.png',
+    },
+    {
+      name: 'Amit Verma',
+      product: 'After-Sales Support',
+      rating: 4,
+      text: 'Had a small issue with my order and it was resolved within a day. Very professional and polite staff.',
+      image: '/public/profile-icon.png',
+    },
+    {
+      name: 'Neha Joshi',
+      product: 'Repeat Customer',
+      rating: 5,
+      text: 'I keep coming back to Leeya Herbals because of their honesty and the way they treat customers. Highly recommended!',
+      image: '/public/profile-icon.png',
+    },
+  ];
+  const [reviews, setReviews] = useState(() => {
+    const saved = localStorage.getItem('leeya_company_reviews');
+    return saved ? JSON.parse(saved) : defaultReviews;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('leeya_company_reviews', JSON.stringify(reviews));
+  }, [reviews]);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ rating: 5, text: '', reviewType: 'Customer Service' });
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setReviews([
+      {
+        name: user?.name || 'You',
+        product: form.reviewType,
+        rating: form.rating,
+        text: form.text,
+        image: '/public/profile-icon.png',
+      },
+      ...reviews,
+    ]);
+    setShowForm(false);
+    setForm({ rating: 5, text: '', reviewType: 'Customer Service' });
+  };
+
   return (
     <section className="section alt">
-      <div className="container testimonials">
-        <blockquote>
-          <img className="avatar" src="https://i.pravatar.cc/60?img=5" alt="Aisha" />
-          “My acne calmed in two weeks. The toner is magic!”
-          <cite>— Aisha</cite>
-        </blockquote>
-        <blockquote>
-          <img className="avatar" src="https://i.pravatar.cc/60?img=12" alt="Rohan" />
-          “Finally a lotion that hydrates without greasiness.”
-          <cite>— Rohan</cite>
-        </blockquote>
-        <blockquote>
-          <img className="avatar" src="https://i.pravatar.cc/60?img=24" alt="Meera" />
-          “The clay pack is my Sunday ritual.”
-          <cite>— Meera</cite>
-        </blockquote>
+      <div className="container section-head">
+        <h2 style={{ fontSize: '2.2rem', fontWeight: 800, marginBottom: '.5rem', color: '#1dbf73' }}>Our Company Reviews</h2>
+        <p style={{ color: '#888', fontSize: '1.1rem' }}>See what our customers say about their experience with Leeya Herbals.</p>
       </div>
+      <div className="container reviews-grid">
+        {reviews.map((r, i) => (
+          <div className="review-card" key={i}>
+            <div className="review-header">
+              <img className="avatar" src={r.image} alt={r.name} />
+              <div>
+                <strong>{r.name}</strong>
+                <div className="review-product">{r.product}</div>
+                <StarDisplay value={Number(r.rating)} />
+              </div>
+            </div>
+            <div className="review-text">{r.text}</div>
+          </div>
+        ))}
+      </div>
+      {isAuthenticated && (
+        <div className="add-review-wrap">
+          {!showForm ? (
+            <button className="btn primary" onClick={() => setShowForm(true)} style={{ marginTop: '2rem' }}>Add Your Company Review</button>
+          ) : (
+            <form className="review-form" onSubmit={handleSubmit} style={{ marginTop: '2rem', background: '#fff', borderRadius: 12, padding: '1.5rem', boxShadow: '0 8px 32px #0ea56a12', maxWidth: 420 }}>
+              <h3 style={{ marginBottom: '1rem' }}>Add Your Company Review</h3>
+              <label>Type of Review
+                <select name="reviewType" value={form.reviewType} onChange={handleFormChange} required>
+                  <option value="Customer Service">Customer Service</option>
+                  <option value="Sales Support">Sales Support</option>
+                  <option value="Order Experience">Order Experience</option>
+                  <option value="After-Sales Support">After-Sales Support</option>
+                  <option value="Overall Satisfaction">Overall Satisfaction</option>
+                </select>
+              </label>
+              <label>Star Rating
+                <select name="rating" value={form.rating} onChange={handleFormChange} required>
+                  {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Star{n>1?'s':''}</option>)}
+                </select>
+              </label>
+              <label>Your Review
+                <textarea name="text" value={form.text} onChange={handleFormChange} required rows={3} placeholder="Share your experience..." />
+              </label>
+              <button className="btn primary" type="submit">Submit Review</button>
+              <button className="btn" type="button" onClick={() => setShowForm(false)} style={{ marginLeft: 8 }}>Cancel</button>
+            </form>
+          )}
+        </div>
+      )}
     </section>
   );
 }
@@ -542,13 +1082,156 @@ function Footer() {
 
 function CartPage({ cart, setCart }) {
   const navigate = useNavigate();
+  // Clear cart if payment was successful (Stripe or COD)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success')) {
+      // Try to save the last Stripe order to backend
+      const lastOrder = JSON.parse(localStorage.getItem('leeya_last_order') || 'null');
+      const token = localStorage.getItem('leeya_jwt') || localStorage.getItem('token');
+      
+      console.log('Stripe success detected:', { lastOrder: !!lastOrder, token: !!token });
+      
+      if (lastOrder && token) {
+        fetch('http://localhost:8080/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify(lastOrder)
+        })
+        .then(async res => {
+          const data = await res.json().catch(() => ({}));
+          console.log('Order save response:', { status: res.status, ok: res.ok, data });
+          
+          if (res.ok) {
+            console.log('Stripe order saved successfully, clearing cart');
+            setCart([]);
+            // Also clear user-specific cart in localStorage if logged in
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            if (user && user.email) {
+              localStorage.setItem(`leeya_cart_${user.email}`, JSON.stringify([]));
+            }
+            localStorage.removeItem('leeya_last_order');
+            // Remove ?success from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            alert('Payment successful! Your order has been placed.');
+          } else {
+            console.error('Failed to save order:', data);
+            alert(`Order failed to save after payment: ${data.error || 'Unknown error'}. Please contact support with your payment confirmation.`);
+          }
+        })
+        .catch(err => {
+          console.error('Network error saving order:', err);
+          alert('Network error saving order. Please contact support with your payment confirmation.');
+        });
+      } else {
+        console.log('Missing order data or token for Stripe success');
+        if (!lastOrder) {
+          console.error('No leeya_last_order found in localStorage');
+        }
+        if (!token) {
+          console.error('No authentication token found');
+          alert('Please login again to complete your order.');
+        }
+        // Remove ?success from URL even if order save failed
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [setCart]);
   const [method, setMethod] = useState('cod');
   const [coupon, setCoupon] = useState('');
 
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const onlineDiscount = method === 'online' ? subtotal * 0.10 : 0;
   const couponDiscount = coupon.trim().toUpperCase() === 'FIRST10' ? subtotal * 0.10 : 0;
-  const total = Math.max(0, subtotal - onlineDiscount - couponDiscount);
+  const shipping = subtotal >= 799 ? 0 : 99;
+  const total = Math.max(0, subtotal - onlineDiscount - couponDiscount + shipping);
+
+  // Stripe Checkout integration
+  const handleCheckout = async () => {
+    const token = localStorage.getItem('leeya_jwt');
+    if (!token) {
+      alert('Please login to place an order.');
+      return;
+    }
+    // Prepare order data for backend
+    const order = {
+      orderId: '100' + Math.floor(Math.random()*9000+1000),
+      placedAt: new Date().toISOString(),
+      status: method === 'cod' ? 'Placed' : 'Placed',
+      paymentMethod: method === 'cod' ? 'COD' : 'Stripe',
+      total,
+      items: cart.map(item => ({
+        productId: item.id,
+        name: item.name,
+        image: item.image,
+        qty: item.qty,
+        price: item.price,
+        subtotal: item.price * item.qty
+      }))
+    };
+    if (method === 'cod') {
+      try {
+        const res = await fetch('http://localhost:8080/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify(order)
+        });
+        if (!res.ok) throw new Error('Order failed');
+        alert('Order placed! Thank you for shopping with us.');
+        setCart([]);
+        window.location.href = '/myorders';
+      } catch (err) {
+        alert('Order failed. Please try again.');
+      }
+    } else {
+      // Stripe Checkout: call backend to create session
+      try {
+        // Save full order draft to localStorage for post-payment processing
+        const orderDraft = {
+          orderId: '100' + Math.floor(Math.random()*9000+1000),
+          placedAt: new Date().toISOString(),
+          status: 'Placed',
+          paymentMethod: 'Stripe',
+          total,
+          items: cart.map(item => ({
+            productId: item.id,
+            name: item.name,
+            image: item.image,
+            qty: item.qty,
+            price: item.price,
+            subtotal: item.price * item.qty
+          }))
+        };
+        localStorage.setItem('leeya_last_order', JSON.stringify(orderDraft));
+        const response = await fetch('http://localhost:8080/api/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cart: cart.map(item => ({
+              name: item.name + ' (10% off)',
+              price: Math.round(item.price * 0.9),
+              quantity: item.qty
+            })),
+            shipping: shipping
+          })
+        });
+        const data = await response.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert('Stripe session creation failed.');
+        }
+      } catch (err) {
+        alert('Payment error. Please try again.');
+      }
+    }
+  };
 
   const updateQuantity = (itemId, newQty) => {
     if (newQty < 1) return;
@@ -652,10 +1335,13 @@ function CartPage({ cart, setCart }) {
               
               <div className="summary-row total-row">
                 <span>Total</span>
-                <span>₹{subtotal + (subtotal >= 799 ? 0 : 99)}</span>
+                <span>
+                  ₹{method === 'online'
+                    ? Math.round((subtotal - subtotal * 0.10 + shipping))
+                    : subtotal + shipping}
+                </span>
               </div>
-              
-              <button className="btn primary checkout-btn">
+              <button className="btn primary checkout-btn" onClick={handleCheckout}>
                 Proceed to Checkout
               </button>
               
@@ -687,6 +1373,86 @@ function CartPage({ cart, setCart }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function OrdersPage() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem('leeya_jwt');
+        if (!token) {
+          setError('Please login to view your orders.');
+          setLoading(false);
+          return;
+        }
+        const res = await fetch('http://localhost:8080/api/orders/my', {
+          headers: { 'Authorization': token }
+        });
+        if (!res.ok) throw new Error('Failed to fetch orders');
+        const data = await res.json();
+        setOrders(data);
+      } catch (err) {
+        setError('Could not load orders.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  if (loading) return <div className="container"><h2>Loading orders...</h2></div>;
+  if (error) return <div className="container"><h2>{error}</h2></div>;
+  if (!orders.length) return <div className="container"><h2>No orders yet.</h2></div>;
+
+  return (
+    <div className="container">
+      <h2>My Orders</h2>
+      {orders.map((order, idx) => (
+        <div key={order._id || idx} className="order-card" style={{border:'1px solid #eee',borderRadius:10,padding:16,marginBottom:16,boxShadow:'0 2px 8px #f3f3f3'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+            <div>
+              <b>Order Placed:</b> {new Date(order.placedAt).toLocaleString()}<br/>
+              <b>Order ID:</b> {order.orderId}
+            </div>
+            <div style={{textAlign:'right'}}>
+              <b>Status:</b> <span style={{color: order.status==='Delivered'?'#2d5a27':'#bfa600'}}>{order.status}{order.paymentMethod==='COD'?' (COD)':''}</span><br/>
+              <b>Payment:</b> {order.paymentMethod==='COD'?'Cash on Delivery':'Online Payment'}
+            </div>
+          </div>
+          <div style={{marginBottom:8}}><b>Total:</b> <span style={{fontSize:18,color:'#2d5a27'}}>₹{order.total}</span></div>
+          <div><b>Items:</b>
+            <table style={{width:'100%',marginTop:8,borderCollapse:'collapse'}}>
+              <thead>
+                <tr style={{background:'#fafafa'}}>
+                  <th style={{textAlign:'left',padding:4}}>Product</th>
+                  <th style={{textAlign:'center',padding:4}}>Qty</th>
+                  <th style={{textAlign:'center',padding:4}}>Price</th>
+                  <th style={{textAlign:'center',padding:4}}>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {order.items.map((item, i) => (
+                  <tr key={i} style={{borderBottom:'1px solid #eee'}}>
+                    <td style={{padding:4}}>
+                      <img src={item.image} alt={item.name} style={{width:40,height:40,objectFit:'cover',borderRadius:6,marginRight:8,verticalAlign:'middle'}} />
+                      {item.name}
+                    </td>
+                    <td style={{textAlign:'center',padding:4}}>{item.qty}</td>
+                    <td style={{textAlign:'center',padding:4}}>₹{item.price}</td>
+                    <td style={{textAlign:'center',padding:4}}>₹{item.subtotal}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -818,16 +1584,24 @@ function App() {
     // Always re-apply reveal animation on navigation
     const els = document.querySelectorAll('.reveal');
     els.forEach(el => el.classList.remove('visible'));
+    let revealed = false;
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) {
           e.target.classList.add('visible');
           io.unobserve(e.target);
+          revealed = true;
         }
       });
     }, { threshold: 0.15 });
     els.forEach(el => io.observe(el));
-    return () => io.disconnect();
+    // Fallback: if nothing is revealed after 500ms, force all .reveal visible
+    const timer = setTimeout(() => {
+      if (!document.querySelector('.reveal.visible')) {
+        els.forEach(el => el.classList.add('visible'));
+      }
+    }, 500);
+    return () => { io.disconnect(); clearTimeout(timer); };
   }, [location.pathname]);
 
   useEffect(() => {
@@ -847,12 +1621,14 @@ function App() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     const qCompact = q.replace(/\s+/g, '');
+    // If category is 'all' and no search, show all products
+    if (category === 'all' && !q) return ALL_PRODUCTS;
     return ALL_PRODUCTS.filter(p => {
       const name = p.name.toLowerCase();
       const nameCompact = name.replace(/\s+/g, '');
       const cat = p.category.toLowerCase();
       const matchesQuery = !q || name.includes(q) || nameCompact.includes(qCompact) || cat.includes(q);
-      const matchesCategory = q ? true : (category === 'all' || p.category === category);
+      const matchesCategory = category === 'all' ? true : p.category === category;
       return matchesCategory && matchesQuery;
     });
   }, [category, search]);
@@ -1009,7 +1785,7 @@ function App() {
                 </div>
               </div>
             </section>
-            <section className="reveal"><Testimonials /></section>
+            <section className="reveal"><ProductReviews isAuthenticated={isAuthenticated} user={user} /></section>
             <section id="about" className="section reveal">
               <div className="container section-head"><h2>About Leeya Herbals</h2><p>Our promise: gentle, effective, and honest skincare</p></div>
               <div className="container">
@@ -1049,6 +1825,11 @@ function App() {
         <Route path="/search" element={<SearchResultsPage />} />
         <Route path="/product/:productId" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage cart={cart} setCart={setCart} />} />
+        <Route path="/wishlist" element={<WishlistPage wishlist={wishlist} setWishlist={setWishlist} setCart={setCart} />} />
+        <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <AuthRedirect />} />
+        <Route path="/reviews" element={<Reviews />} />
+  <Route path="/profile" element={<UserProfile user={user} onLogout={handleLogout} />} />
+  <Route path="/myorders" element={<OrdersPage />} />
       </Routes>
       {showCart ? (
         <div className="drawer" role="dialog" aria-label="Cart">

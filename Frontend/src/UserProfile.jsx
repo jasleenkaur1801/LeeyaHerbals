@@ -55,7 +55,7 @@ const UserProfile = ({ user, onLogout }) => {
               <span className="dropdown-icon">👤</span>
               My Profile
             </button>
-            <button className="dropdown-item">
+            <button className="dropdown-item" onClick={() => { window.location.href = '/myorders'; setIsDropdownOpen(false); }}>
               <span className="dropdown-icon">📦</span>
               My Orders
             </button>
