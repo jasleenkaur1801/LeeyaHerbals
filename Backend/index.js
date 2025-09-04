@@ -10,9 +10,9 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const AuthRouter = require('./Routes/AuthRouter');
-const orderRouter = require('./Routes/OrderRouter');
+const orderRouter = require('./routes/orders');
 const ProductRouter = require('./Routes/ProductRouter');
-const StripeRouter = require('./Routes/StripeRouter');
+const StripeRouter = require('./routes/stripe');
 
 
 const PORT = process.env.PORT || 8080;
@@ -24,8 +24,12 @@ app.get("/ping",(req,res)=>{
 
 app.use(bodyParser.json());
 app.use(cors());
-    app.use('/auth', AuthRouter);
-    app.use('/api/orders', orderRouter);
+
+// Stripe webhook needs raw body, so handle it before other middleware
+app.use('/api/webhook', express.raw({type: 'application/json'}));
+
+app.use('/auth', AuthRouter);
+app.use('/api/orders', orderRouter);
 app.use('/products', ProductRouter);
 app.use('/api', StripeRouter);
 

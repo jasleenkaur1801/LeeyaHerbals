@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
 import './App.css'
+import './ContactUs.css'
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import ProductPage from './ProductPage'
 import SearchResultsPage from './SearchResultsPage'
@@ -7,6 +8,11 @@ import AuthModal from './AuthModal'
 import UserProfile from './UserProfile'
 import Chatbot from './Chatbot'
 import Reviews from './Reviews'
+import SkincareFlipCards from './SkincareFlipCards'
+import CartPage from './CartPage'
+import OrdersPage from './OrdersPage'
+import PaymentSuccess from './PaymentSuccess'
+import CheckoutPage from './CheckoutPage';
 function AuthRedirect() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -1080,382 +1086,6 @@ function Footer() {
   )
 }
 
-function CartPage({ cart, setCart }) {
-  const navigate = useNavigate();
-  // Clear cart if payment was successful (Stripe or COD)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('success')) {
-      // Try to save the last Stripe order to backend
-      const lastOrder = JSON.parse(localStorage.getItem('leeya_last_order') || 'null');
-      const token = localStorage.getItem('leeya_jwt') || localStorage.getItem('token');
-      
-      console.log('Stripe success detected:', { lastOrder: !!lastOrder, token: !!token });
-      
-      if (lastOrder && token) {
-        fetch('http://localhost:8080/api/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-          },
-          body: JSON.stringify(lastOrder)
-        })
-        .then(async res => {
-          const data = await res.json().catch(() => ({}));
-          console.log('Order save response:', { status: res.status, ok: res.ok, data });
-          
-          if (res.ok) {
-            console.log('Stripe order saved successfully, clearing cart');
-            setCart([]);
-            // Also clear user-specific cart in localStorage if logged in
-            const user = JSON.parse(localStorage.getItem('user') || 'null');
-            if (user && user.email) {
-              localStorage.setItem(`leeya_cart_${user.email}`, JSON.stringify([]));
-            }
-            localStorage.removeItem('leeya_last_order');
-            // Remove ?success from URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-            alert('Payment successful! Your order has been placed.');
-          } else {
-            console.error('Failed to save order:', data);
-            alert(`Order failed to save after payment: ${data.error || 'Unknown error'}. Please contact support with your payment confirmation.`);
-          }
-        })
-        .catch(err => {
-          console.error('Network error saving order:', err);
-          alert('Network error saving order. Please contact support with your payment confirmation.');
-        });
-      } else {
-        console.log('Missing order data or token for Stripe success');
-        if (!lastOrder) {
-          console.error('No leeya_last_order found in localStorage');
-        }
-        if (!token) {
-          console.error('No authentication token found');
-          alert('Please login again to complete your order.');
-        }
-        // Remove ?success from URL even if order save failed
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
-  }, [setCart]);
-  const [method, setMethod] = useState('cod');
-  const [coupon, setCoupon] = useState('');
-
-  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const onlineDiscount = method === 'online' ? subtotal * 0.10 : 0;
-  const couponDiscount = coupon.trim().toUpperCase() === 'FIRST10' ? subtotal * 0.10 : 0;
-  const shipping = subtotal >= 799 ? 0 : 99;
-  const total = Math.max(0, subtotal - onlineDiscount - couponDiscount + shipping);
-
-  // Stripe Checkout integration
-  const handleCheckout = async () => {
-    const token = localStorage.getItem('leeya_jwt');
-    if (!token) {
-      alert('Please login to place an order.');
-      return;
-    }
-    // Prepare order data for backend
-    const order = {
-      orderId: '100' + Math.floor(Math.random()*9000+1000),
-      placedAt: new Date().toISOString(),
-      status: method === 'cod' ? 'Placed' : 'Placed',
-      paymentMethod: method === 'cod' ? 'COD' : 'Stripe',
-      total,
-      items: cart.map(item => ({
-        productId: item.id,
-        name: item.name,
-        image: item.image,
-        qty: item.qty,
-        price: item.price,
-        subtotal: item.price * item.qty
-      }))
-    };
-    if (method === 'cod') {
-      try {
-        const res = await fetch('http://localhost:8080/api/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-          },
-          body: JSON.stringify(order)
-        });
-        if (!res.ok) throw new Error('Order failed');
-        alert('Order placed! Thank you for shopping with us.');
-        setCart([]);
-        window.location.href = '/myorders';
-      } catch (err) {
-        alert('Order failed. Please try again.');
-      }
-    } else {
-      // Stripe Checkout: call backend to create session
-      try {
-        // Save full order draft to localStorage for post-payment processing
-        const orderDraft = {
-          orderId: '100' + Math.floor(Math.random()*9000+1000),
-          placedAt: new Date().toISOString(),
-          status: 'Placed',
-          paymentMethod: 'Stripe',
-          total,
-          items: cart.map(item => ({
-            productId: item.id,
-            name: item.name,
-            image: item.image,
-            qty: item.qty,
-            price: item.price,
-            subtotal: item.price * item.qty
-          }))
-        };
-        localStorage.setItem('leeya_last_order', JSON.stringify(orderDraft));
-        const response = await fetch('http://localhost:8080/api/create-checkout-session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            cart: cart.map(item => ({
-              name: item.name + ' (10% off)',
-              price: Math.round(item.price * 0.9),
-              quantity: item.qty
-            })),
-            shipping: shipping
-          })
-        });
-        const data = await response.json();
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          alert('Stripe session creation failed.');
-        }
-      } catch (err) {
-        alert('Payment error. Please try again.');
-      }
-    }
-  };
-
-  const updateQuantity = (itemId, newQty) => {
-    if (newQty < 1) return;
-    setCart(prev => prev.map(item => 
-      item.id === itemId ? { ...item, qty: newQty } : item
-    ));
-  };
-
-  const removeItem = (itemId) => {
-    setCart(prev => prev.filter(item => item.id !== itemId));
-  };
-
-  if (cart.length === 0) {
-    return (
-      <div className="empty-cart">
-        <div className="container">
-          <div className="empty-cart-content">
-            <div className="empty-cart-icon">🛒</div>
-            <h2>Your cart is empty</h2>
-            <p>Looks like you haven't added any items to your cart yet.</p>
-            <button className="btn primary" onClick={() => navigate('/')}>
-              Start Shopping
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="cart-page-container">
-      <div className="container">
-        <div className="cart-header">
-          <button className="back-btn" onClick={() => navigate('/')}>
-            ← Continue Shopping
-          </button>
-          <h1>Your Cart ({cart.reduce((total, item) => total + item.qty, 0)} items)</h1>
-        </div>
-        
-        <div className="cart-content">
-          <div className="cart-items-section">
-            <h2>Cart Items</h2>
-            {cart.map(item => (
-              <div key={item.id} className="cart-item">
-                <div className="cart-item-image">
-                  <img src={item.image} alt={item.name} />
-                </div>
-                <div className="cart-item-details">
-                  <h3 className="cart-item-name">{item.name}</h3>
-                  <div className="cart-item-price">₹{item.price}</div>
-                  <div className="cart-item-category">{item.category}</div>
-                </div>
-                <div className="cart-item-quantity">
-                  <button 
-                    className="qty-btn" 
-                    onClick={() => updateQuantity(item.id, item.qty - 1)}
-                    disabled={item.qty <= 1}
-                  >
-                    −
-                  </button>
-                  <span className="qty-display">{item.qty}</span>
-                  <button 
-                    className="qty-btn" 
-                    onClick={() => updateQuantity(item.id, item.qty + 1)}
-                  >
-                    +
-                  </button>
-                </div>
-                <div className="cart-item-total">
-                  ₹{item.price * item.qty}
-                </div>
-                <button 
-                  className="remove-btn" 
-                  onClick={() => removeItem(item.id)}
-                  title="Remove item"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
-          
-          <div className="cart-summary-section">
-            <h2>Order Summary</h2>
-            <div className="summary-content">
-              <div className="summary-row">
-                <span>Subtotal ({cart.reduce((total, item) => total + item.qty, 0)} items)</span>
-                <span>₹{subtotal}</span>
-              </div>
-              
-              <div className="summary-row">
-                <span>Shipping</span>
-                <span>{subtotal >= 799 ? 'Free' : '₹99'}</span>
-              </div>
-              
-              {subtotal < 799 && (
-                <div className="shipping-notice">
-                  <span>Add ₹{799 - subtotal} more for free shipping!</span>
-                </div>
-              )}
-              
-              <div className="summary-row total-row">
-                <span>Total</span>
-                <span>
-                  ₹{method === 'online'
-                    ? Math.round((subtotal - subtotal * 0.10 + shipping))
-                    : subtotal + shipping}
-                </span>
-              </div>
-              <button className="btn primary checkout-btn" onClick={handleCheckout}>
-                Proceed to Checkout
-              </button>
-              
-              <div className="payment-options">
-                <h3>Payment Options</h3>
-                <div className="payment-method">
-                  <label>
-                    <input 
-                      type="radio" 
-                      name="payment" 
-                      value="cod" 
-                      checked={method === 'cod'} 
-                      onChange={(e) => setMethod(e.target.value)} 
-                    />
-                    Cash on Delivery
-                  </label>
-                  <label>
-                    <input type="radio" 
-                      name="payment" 
-                      value="online" 
-                      checked={method === 'online'} 
-                      onChange={(e) => setMethod(e.target.value)} 
-                    />
-                    Online Payment (10% off)
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function OrdersPage() {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const token = localStorage.getItem('leeya_jwt');
-        if (!token) {
-          setError('Please login to view your orders.');
-          setLoading(false);
-          return;
-        }
-        const res = await fetch('http://localhost:8080/api/orders/my', {
-          headers: { 'Authorization': token }
-        });
-        if (!res.ok) throw new Error('Failed to fetch orders');
-        const data = await res.json();
-        setOrders(data);
-      } catch (err) {
-        setError('Could not load orders.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOrders();
-  }, []);
-
-  if (loading) return <div className="container"><h2>Loading orders...</h2></div>;
-  if (error) return <div className="container"><h2>{error}</h2></div>;
-  if (!orders.length) return <div className="container"><h2>No orders yet.</h2></div>;
-
-  return (
-    <div className="container">
-      <h2>My Orders</h2>
-      {orders.map((order, idx) => (
-        <div key={order._id || idx} className="order-card" style={{border:'1px solid #eee',borderRadius:10,padding:16,marginBottom:16,boxShadow:'0 2px 8px #f3f3f3'}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-            <div>
-              <b>Order Placed:</b> {new Date(order.placedAt).toLocaleString()}<br/>
-              <b>Order ID:</b> {order.orderId}
-            </div>
-            <div style={{textAlign:'right'}}>
-              <b>Status:</b> <span style={{color: order.status==='Delivered'?'#2d5a27':'#bfa600'}}>{order.status}{order.paymentMethod==='COD'?' (COD)':''}</span><br/>
-              <b>Payment:</b> {order.paymentMethod==='COD'?'Cash on Delivery':'Online Payment'}
-            </div>
-          </div>
-          <div style={{marginBottom:8}}><b>Total:</b> <span style={{fontSize:18,color:'#2d5a27'}}>₹{order.total}</span></div>
-          <div><b>Items:</b>
-            <table style={{width:'100%',marginTop:8,borderCollapse:'collapse'}}>
-              <thead>
-                <tr style={{background:'#fafafa'}}>
-                  <th style={{textAlign:'left',padding:4}}>Product</th>
-                  <th style={{textAlign:'center',padding:4}}>Qty</th>
-                  <th style={{textAlign:'center',padding:4}}>Price</th>
-                  <th style={{textAlign:'center',padding:4}}>Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.items.map((item, i) => (
-                  <tr key={i} style={{borderBottom:'1px solid #eee'}}>
-                    <td style={{padding:4}}>
-                      <img src={item.image} alt={item.name} style={{width:40,height:40,objectFit:'cover',borderRadius:6,marginRight:8,verticalAlign:'middle'}} />
-                      {item.name}
-                    </td>
-                    <td style={{textAlign:'center',padding:4}}>{item.qty}</td>
-                    <td style={{textAlign:'center',padding:4}}>₹{item.price}</td>
-                    <td style={{textAlign:'center',padding:4}}>₹{item.subtotal}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function WishlistPage({ wishlist, setWishlist, setCart }) {
   return (
@@ -1537,6 +1167,29 @@ function App() {
   }, [wishlist, user]);
 
   // Check for existing authentication on app load and load user-specific cart/wishlist
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+
+    // Listen for cart updates from other components
+    const handleCartUpdate = () => {
+      const updatedCart = localStorage.getItem('cart');
+      if (updatedCart) {
+        setCart(JSON.parse(updatedCart));
+      } else {
+        setCart([]);
+      }
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
@@ -1787,35 +1440,125 @@ function App() {
             </section>
             <section className="reveal"><ProductReviews isAuthenticated={isAuthenticated} user={user} /></section>
             <section id="about" className="section reveal">
+              <SkincareFlipCards />
               <div className="container section-head"><h2>About Leeya Herbals</h2><p>Our promise: gentle, effective, and honest skincare</p></div>
               <div className="container">
                 <p>We craft nature-first skincare using clinically-backed herbal actives. Every formula is cruelty-free, free from parabens, sulfates, and mineral oils, and made in small batches for freshness. Our mission is to simplify routines with high-performance essentials that let your skin breathe and glow.</p>
               </div>
             </section>
             <section id="contact" className="section reveal">
-              <div className="container section-head"><h2>Contact Us</h2><p>We'd love to hear from you</p></div>
-              <div className="container">
-                <form className="subscribe" onSubmit={(e)=>e.preventDefault()}>
-                  <input type="text" placeholder="Your name" required />
-                  <input type="email" placeholder="Your email" required />
-                  <button className="btn primary" type="submit">Send</button>
-                </form>
-                <p className="muted">Email: care@leeyaherbals.example • Phone: +91-90000 00000 • Address: Mumbai, India</p>
-              </div>
-            </section>
-            <section className="section reveal" id="blog">
-              <div className="container section-head"><h2>Skincare Tips</h2><p>Learn how to care for your skin naturally</p></div>
-              <div className="container blog-grid">
-                {[1,2,3].map((i)=> (
-                  <article key={i} className="blog-card">
-                    <img src={`https://images.unsplash.com/photo-15${i}6228720-195a672e8a03?q=80&w=800&auto=format&fit=crop`} alt="Blog" />
-                    <div className="blog-body">
-                      <h3>Herbal skincare routine #{i}</h3>
-                      <p>Simple steps to keep your skin calm, clear and hydrated.</p>
-                      <a href="#" className="btn small">Read More</a>
+              <div className="container section-head"><h2>Contact Us</h2><p>We'd love to hear from you and help with your skincare journey</p></div>
+              <div className="container contact-content">
+                <div className="contact-grid">
+                  <div className="contact-info">
+                    <div className="contact-card">
+                      <div className="contact-icon">📧</div>
+                      <h3>Email Us</h3>
+                      <p>care@leeyaherbals.com</p>
+                      <p>support@leeyaherbals.com</p>
+                      <small>We respond within 24 hours</small>
                     </div>
-                  </article>
-                ))}
+                    
+                    <div className="contact-card">
+                      <div className="contact-icon">📞</div>
+                      <h3>Call Us</h3>
+                      <p>+91-98765 43210</p>
+                      <p>+91-87654 32109</p>
+                      <small>Mon-Sat: 9 AM - 7 PM IST</small>
+                    </div>
+                    
+                    <div className="contact-card">
+                      <div className="contact-icon">📍</div>
+                      <h3>Visit Us</h3>
+                      <p>Leeya Herbals Pvt. Ltd.</p>
+                      <p>123 Herbal Street, Green Valley</p>
+                      <p>Mumbai, Maharashtra 400001</p>
+                      <small>India</small>
+                    </div>
+                    
+                    <div className="contact-card">
+                      <div className="contact-icon">🕒</div>
+                      <h3>Business Hours</h3>
+                      <p>Monday - Friday: 9:00 AM - 7:00 PM</p>
+                      <p>Saturday: 10:00 AM - 5:00 PM</p>
+                      <p>Sunday: Closed</p>
+                      <small>All times in IST</small>
+                    </div>
+                    
+                    <div className="contact-card social-card">
+                      <div className="contact-icon">🌐</div>
+                      <h3>Follow Us</h3>
+                      <div className="social-links">
+                        <a href="#" className="social-link">📘 Facebook</a>
+                        <a href="#" className="social-link">📷 Instagram</a>
+                        <a href="#" className="social-link">🐦 Twitter</a>
+                        <a href="#" className="social-link">💼 LinkedIn</a>
+                      </div>
+                    </div>
+                    
+                    <div className="contact-card">
+                      <div className="contact-icon">💬</div>
+                      <h3>WhatsApp</h3>
+                      <p>+91-98765 43210</p>
+                      <small>Quick support & order updates</small>
+                    </div>
+                  </div>
+                  
+                  <div className="contact-form-section">
+                    <div className="form-container">
+                      <h3>Send us a Message</h3>
+                      <form className="contact-form" onSubmit={(e)=>e.preventDefault()}>
+                        <div className="form-row">
+                          <input type="text" placeholder="Your Name *" required />
+                          <input type="email" placeholder="Your Email *" required />
+                        </div>
+                        <input type="tel" placeholder="Phone Number" />
+                        <select>
+                          <option value="">Select Subject</option>
+                          <option value="product">Product Inquiry</option>
+                          <option value="order">Order Support</option>
+                          <option value="skincare">Skincare Consultation</option>
+                          <option value="wholesale">Wholesale/Business</option>
+                          <option value="feedback">Feedback</option>
+                          <option value="other">Other</option>
+                        </select>
+                        <textarea placeholder="Your Message *" rows="5" required></textarea>
+                        <button className="btn primary" type="submit">Send Message</button>
+                      </form>
+                    </div>
+                    
+                    <div className="contact-features">
+                      <div className="feature-item">
+                        <span className="feature-icon">🚚</span>
+                        <div>
+                          <h4>Free Shipping</h4>
+                          <p>On orders above ₹799</p>
+                        </div>
+                      </div>
+                      <div className="feature-item">
+                        <span className="feature-icon">🔄</span>
+                        <div>
+                          <h4>Easy Returns</h4>
+                          <p>30-day return policy</p>
+                        </div>
+                      </div>
+                      <div className="feature-item">
+                        <span className="feature-icon">🛡️</span>
+                        <div>
+                          <h4>Secure Payment</h4>
+                          <p>100% secure transactions</p>
+                        </div>
+                      </div>
+                      <div className="feature-item">
+                        <span className="feature-icon">👩‍⚕️</span>
+                        <div>
+                          <h4>Expert Support</h4>
+                          <p>Skincare consultation available</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </section>
             <Newsletter />
@@ -1828,8 +1571,10 @@ function App() {
         <Route path="/wishlist" element={<WishlistPage wishlist={wishlist} setWishlist={setWishlist} setCart={setCart} />} />
         <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <AuthRedirect />} />
         <Route path="/reviews" element={<Reviews />} />
-  <Route path="/profile" element={<UserProfile user={user} onLogout={handleLogout} />} />
-  <Route path="/myorders" element={<OrdersPage />} />
+        <Route path="/profile" element={<UserProfile user={user} onLogout={handleLogout} />} />
+        <Route path="/myorders" element={<OrdersPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
       </Routes>
       {showCart ? (
         <div className="drawer" role="dialog" aria-label="Cart">
