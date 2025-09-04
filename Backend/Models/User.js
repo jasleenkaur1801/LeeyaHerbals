@@ -14,8 +14,29 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: true,
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
+    phone: {
+        type: String,
+        default: ''
+    },
+    address: {
+        type: String,
+        default: ''
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    lastLogin: {
+        type: Date,
+        default: Date.now
     }
 });
 
-const userModel = mongoose.model('users',UserSchema);
+const userModel = mongoose.model('User',UserSchema);
 module.exports = userModel;

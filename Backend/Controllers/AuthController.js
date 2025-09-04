@@ -35,11 +35,16 @@ const login = async (req,res) =>{
             jwtSecret,
             {expiresIn: '24h'}
         )
+        
+        // Update last login
+        await UserModel.findByIdAndUpdate(user._id, { lastLogin: new Date() });
+        
         res.status(201).json({message: "login successfully",
             success: true,
             jwtToken,
             email,
-            name: user.name
+            name: user.name,
+            role: user.role
         })
     }catch(err){
         res.status(500).json({message: "Internal server error",success: false})

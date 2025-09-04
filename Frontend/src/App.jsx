@@ -7,6 +7,7 @@ import AuthModal from './AuthModal'
 import UserProfile from './UserProfile'
 import Chatbot from './Chatbot'
 import Reviews from './Reviews'
+import AdminDashboard from './AdminDashboard'
 function AuthRedirect() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -539,100 +540,106 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
       <div className="nav-top">
         <div className="container nav-top-inner">
           <div className="brand-section">
-            <div className="brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+            <div className="brand" onClick={() => navigate(user?.role === 'admin' ? '/admin' : '/')} style={{ cursor: 'pointer' }}>
               <span className="leaf">✿</span>
               <span>Leeya Herbals</span>
             </div>
           </div>
           
-          <div className="search-container" ref={searchRef}>
-            <form onSubmit={handleSearchSubmit} className="search-form">
-              <div className="search-input-wrapper">
-                <span className="search-icon">🔍</span>
-                <input 
-                  className="search" 
-                  placeholder="Search products, categories..." 
-                  value={search} 
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                  onFocus={() => search.trim() && setShowSuggestions(true)}
-                />
-                <button type="submit" className="search-btn">Search</button>
-              </div>
-              {showSuggestions && suggestions.length > 0 && (
-                <div className="search-suggestions">
-                  {suggestions.map((suggestion, index) => (
-                    <div 
-                      key={index} 
-                      className="suggestion-item"
-                      onClick={() => handleSuggestionClick(suggestion)}
-                    >
-                      <span className="suggestion-icon">
-                        {suggestion.type === 'product' ? '🛍️' : '🏷️'}
-                      </span>
-                      <div className="suggestion-content">
-                        <span className="suggestion-text">{suggestion.text}</span>
-                        {suggestion.type === 'product' && (
-                          <span className="suggestion-meta">
-                            {suggestion.category} • ₹{suggestion.price}
-                          </span>
-                        )}
-                        {suggestion.type === 'category' && (
-                          <span className="suggestion-meta">Category</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+          {user?.role !== 'admin' && (
+            <div className="search-container" ref={searchRef}>
+              <form onSubmit={handleSearchSubmit} className="search-form">
+                <div className="search-input-wrapper">
+                  <span className="search-icon">🔍</span>
+                  <input 
+                    className="search" 
+                    placeholder="Search products, categories..." 
+                    value={search} 
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    onFocus={() => search.trim() && setShowSuggestions(true)}
+                  />
+                  <button type="submit" className="search-btn">Search</button>
                 </div>
-              )}
-            </form>
-          </div>
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="search-suggestions">
+                    {suggestions.map((suggestion, index) => (
+                      <div 
+                        key={index} 
+                        className="suggestion-item"
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        <span className="suggestion-icon">
+                          {suggestion.type === 'product' ? '🛍️' : '🏷️'}
+                        </span>
+                        <div className="suggestion-content">
+                          <span className="suggestion-text">{suggestion.text}</span>
+                          {suggestion.type === 'product' && (
+                            <span className="suggestion-meta">
+                              {suggestion.category} • ₹{suggestion.price}
+                            </span>
+                          )}
+                          {suggestion.type === 'category' && (
+                            <span className="suggestion-meta">Category</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </form>
+            </div>
+          )}
           
           <div className="user-actions">
-            <button 
-              className="chat-btn" 
-              aria-label="Chatbot"
-              title="Ask LeeyaBot"
-              onClick={() => {
-                if (!isAuthenticated) {
-                  onOpenAuth();
-                } else {
-                  navigate('/chat');
-                }
-              }}
-            >💬</button>
-            <button 
-              className={`wishlist ${!isAuthenticated ? 'auth-required' : ''}`} 
-              aria-label={isAuthenticated ? "Wishlist" : "Login to view wishlist"} 
-              onClick={() => {
-                if (!isAuthenticated) {
-                  onOpenAuth();
-                } else {
-                  navigate('/wishlist');
-                }
-              }}
-              title={isAuthenticated ? "View wishlist" : "Login to view wishlist"}
-            >
-              💖
-              {isAuthenticated && wishlistCount > 0 && <span className="wishlist-count">{wishlistCount}</span>}
-            </button>
-            
-            <button 
-              className={`cart ${!isAuthenticated ? 'auth-required' : ''}`} 
-              aria-label={isAuthenticated ? "Cart" : "Login to view cart"} 
-              onClick={() => {
-                if (!isAuthenticated) {
-                  onOpenAuth();
-                } else {
-                  navigate('/cart');
-                }
-              }}
-              title={isAuthenticated ? "View cart" : "Login to view cart"}
-            >
-              🛒
-              {isAuthenticated && cart.length > 0 && (
-                <span className="cart-count">{cart.reduce((total, item) => total + item.qty, 0)}</span>
-              )}
-            </button>
+            {user?.role !== 'admin' && (
+              <>
+                <button 
+                  className="chat-btn" 
+                  aria-label="Chatbot"
+                  title="Ask LeeyaBot"
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      onOpenAuth();
+                    } else {
+                      navigate('/chat');
+                    }
+                  }}
+                >💬</button>
+                <button 
+                  className={`wishlist ${!isAuthenticated ? 'auth-required' : ''}`} 
+                  aria-label={isAuthenticated ? "Wishlist" : "Login to view wishlist"} 
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      onOpenAuth();
+                    } else {
+                      navigate('/wishlist');
+                    }
+                  }}
+                  title={isAuthenticated ? "View wishlist" : "Login to view wishlist"}
+                >
+                  💖
+                  {isAuthenticated && wishlistCount > 0 && <span className="wishlist-count">{wishlistCount}</span>}
+                </button>
+                
+                <button 
+                  className={`cart ${!isAuthenticated ? 'auth-required' : ''}`} 
+                  aria-label={isAuthenticated ? "Cart" : "Login to view cart"} 
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      onOpenAuth();
+                    } else {
+                      navigate('/cart');
+                    }
+                  }}
+                  title={isAuthenticated ? "View cart" : "Login to view cart"}
+                >
+                  🛒
+                  {isAuthenticated && cart.length > 0 && (
+                    <span className="cart-count">{cart.reduce((total, item) => total + item.qty, 0)}</span>
+                  )}
+                </button>
+              </>
+            )}
             
             {isAuthenticated ? (
               <>
@@ -652,57 +659,67 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
           <button className="hamburger" aria-label="Menu" onClick={onToggleMenu}>☰</button>
           
           <nav className="nav-links-main">
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>Home</a>
-            <a href="#profile" onClick={(e) => { e.preventDefault(); navigate('/profile') }}>Profile</a>
-            <div className="nav-dropdown">
-              <a href="#categories" onClick={(e) => { e.preventDefault(); navigate('/#categories') }}>
-                Categories <span className="dropdown-arrow">▼</span>
+            {user?.role === 'admin' ? (
+              // Admin-only navigation
+              <a href="#admin" onClick={(e) => { e.preventDefault(); navigate('/admin') }} style={{ color: '#e74c3c', fontWeight: 'bold', margin: '0 auto' }}>
+                🛡️ Admin Panel
               </a>
-              <div className="dropdown-content">
-                <a href="#cat-serum">Serums</a>
-                <a href="#cat-cleanser">Cleansers</a>
-                <a href="#cat-toner">Toners</a>
-                <a href="#cat-facepack">Face Packs</a>
-                <a href="#cat-facewashgel">Face Wash Gel</a>
-                <a href="#cat-acneoilgel">Acne Oil Gel</a>
-              </div>
-            </div>
-            <div className="nav-dropdown">
-              <a href="#bath-body">
-                Bath & Body <span className="dropdown-arrow">▼</span>
-              </a>
-              <div className="dropdown-content">
-                <a href="#body-wash">Body Wash</a>
-                <a href="#body-lotion">Body Lotion</a>
-                <a href="#bath-salts">Bath Salts</a>
-                <a href="#scrubs">Body Scrubs</a>
-              </div>
-            </div>
-            <div className="nav-dropdown">
-              <a href="#skincare">
-                Skin Care <span className="dropdown-arrow">▼</span>
-              </a>
-              <div className="dropdown-content">
-                <a href="#anti-aging">Anti-Aging</a>
-                <a href="#moisturizers">Moisturizers</a>
-                <a href="#sun-protection">Sun Protection</a>
-                <a href="#treatments">Treatments</a>
-              </div>
-            </div>
-            <div className="nav-dropdown">
-              <a href="#collections">
-                Collections <span className="dropdown-arrow">▼</span>
-              </a>
-              <div className="dropdown-content">
-                <a href="#face-kits">Face Care Kits</a>
-                <a href="#gift-sets">Gift Sets</a>
-                <a href="#travel-kits">Travel Kits</a>
-                <a href="#seasonal">Seasonal Collections</a>
-                <a href="#reviews" onClick={(e)=>{ e.preventDefault(); navigate('/reviews') }}>Reviews</a>
-              </div>
-            </div>
-            <a href="#about" onClick={(e) => { e.preventDefault(); navigate('/#about') }}>About Us</a>
-            <a href="#contact" onClick={(e) => { e.preventDefault(); navigate('/#contact') }}>Contact</a>
+            ) : (
+              // Regular user navigation
+              <>
+                <a href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>Home</a>
+                <a href="#profile" onClick={(e) => { e.preventDefault(); navigate('/profile') }}>Profile</a>
+                <div className="nav-dropdown">
+                  <a href="#categories" onClick={(e) => { e.preventDefault(); navigate('/#categories') }}>
+                    Categories <span className="dropdown-arrow">▼</span>
+                  </a>
+                  <div className="dropdown-content">
+                    <a href="#cat-serum">Serums</a>
+                    <a href="#cat-cleanser">Cleansers</a>
+                    <a href="#cat-toner">Toners</a>
+                    <a href="#cat-facepack">Face Packs</a>
+                    <a href="#cat-facewashgel">Face Wash Gel</a>
+                    <a href="#cat-acneoilgel">Acne Oil Gel</a>
+                  </div>
+                </div>
+                <div className="nav-dropdown">
+                  <a href="#bath-body">
+                    Bath & Body <span className="dropdown-arrow">▼</span>
+                  </a>
+                  <div className="dropdown-content">
+                    <a href="#body-wash">Body Wash</a>
+                    <a href="#body-lotion">Body Lotion</a>
+                    <a href="#bath-salts">Bath Salts</a>
+                    <a href="#scrubs">Body Scrubs</a>
+                  </div>
+                </div>
+                <div className="nav-dropdown">
+                  <a href="#skincare">
+                    Skin Care <span className="dropdown-arrow">▼</span>
+                  </a>
+                  <div className="dropdown-content">
+                    <a href="#anti-aging">Anti-Aging</a>
+                    <a href="#moisturizers">Moisturizers</a>
+                    <a href="#sun-protection">Sun Protection</a>
+                    <a href="#treatments">Treatments</a>
+                  </div>
+                </div>
+                <div className="nav-dropdown">
+                  <a href="#collections">
+                    Collections <span className="dropdown-arrow">▼</span>
+                  </a>
+                  <div className="dropdown-content">
+                    <a href="#face-kits">Face Care Kits</a>
+                    <a href="#gift-sets">Gift Sets</a>
+                    <a href="#travel-kits">Travel Kits</a>
+                    <a href="#seasonal">Seasonal Collections</a>
+                    <a href="#reviews" onClick={(e)=>{ e.preventDefault(); navigate('/reviews') }}>Reviews</a>
+                  </div>
+                </div>
+                <a href="#about" onClick={(e) => { e.preventDefault(); navigate('/#about') }}>About Us</a>
+                <a href="#contact" onClick={(e) => { e.preventDefault(); navigate('/#contact') }}>Contact</a>
+              </>
+            )}
           </nav>
         </div>
       </div>
@@ -1830,6 +1847,7 @@ function App() {
         <Route path="/reviews" element={<Reviews />} />
   <Route path="/profile" element={<UserProfile user={user} onLogout={handleLogout} />} />
   <Route path="/myorders" element={<OrdersPage />} />
+  <Route path="/admin" element={<AdminDashboard user={user} onLogout={handleLogout} />} />
       </Routes>
       {showCart ? (
         <div className="drawer" role="dialog" aria-label="Cart">

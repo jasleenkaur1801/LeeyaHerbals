@@ -13,6 +13,7 @@ const AuthRouter = require('./Routes/AuthRouter');
 const orderRouter = require('./Routes/OrderRouter');
 const ProductRouter = require('./Routes/ProductRouter');
 const StripeRouter = require('./Routes/StripeRouter');
+const AdminRouter = require('./Routes/AdminRouter');
 
 
 const PORT = process.env.PORT || 8080;
@@ -28,6 +29,7 @@ app.use(cors());
     app.use('/api/orders', orderRouter);
 app.use('/products', ProductRouter);
 app.use('/api', StripeRouter);
+app.use('/admin', AdminRouter);
 
 
 app.listen(PORT,()=>{
