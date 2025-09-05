@@ -37,40 +37,6 @@
   align-items: center;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .admin-header-content {
-    padding: 1rem 1.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .admin-header-content {
-    padding: 1rem;
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-  
-  .admin-header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .admin-user-info {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .admin-header-content {
-    padding: 0.8rem;
-  }
-  
-  .admin-header h1 {
-    font-size: 1.3rem;
-  }
-}
-
 .admin-header h1 {
   color: #2c3e50;
   margin: 0;

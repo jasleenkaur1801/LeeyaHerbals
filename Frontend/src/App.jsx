@@ -1002,18 +1002,14 @@ function App() {
           <>
             <div className="theme-toggle-wrap"><button className="theme-toggle" onClick={() => setDark(v => !v)}>{dark ? '🌙' : '☀️'}</button></div>
             {showMenu ? (
-              <div className="mobile-menu" onClick={() => setShowMenu(false)}>
-                <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
-                  <button className="mobile-menu-close" onClick={() => setShowMenu(false)}>×</button>
-                  <Link to="/" onClick={() => setShowMenu(false)}>🏠 Home</Link>
-                  <Link to="/categories" onClick={() => setShowMenu(false)}>📂 Categories</Link>
-                  <Link to="/skincare" onClick={() => setShowMenu(false)}>✨ Skincare</Link>
-                  <Link to="/bathbody" onClick={() => setShowMenu(false)}>🛁 Bath & Body</Link>
-                  <Link to="/contact" onClick={() => setShowMenu(false)}>📞 Contact</Link>
-                  <Link to="/about" onClick={() => setShowMenu(false)}>ℹ️ About</Link>
-                </div>
+              <div className="mobile-menu">
+                <a href="#" onClick={() => setShowMenu(false)}>Home</a>
+                <a href="#shop" onClick={() => setShowMenu(false)}>Shop</a>
+                <a href="#about" onClick={() => setShowMenu(false)}>About</a>
+                <a href="#contact" onClick={() => setShowMenu(false)}>Contact</a>
               </div>
             ) : null}
+            <Hero />
             <div className="reveal"><CircleCategories onChoose={setCategory} /></div>
             <section className="section benefits">
               <div className="container benefits-inner">
