@@ -61,10 +61,11 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
-      // Store order details for Stripe
+      // Store order details and address for Stripe
       localStorage.setItem('checkoutOrderTotal', total.toString());
       localStorage.setItem('checkoutOrderItems', JSON.stringify(cart));
       localStorage.setItem('checkoutOrderAddress', JSON.stringify(address));
+      localStorage.setItem('tempCheckoutAddress', JSON.stringify(address)); // Store for form restoration
       
       // Create Stripe checkout session
       const stripeResponse = await fetch('http://localhost:8080/api/create-checkout-session', {
@@ -90,9 +91,13 @@ const CheckoutPage = () => {
         throw new Error('Failed to create payment session');
       }
 
-      const { url } = await stripeResponse.json();
+      const { url, sessionId } = await stripeResponse.json();
       
       if (url) {
+        // Store session ID for later use
+        if (sessionId) {
+          localStorage.setItem('stripeSessionId', sessionId);
+        }
         // Redirect to Stripe checkout
         window.location.href = url;
       } else {
@@ -120,39 +125,73 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
-      // Create the order
-      const newOrder = {
-        id: Date.now(),
-        createdAt: new Date().toISOString(),
-        status: 'confirmed',
-        items: cart,
+      // Get auth token
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to place an order');
+        navigate('/login');
+        return;
+      }
+
+      // Prepare order data for API
+      const orderData = {
+        paymentMethod: paymentMethod === 'card' ? 'online' : 'cod',
+        paymentStatus: 'completed',
+        stripeSessionId: paymentMethod === 'card' ? localStorage.getItem('stripeSessionId') : null,
         subtotal,
         shipping,
         total,
-        paymentMethod: paymentMethod === 'card' ? 'online' : 'cod',
-        address
+        items: cart.map(item => ({
+          productId: item.id || item.productId,
+          name: item.name,
+          image: item.image,
+          weight: item.weight,
+          qty: item.qty,
+          price: item.price,
+          subtotal: item.price * item.qty
+        })),
+        address,
+        status: 'placed'
       };
 
-      // Save order to localStorage
-      const existingOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
-      existingOrders.unshift(newOrder);
-      localStorage.setItem('userOrders', JSON.stringify(existingOrders));
+      // Create order via API
+      const response = await fetch('http://localhost:8080/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
 
-      // Clear cart
-      localStorage.removeItem('cart');
-      localStorage.removeItem('checkoutOrderTotal');
-      localStorage.removeItem('checkoutOrderItems');
-      localStorage.removeItem('checkoutOrderAddress');
-      
-      // Dispatch cart update event
-      window.dispatchEvent(new Event('cartUpdated'));
+      const result = await response.json();
 
-      alert('Order submitted successfully! You will receive a confirmation call within 24 hours.');
-      navigate('/myorders');
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create order');
+      }
+
+      if (result.success) {
+        // Clear cart and temporary data
+        localStorage.removeItem('cart');
+        localStorage.removeItem('checkoutCart');
+        localStorage.removeItem('checkoutOrderTotal');
+        localStorage.removeItem('checkoutOrderItems');
+        localStorage.removeItem('checkoutOrderAddress');
+        localStorage.removeItem('stripeSessionId');
+        localStorage.removeItem('tempCheckoutAddress'); // Clean up address backup
+        
+        // Dispatch cart update event
+        window.dispatchEvent(new Event('cartUpdated'));
+
+        alert('Order submitted successfully! You will receive a confirmation call within 24 hours.');
+        navigate('/myorders');
+      } else {
+        throw new Error(result.error || 'Failed to create order');
+      }
       
     } catch (error) {
       console.error('Order submission error:', error);
-      alert('Failed to submit order. Please try again.');
+      alert(`Failed to submit order: ${error.message}. Please try again.`);
       setIsProcessing(false);
     }
   };
@@ -165,6 +204,18 @@ const CheckoutPage = () => {
     if (urlParams.get('payment_success') === 'true' || cardPaymentStatus === 'true') {
       setCardPaymentCompleted(true);
       setPaymentMethod('card');
+      
+      // Restore address data if available
+      const savedAddress = localStorage.getItem('tempCheckoutAddress');
+      if (savedAddress) {
+        try {
+          const parsedAddress = JSON.parse(savedAddress);
+          setAddress(parsedAddress);
+        } catch (error) {
+          console.error('Error restoring address:', error);
+        }
+      }
+      
       localStorage.removeItem('cardPaymentCompleted'); // Clean up
       // Clear URL params
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -301,12 +352,7 @@ const CheckoutPage = () => {
                     <div>
                       <strong>Credit or debit card</strong>
                       <div className="card-icons">
-                        <img src="/api/placeholder/30/20" alt="Visa" />
-                        <img src="/api/placeholder/30/20" alt="Mastercard" />
-                        <img src="/api/placeholder/30/20" alt="American Express" />
-                        <img src="/api/placeholder/30/20" alt="Diners Club" />
-                        <img src="/api/placeholder/30/20" alt="Maestro" />
-                        <img src="/api/placeholder/30/20" alt="RuPay" />
+                        <span>💳 Cards Accepted</span>
                       </div>
                       {paymentMethod === 'card' && !cardPaymentCompleted && (
                         <div className="card-payment-section">

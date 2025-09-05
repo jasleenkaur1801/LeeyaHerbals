@@ -10,7 +10,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const AuthRouter = require('./Routes/AuthRouter');
-const orderRouter = require('./Routes/orders');
+const OrderRouter = require('./Routes/OrderRouter');
 const ProductRouter = require('./Routes/ProductRouter');
 const StripeRouter = require('./Routes/StripeRouter');  // ✅ merged
 const AdminRouter = require('./Routes/AdminRouter');    // ✅ merged
@@ -29,7 +29,7 @@ app.use(cors());
 app.use('/api/webhook', express.raw({type: 'application/json'}));
 
 app.use('/auth', AuthRouter);
-app.use('/api/orders', orderRouter);
+app.use('/api/orders', OrderRouter);
 app.use('/products', ProductRouter);
 app.use('/api', StripeRouter);
 app.use('/admin', AdminRouter);

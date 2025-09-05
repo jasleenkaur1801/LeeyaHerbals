@@ -1347,21 +1347,6 @@ function App() {
               </div>
             ) : null}
             <Hero />
-            <section className="section reveal" id="categories">
-              <div className="container section-head"><h2>Shop by category</h2><p>Find the perfect ritual for your skin</p></div>
-              <div className="container cat-grid">
-                {[
-                  {icon:'🫧',label:'Cleansers'},
-                  {icon:'💧',label:'Serums'},
-                  {icon:'🌸',label:'Toners'},
-                  {icon:'🧖‍♀️',label:'Masks'},
-                  {icon:'🌿',label:'Natural Oils'},
-                  {icon:'🧴',label:'Lotions'},
-                ].map((c,i)=> (
-                  <div key={i} className="cat-card"><span className="cat-icn">{c.icon}</span><span>{c.label}</span></div>
-                ))}
-              </div>
-            </section>
             <div className="reveal"><CircleCategories onChoose={setCategory} /></div>
             <section className="section benefits">
               <div className="container benefits-inner">

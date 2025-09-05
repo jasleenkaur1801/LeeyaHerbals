@@ -13,21 +13,30 @@ const PaymentSuccess = () => {
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
-    // Mark card payment as completed and redirect back to checkout
-    const urlParams = new URLSearchParams(window.location.search);
-    if (sessionId) {
-      // Store payment completion status
-      localStorage.setItem('cardPaymentCompleted', 'true');
-      
-      // Redirect back to checkout with payment success flag
-      setTimeout(() => {
-        navigate('/checkout?payment_success=true');
-      }, 2000);
-    }
+    const handlePaymentSuccess = async () => {
+      if (sessionId) {
+        try {
+          // Store payment completion status and session ID
+          localStorage.setItem('cardPaymentCompleted', 'true');
+          localStorage.setItem('stripeSessionId', sessionId);
+          
+          setPaymentStatus('succeeded');
+          setError(null);
+          
+          // Redirect back to checkout with payment success flag
+          setTimeout(() => {
+            navigate('/checkout?payment_success=true');
+          }, 2000);
+          
+        } catch (error) {
+          console.error('Payment success handling error:', error);
+          setError('Payment verification failed');
+        }
+      }
+      setLoading(false);
+    };
 
-    setPaymentStatus('succeeded');
-    setError(null);
-    setLoading(false);
+    handlePaymentSuccess();
   }, [sessionId, navigate]);
 
   const verifyPayment = async () => {

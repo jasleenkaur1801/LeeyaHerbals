@@ -14,45 +14,49 @@ const OrdersPage = () => {
 
   const fetchOrders = async () => {
     try {
-      // Get orders from localStorage instead of backend
-      const storedOrders = localStorage.getItem('userOrders');
-      if (storedOrders) {
-        const parsedOrders = JSON.parse(storedOrders);
-        setOrders(parsedOrders);
-      } else {
-        // Create sample orders if none exist
-        const sampleOrders = [
-          {
-            id: Date.now(),
-            createdAt: new Date().toISOString(),
-            status: 'completed',
-            items: JSON.parse(localStorage.getItem('lastOrderItems') || '[]'),
-            subtotal: parseFloat(localStorage.getItem('lastOrderTotal') || '0'),
-            shipping: 0,
-            total: parseFloat(localStorage.getItem('lastOrderTotal') || '0'),
-            paymentMethod: 'online',
-            address: {
-              fullName: 'Customer',
-              phone: '1234567890',
-              addressLine1: 'Sample Address',
-              city: 'City',
-              state: 'State',
-              pincode: '123456'
-            }
-          }
-        ];
-        
-        // Only add sample order if there was a recent purchase
-        if (localStorage.getItem('lastOrderTotal')) {
-          setOrders(sampleOrders);
-          localStorage.setItem('userOrders', JSON.stringify(sampleOrders));
-        } else {
-          setOrders([]);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Please login to view your orders');
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch('http://localhost:8080/api/orders/my', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to fetch orders');
+      }
+
+      if (result.success) {
+        // Transform the orders to match the expected format
+        const transformedOrders = result.orders.map(order => ({
+          id: order.orderId,
+          _id: order._id,
+          createdAt: order.createdAt || order.placedAt,
+          status: order.status,
+          items: order.items,
+          subtotal: order.subtotal,
+          shipping: order.shipping,
+          total: order.total,
+          paymentMethod: order.paymentMethod,
+          address: order.address
+        }));
+        
+        setOrders(transformedOrders);
+      } else {
+        throw new Error(result.error || 'Failed to fetch orders');
       }
     } catch (error) {
       console.error('Error loading orders:', error);
-      setError('Failed to load orders');
+      setError(`Failed to load orders: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -160,8 +164,8 @@ const OrdersPage = () => {
                 </div>
 
                 <div className="order-items">
-                  {order.items.map(item => (
-                    <div key={item.id} className="order-item">
+                  {order.items.map((item, index) => (
+                    <div key={item.productId || item.id || `item-${index}`} className="order-item">
                       <img src={item.image} alt={item.name} className="item-image" />
                       <div className="item-details">
                         <h4>{item.name}</h4>
