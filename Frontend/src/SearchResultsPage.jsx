@@ -1,27 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import './App.css'
-
-const ALL_PRODUCTS = [
-  { id: 1, name: 'Vitamin C Glow Serum', price: 699, category: 'serum', rating: 4.7, tag: 'Bestseller', image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?q=80&w=800&auto=format&fit=crop', description: 'Brightening serum with natural Vitamin C extracts for radiant, even-toned skin.' },
-  { id: 2, name: 'Gentle Foam Face Wash', price: 349, category: 'facewash', rating: 4.5, tag: 'New', image: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?q=80&w=800&auto=format&fit=crop', description: 'Gentle foaming cleanser that removes impurities without stripping natural oils.' },
-  { id: 3, name: 'Hydra Balance Toner', price: 299, category: 'toner', rating: 4.4, image: 'https://images.unsplash.com/photo-1571781923300-5c41ce3d9a2c?q=80&w=800&auto=format&fit=crop', description: 'Hydrating toner that balances pH and preps skin for better product absorption.' },
-  { id: 4, name: 'Neem Purify Cleanser', price: 399, category: 'cleanser', rating: 4.3, image: 'https://images.unsplash.com/photo-1610173826124-1d8d2eddf65a?q=80&w=800&auto=format&fit=crop', description: 'Purifying cleanser with neem extracts for acne-prone and oily skin.' },
-  { id: 5, name: 'Clay Detox Face Pack', price: 449, category: 'facepack', rating: 4.6, tag: 'Hot', image: 'https://images.unsplash.com/photo-1619983081563-430f63602796?q=80&w=800&auto=format&fit=crop', description: 'Detoxifying clay mask that draws out impurities and unclogs pores.' },
-  { id: 6, name: 'Targeted Acne Gel', price: 379, category: 'acne', rating: 4.2, image: 'https://images.unsplash.com/photo-1600275669283-5b56309f3a3a?q=80&w=800&auto=format&fit=crop', description: 'Spot treatment gel with natural ingredients to reduce acne and inflammation.' },
-  { id: 7, name: 'Daily Moisture Lotion', price: 499, category: 'lotion', rating: 4.5, image: 'https://images.unsplash.com/photo-1611930022110-0c4e8b4fcb13?q=80&w=800&auto=format&fit=crop', description: 'Lightweight moisturizing lotion for daily hydration without greasiness.' },
-  { id: 8, name: 'Aloe Calm Toner', price: 279, category: 'toner', rating: 4.1, image: 'https://images.unsplash.com/photo-1618477461849-4729ce312e34?q=80&w=800&auto=format&fit=crop', description: 'Soothing aloe-based toner for sensitive and irritated skin.' },
-]
-
-const CATEGORIES = [
-  { key: 'serum', label: 'Serums' },
-  { key: 'cleanser', label: 'Cleansers' },
-  { key: 'toner', label: 'Toners' },
-  { key: 'facewash', label: 'Face Wash' },
-  { key: 'facepack', label: 'Face Packs' },
-  { key: 'acne', label: 'Acne Gel' },
-  { key: 'lotion', label: 'Lotions' },
-]
+import { ALL_PRODUCTS, CATEGORIES } from './products'
 
 function StarRating({ value }) {
   const fullStars = Math.round(value)
