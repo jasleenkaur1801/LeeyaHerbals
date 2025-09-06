@@ -36,33 +36,15 @@ function ProductCard({ product, onAdd }) {
   )
 }
 
-function ProductPage() {
+function ProductPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
   const { productId } = useParams();
   const navigate = useNavigate();
   const product = ALL_PRODUCTS.find(p => p.id === parseInt(productId, 10));
   const [quantity, setQuantity] = useState(1);
-  const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [productId]);
-
-  // Load cart and wishlist from localStorage
-  useEffect(() => {
-    const savedCart = localStorage.getItem('leeya_cart')
-    const savedWishlist = localStorage.getItem('leeya_wishlist')
-    if (savedCart) setCart(JSON.parse(savedCart))
-    if (savedWishlist) setWishlist(JSON.parse(savedWishlist))
-  }, [])
-
-  // Save cart and wishlist to localStorage
-  useEffect(() => {
-    localStorage.setItem('leeya_cart', JSON.stringify(cart))
-  }, [cart])
-  useEffect(() => {
-    localStorage.setItem('leeya_wishlist', JSON.stringify(wishlist))
-  }, [wishlist])
 
   if (!product) {
     return (
@@ -74,6 +56,10 @@ function ProductPage() {
   }
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      onOpenAuth();
+      return;
+    }
     setCart(prev => {
       const found = prev.find(i => i.id === product.id)
       if (found) {
@@ -85,6 +71,10 @@ function ProductPage() {
   };
 
   const toggleWishlist = () => {
+    if (!isAuthenticated) {
+      onOpenAuth();
+      return;
+    }
     setWishlist(prev => {
       const found = prev.find(i => i.id === product.id)
       if (found) {
@@ -153,13 +143,13 @@ function ProductPage() {
                 padding: '1.2rem 2.5rem',
                 fontSize: '1.2rem',
                 fontWeight: '700',
-                backgroundColor: '#1dbf73',
+                backgroundColor: isAuthenticated ? '#1dbf73' : '#6c757d',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '12px',
                 cursor: 'pointer',
                 marginTop: '1rem',
-                boxShadow: '0 4px 15px rgba(24,167,99,.3)',
+                boxShadow: `0 4px 15px ${isAuthenticated ? 'rgba(24,167,99,.3)' : 'rgba(108,117,125,.3)'}`,
                 transition: 'all 0.3s ease',
                 opacity: '1',
                 visibility: 'visible',
@@ -167,15 +157,19 @@ function ProductPage() {
                 zIndex: '10'
               }}
               onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-3px)';
-                e.target.style.boxShadow = '0 10px 30px rgba(24,167,99,.4)';
+                if (isAuthenticated) {
+                  e.target.style.transform = 'translateY(-3px)';
+                  e.target.style.boxShadow = '0 10px 30px rgba(24,167,99,.4)';
+                }
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 15px rgba(24,167,99,.3)';
+                if (isAuthenticated) {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 15px rgba(24,167,99,.3)';
+                }
               }}
             >
-              Add to Cart - ₹{product.price * quantity}
+              {isAuthenticated ? `Add to Cart - ₹${product.price * quantity}` : 'Login to Add to Cart'}
             </button>
           </div>
           <div className="product-features">

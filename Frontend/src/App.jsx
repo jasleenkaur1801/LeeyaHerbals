@@ -344,7 +344,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                     <a href="#cat-serum" onClick={(e) => { e.preventDefault(); navigate('/search?q=serum') }}>Serums</a>
                     <a href="#cat-cleanser" onClick={(e) => { e.preventDefault(); navigate('/search?q=cleanser') }}>Cleansers</a>
                     <a href="#cat-toner" onClick={(e) => { e.preventDefault(); navigate('/search?q=toner') }}>Toners</a>
-                    <a href="#cat-facepack" onClick={(e) => { e.preventDefault(); navigate('/search?q=facepack') }}>Face Packs</a>
+                    <a href="#cat-facemask" onClick={(e) => { e.preventDefault(); navigate('/search?q=facemask') }}>Face Masks</a>
                     <a href="#cat-facewashgel" onClick={(e) => { e.preventDefault(); navigate('/search?q=facewashgel') }}>Face Wash Gel</a>
                     <a href="#cat-acneoilgel" onClick={(e) => { e.preventDefault(); navigate('/search?q=acneoilgel') }}>Acne Oil Gel</a>
                   </div>
@@ -376,11 +376,19 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                     Collections <span className="dropdown-arrow">▼</span>
                   </a>
                   <div className="dropdown-content">
-                    <a href="#face-kits" onClick={(e) => { e.preventDefault(); navigate('/search?q=face kit') }}>Face Care Kits</a>
+                    <a href="#face-kits" onClick={(e) => { 
+                      e.preventDefault(); 
+                      e.stopPropagation();
+                      setShowMenu(false); 
+                      setCategory('facialkit'); 
+                      setSearch('');
+                      setTimeout(() => { 
+                        document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' }); 
+                      }, 200); 
+                    }}>Facial Kits</a>
                     <a href="#gift-sets" onClick={(e) => { e.preventDefault(); navigate('/search?q=gift set') }}>Gift Sets</a>
                     <a href="#travel-kits" onClick={(e) => { e.preventDefault(); navigate('/search?q=travel kit') }}>Travel Kits</a>
                     <a href="#seasonal" onClick={(e) => { e.preventDefault(); navigate('/search?q=seasonal') }}>Seasonal Collections</a>
-                    <a href="#reviews" onClick={(e)=>{ e.preventDefault(); navigate('/reviews') }}>Reviews</a>
                   </div>
                 </div>
                 <a href="#about" onClick={(e) => { e.preventDefault(); navigate('/about') }}>About Us</a>
@@ -743,7 +751,7 @@ function Footer() {
             <a href="#cat-serum">Serums</a>
             <a href="#cat-cleanser">Cleansers</a>
             <a href="#cat-toner">Toners</a>
-            <a href="#cat-facepack">Face Packs</a>
+            <a href="#cat-facemask">Face Masks</a>
           </div>
           <div>
             <h4>Company</h4>
@@ -823,10 +831,11 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
 
-  // Clear search when navigating to different routes
+  // Clear search when navigating to different routes and ensure category is set to 'all'
   useEffect(() => {
     if (location.pathname === '/') {
       setSearch('')
+      setCategory('all') // Ensure category is properly initialized
     }
   }, [location.pathname])
 
@@ -952,17 +961,26 @@ function App() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     const qCompact = q.replace(/\s+/g, '');
-    // Filter out face wash gels from main page - they have their own dedicated page
-    const productsToShow = ALL_PRODUCTS.filter(p => p.category !== 'facewashgel');
-    // If category is 'all' and no search, show all products except face wash gels
-    if (category === 'all' && !q) return productsToShow;
-    return productsToShow.filter(p => {
+    
+    // If category is 'all', show all products except facewashgel (with search filter if applicable)
+    if (category === 'all') {
+      const productsToShow = ALL_PRODUCTS.filter(p => p.category !== 'facewashgel');
+      if (!q) return productsToShow; // No search, show all products
+      return productsToShow.filter(p => {
+        const name = p.name.toLowerCase();
+        const nameCompact = name.replace(/\s+/g, '');
+        const cat = p.category.toLowerCase();
+        return name.includes(q) || nameCompact.includes(qCompact) || cat.includes(q);
+      });
+    }
+    
+    // For specific categories, show all products of that category (including facewashgel if selected)
+    return ALL_PRODUCTS.filter(p => {
       const name = p.name.toLowerCase();
       const nameCompact = name.replace(/\s+/g, '');
       const cat = p.category.toLowerCase();
       const matchesQuery = !q || name.includes(q) || nameCompact.includes(qCompact) || cat.includes(q);
-      // Strict category matching - only show products that exactly match the selected category
-      const matchesCategory = category === 'all' ? true : p.category === category;
+      const matchesCategory = p.category === category;
       return matchesCategory && matchesQuery;
     });
   }, [category, search]);
@@ -1231,8 +1249,8 @@ function App() {
             <button className="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Back to top">↑</button>
           </>
         } />
-        <Route path="/search" element={<SearchResultsPage />} />
-        <Route path="/product/:productId" element={<ProductPage />} />
+        <Route path="/search" element={<SearchResultsPage cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
+        <Route path="/product/:productId" element={<ProductPage cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
         <Route path="/cart" element={<CartPage cart={cart} setCart={setCart} />} />
         <Route path="/wishlist" element={<WishlistPage wishlist={wishlist} setWishlist={setWishlist} setCart={setCart} />} />
         <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <AuthRedirect />} />

@@ -5,7 +5,7 @@ const CATEGORIES = [
   { key: 'serum', label: 'Serums', icon: '✨', description: 'Concentrated treatments for targeted skin concerns' },
   { key: 'cleanser', label: 'Cleansers', icon: '🧼', description: 'Gentle cleansing for all skin types' },
   { key: 'toner', label: 'Toners', icon: '💧', description: 'Balance and refresh your skin' },
-  { key: 'facepack', label: 'Face Packs', icon: '🎭', description: 'Deep cleansing and nourishing masks' },
+  { key: 'facemask', label: 'Face Masks', icon: '🎭', description: 'Deep cleansing and nourishing masks' },
   { key: 'facewashgel', label: 'Face Wash Gel', icon: '🫧', description: 'Daily cleansing gel for fresh skin', image: '/items/facewashgel/vitamin c & orange.png' },
   { key: 'acneoilgel', label: 'Acne Oil Gel', icon: '🌿', description: 'Targeted acne treatment solutions' },
   { key: 'bath-body', label: 'Bath & Body', icon: '🛁', description: 'Complete body care essentials' },

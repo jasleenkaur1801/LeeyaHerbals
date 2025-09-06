@@ -14,8 +14,26 @@ function StarRating({ value }) {
   )
 }
 
-function ProductCard({ product, onAdd, onWishlist, isInWishlist }) {
+function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated, onShowAuth }) {
   const navigate = useNavigate()
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation()
+    if (!isAuthenticated) {
+      onShowAuth()
+      return
+    }
+    onAdd(product)
+  }
+
+  const handleWishlist = (e) => {
+    e.stopPropagation()
+    if (!isAuthenticated) {
+      onShowAuth()
+      return
+    }
+    onWishlist(product)
+  }
 
   return (
     <article className="card product" onClick={() => navigate(`/product/${product.id}`)} style={{ cursor: 'pointer' }}>
@@ -25,12 +43,10 @@ function ProductCard({ product, onAdd, onWishlist, isInWishlist }) {
       <div className="product-image-wrap">
         <img src={product.image} alt={product.name} className="product-image" loading="lazy" />
         <button 
-          className={`wishlist ${isInWishlist ? 'active' : ''}`} 
+          className={`wishlist ${isInWishlist ? 'active' : ''} ${!isAuthenticated ? 'auth-required' : ''}`} 
           aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
-          onClick={(e) => {
-            e.stopPropagation()
-            onWishlist(product)
-          }}
+          onClick={handleWishlist}
+          title={isAuthenticated ? (isInWishlist ? "Remove from wishlist" : "Add to wishlist") : "Login to manage wishlist"}
         >
           {isInWishlist ? '❤️' : '♡'}
         </button>
@@ -39,71 +55,72 @@ function ProductCard({ product, onAdd, onWishlist, isInWishlist }) {
       <StarRating value={product.rating} />
       <div className="product-footer">
         <span className="price">₹{product.price}</span>
-        <button className="btn small" onClick={(e) => { e.stopPropagation(); onAdd(product) }}>Add to cart</button>
+        <button 
+          className={`btn small ${isAuthenticated ? 'authenticated' : 'auth-required'}`}
+          onClick={handleAddToCart}
+        >
+          {isAuthenticated ? 'Add to cart' : 'Login to Add'}
+        </button>
       </div>
     </article>
   )
 }
 
-function SearchResultsPage() {
+function SearchResultsPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
-  const [cart, setCart] = useState([])
-  const [wishlist, setWishlist] = useState([])
   const [sortBy, setSortBy] = useState('relevance')
   const [priceRange, setPriceRange] = useState('all')
   const [selectedCategories, setSelectedCategories] = useState([])
 
   const searchQuery = searchParams.get('q') || ''
 
-  // Load cart and wishlist from localStorage
-  useEffect(() => {
-    const savedCart = localStorage.getItem('leeya_cart')
-    const savedWishlist = localStorage.getItem('leeya_wishlist')
-    if (savedCart) setCart(JSON.parse(savedCart))
-    if (savedWishlist) setWishlist(JSON.parse(savedWishlist))
-  }, [])
-
-  // Save cart and wishlist to localStorage
-  useEffect(() => {
-    localStorage.setItem('leeya_cart', JSON.stringify(cart))
-  }, [cart])
-  useEffect(() => {
-    localStorage.setItem('leeya_wishlist', JSON.stringify(wishlist))
-  }, [wishlist])
-
   // Filter and sort products
   const filteredProducts = ALL_PRODUCTS.filter(product => {
-    if (!searchQuery) return true
+    // Apply price range filter
+    let matchesPrice = true
+    if (priceRange === 'under500') matchesPrice = product.price < 500
+    else if (priceRange === '500to1000') matchesPrice = product.price >= 500 && product.price <= 1000
+    else if (priceRange === 'over1000') matchesPrice = product.price > 1000
 
-    const query = searchQuery.toLowerCase().trim()
-    const name = product.name.toLowerCase()
-    const category = product.category.toLowerCase()
-    const description = product.description.toLowerCase()
-    
-    // Handle plural/singular matching
-    const querySingular = query.replace(/s$/, '') // Remove 's' from end
-    const queryPlural = query + 's' // Add 's' to end
-    const categorySingular = category.replace(/s$/, '')
-    const categoryPlural = category + 's'
-    
-    // Check if query matches any part of the product
-    const nameMatch = name.includes(query) || name.includes(querySingular) || name.includes(queryPlural)
-    const categoryMatch = category.includes(query) || category.includes(querySingular) || category.includes(queryPlural) ||
-                         query.includes(category) || query.includes(categorySingular) || query.includes(categoryPlural)
-    const descriptionMatch = description.includes(query) || description.includes(querySingular) || description.includes(queryPlural)
-    
-    return nameMatch || categoryMatch || descriptionMatch
-  }).filter(product => {
-    // Filter by price range
-    if (priceRange === 'under500') return product.price < 500
-    if (priceRange === '500to1000') return product.price >= 500 && product.price <= 1000
-    if (priceRange === 'over1000') return product.price > 1000
-    return true
-  }).filter(product => {
-    // Filter by categories
-    if (selectedCategories.length === 0) return true
-    return selectedCategories.includes(product.category)
+    // Apply category filter - if categories are selected, product must match one of them
+    let matchesCategory = true
+    if (selectedCategories.length > 0) {
+      matchesCategory = selectedCategories.includes(product.category)
+    }
+
+    // Apply search query filter if there's a search term
+    let matchesSearch = true
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase().trim()
+      const name = product.name.toLowerCase()
+      const category = product.category.toLowerCase()
+      const description = product.description.toLowerCase()
+      
+      // Handle plural/singular matching
+      const querySingular = query.replace(/s$/, '') // Remove 's' from end
+      const queryPlural = query + 's' // Add 's' to end
+      const categorySingular = category.replace(/s$/, '')
+      const categoryPlural = category + 's'
+      
+      // Check if query matches any part of the product
+      const nameMatch = name.includes(query) || name.includes(querySingular) || name.includes(queryPlural)
+      const categoryMatch = category.includes(query) || category.includes(querySingular) || category.includes(queryPlural) ||
+                           query.includes(category) || query.includes(categorySingular) || query.includes(categoryPlural)
+      const descriptionMatch = description.includes(query) || description.includes(querySingular) || description.includes(queryPlural)
+      
+      matchesSearch = nameMatch || categoryMatch || descriptionMatch
+    }
+
+    // When both search and category filters are active:
+    // - If search matches and no categories selected: show product
+    // - If categories selected and no search: show products from selected categories
+    // - If both search and categories: show products that match search OR are in selected categories
+    if (searchQuery && selectedCategories.length > 0) {
+      return matchesPrice && (matchesSearch || matchesCategory)
+    }
+
+    return matchesPrice && matchesSearch && matchesCategory
   })
 
   // Sort products
@@ -129,6 +146,15 @@ function SearchResultsPage() {
       setSearchParams({})
     }
   }
+
+  const clearAllFilters = () => {
+    setSelectedCategories([])
+    setPriceRange('all')
+    setSortBy('relevance')
+    setSearchParams({})
+  }
+
+  const hasActiveFilters = selectedCategories.length > 0 || priceRange !== 'all' || searchQuery
 
   const handleCategoryToggle = (category) => {
     setSelectedCategories(prev =>
@@ -168,15 +194,29 @@ function SearchResultsPage() {
     <div className="search-results-page">
       <div className="container">
         <div className="search-header">
-          <h1>Search Results</h1>
+          <h1>{searchQuery ? 'Search Results' : 'All Products'}</h1>
           {searchQuery && (
             <p>Showing {sortedProducts.length} results for "{searchQuery}"</p>
+          )}
+          {!searchQuery && hasActiveFilters && (
+            <p>Showing {sortedProducts.length} filtered products</p>
+          )}
+          {!searchQuery && !hasActiveFilters && (
+            <p>Browse all {sortedProducts.length} products</p>
           )}
         </div>
 
         <div className="search-layout">
           {/* Sidebar Filters */}
           <aside className="search-filters">
+            <div className="filter-actions">
+              {hasActiveFilters && (
+                <button className="btn secondary" onClick={clearAllFilters} style={{ marginBottom: '1rem', width: '100%' }}>
+                  Clear all filters
+                </button>
+              )}
+            </div>
+
             <div className="filter-section">
               <h3>Categories</h3>
               {CATEGORIES.map(category => (
@@ -211,6 +251,17 @@ function SearchResultsPage() {
                 <option value="name">Name: A to Z</option>
               </select>
             </div>
+
+            <div className="filter-summary" style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f8f9fa', borderRadius: '8px', fontSize: '0.9rem' }}>
+              <div><strong>Active Filters:</strong></div>
+              {selectedCategories.length > 0 && (
+                <div>Categories: {selectedCategories.join(', ')}</div>
+              )}
+              {priceRange !== 'all' && (
+                <div>Price: {priceRange === 'under500' ? 'Under ₹500' : priceRange === '500to1000' ? '₹500-₹1000' : 'Over ₹1000'}</div>
+              )}
+              {!hasActiveFilters && <div>No filters applied</div>}
+            </div>
           </aside>
 
           {/* Main Results */}
@@ -219,7 +270,7 @@ function SearchResultsPage() {
               <div className="no-results">
                 <h2>No products found</h2>
                 <p>Try adjusting your search terms or filters</p>
-                <button className="btn primary" onClick={() => setSearchParams({})}>
+                <button className="btn primary" onClick={clearAllFilters}>
                   Clear all filters
                 </button>
               </div>
@@ -232,6 +283,8 @@ function SearchResultsPage() {
                     onAdd={addToCart} 
                     onWishlist={toggleWishlist} 
                     isInWishlist={isProductInWishlist(product)}
+                    isAuthenticated={isAuthenticated}
+                    onShowAuth={onOpenAuth}
                   />
                 ))}
               </div>

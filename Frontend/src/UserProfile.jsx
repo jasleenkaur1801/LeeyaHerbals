@@ -76,13 +76,6 @@ const UserProfile = ({ user, onLogout }) => {
         </div>
       )}
 
-      {/* Overlay to close dropdown when clicking outside */}
-      {isDropdownOpen && (
-        <div 
-          className="dropdown-overlay" 
-          onClick={() => setIsDropdownOpen(false)}
-        />
-      )}
     </div>
   );
 };
