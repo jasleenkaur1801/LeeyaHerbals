@@ -275,3 +275,127 @@
     font-size: 1.5rem;
   }
 }
+
+/* Back to Home Section */
+.back-to-home-section {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 1rem 0;
+}
+
+.back-to-home-section .back-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #e2e8f0;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  color: #4a5568;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  position: static;
+}
+
+.back-to-home-section .back-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: #667eea;
+  color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+}
+
+/* Social WhatsApp Section */
+.social-whatsapp-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.whatsapp-card,
+.follow-us-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.whatsapp-card:hover,
+.follow-us-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.whatsapp-card .contact-icon,
+.follow-us-card .contact-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.whatsapp-card h3,
+.follow-us-card h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 12px;
+}
+
+.whatsapp-card p {
+  color: #4a5568;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.whatsapp-card small {
+  color: #718096;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Social Logo Styles */
+.social-logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+  border-radius: 4px;
+}
+
+.social-link.facebook {
+  color: #1877f2;
+  border-color: #1877f2;
+}
+
+.social-link.facebook:hover {
+  background-color: #1877f2;
+  color: white;
+}
+
+.social-link.instagram {
+  color: #e4405f;
+  border-color: #e4405f;
+}
+
+.social-link.instagram:hover {
+  background-color: #e4405f;
+  color: white;
+}
+
+.social-link:hover .social-logo {
+  filter: brightness(0) invert(1);
+}
+
+/* Responsive for Social WhatsApp Section */
+@media (max-width: 768px) {
+  .social-whatsapp-section {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}

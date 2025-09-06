@@ -340,13 +340,20 @@ function OrderManagement({ orders, loading, onUpdateStatus }) {
     return categoryMap[category] || category;
   };
 
+  console.log('Orders data:', orders); // Debug log
+  
   return (
     <div className="order-management">
       <h2>Order Management</h2>
       <p className="section-subtitle">Total Orders: {orders.length}</p>
       
       <div className="orders-container">
-        {orders.map(order => (
+        {orders.length === 0 ? (
+          <div style={{padding: '2rem', textAlign: 'center', color: '#666'}}>
+            No orders found. Make sure the backend is running and orders exist in the database.
+          </div>
+        ) : (
+          orders.map(order => (
           <div key={order._id} className="order-card">
             <div className="order-header" onClick={() => toggleOrderExpansion(order._id)}>
               <div className="order-main-info">
@@ -449,7 +456,8 @@ function OrderManagement({ orders, loading, onUpdateStatus }) {
               </div>
             )}
           </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
