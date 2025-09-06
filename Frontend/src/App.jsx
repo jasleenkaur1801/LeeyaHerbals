@@ -1223,7 +1223,7 @@ function App() {
                         <span className="feature-icon">🔄</span>
                         <div>
                           <h4>Easy Returns</h4>
-                          <p>30-day return policy</p>
+                          <p>Only damaged/expired products return within 7 days</p>
                         </div>
                       </div>
                       <div className="feature-item">

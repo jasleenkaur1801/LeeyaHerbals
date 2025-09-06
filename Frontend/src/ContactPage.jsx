@@ -200,7 +200,7 @@ function ContactPage() {
             <span className="feature-icon">🔄</span>
             <div>
               <h4>Easy Returns</h4>
-              <p>30-day return policy</p>
+              <p>Only damaged/expired products return within 7 days</p>
             </div>
           </div>
           <div className="feature-item">
@@ -228,7 +228,7 @@ function ContactPage() {
             </div>
             <div className="faq-item">
               <h4>What is your return policy?</h4>
-              <p>We offer a 30-day return policy for unopened products. Please contact us for return instructions.</p>
+              <p>We only accept returns for damaged or expired products within 7 days of delivery. Please contact us for return instructions.</p>
             </div>
             <div className="faq-item">
               <h4>Are your products suitable for sensitive skin?</h4>
