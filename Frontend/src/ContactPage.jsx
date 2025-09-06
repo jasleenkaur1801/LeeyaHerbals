@@ -49,9 +49,6 @@ function ContactPage() {
     <div className="contact-page">
       <div className="container">
         <div className="page-header">
-          <button className="back-btn" onClick={() => navigate('/')}>
-            ← Back to Home
-          </button>
           <h1>Contact Us</h1>
           <p>We'd love to hear from you. Get in touch with our team!</p>
         </div>
@@ -62,8 +59,7 @@ function ContactPage() {
               <div className="contact-icon">📧</div>
               <div>
                 <h3>Email Us</h3>
-                <p>info@leeyaherbals.com</p>
-                <p>support@leeyaherbals.com</p>
+                <p>kpherbals300@gmail.com</p>
               </div>
             </div>
 
@@ -71,7 +67,7 @@ function ContactPage() {
               <div className="contact-icon">📞</div>
               <div>
                 <h3>Call Us</h3>
-                <p>+91 98765 43210</p>
+                <p>+91 9254473593</p>
                 <p>Mon-Fri: 9:00 AM - 6:00 PM</p>
               </div>
             </div>
@@ -168,12 +164,67 @@ function ContactPage() {
           </form>
         </div>
 
+        <div className="social-whatsapp-section">
+          <div className="whatsapp-card">
+            <div className="contact-icon">💬</div>
+            <h3>WhatsApp</h3>
+            <p>+91-9254473593</p>
+            <small>Quick support & order updates</small>
+          </div>
+
+          <div className="follow-us-card">
+            <div className="contact-icon">🌐</div>
+            <h3>Follow Us</h3>
+            <div className="social-links">
+              <a href="https://www.facebook.com/leeyaherbalsofficial?rdid=NtSw720FcKpPbzU8&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1CNMek2Gjd%2F" target="_blank" rel="noopener noreferrer" className="social-link facebook">
+                <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" className="social-logo" />
+                Facebook
+              </a>
+              <a href="https://www.instagram.com/leeyaherbals/?igsh=OGQyZmF2N2lzd2kz" target="_blank" rel="noopener noreferrer" className="social-link instagram">
+                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" className="social-logo" />
+                Instagram
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="contact-features">
+          <div className="feature-item">
+            <span className="feature-icon">🚚</span>
+            <div>
+              <h4>Free Shipping</h4>
+              <p>On orders above ₹799</p>
+            </div>
+          </div>
+          <div className="feature-item">
+            <span className="feature-icon">🔄</span>
+            <div>
+              <h4>Easy Returns</h4>
+              <p>30-day return policy</p>
+            </div>
+          </div>
+          <div className="feature-item">
+            <span className="feature-icon">🔒</span>
+            <div>
+              <h4>Secure Payment</h4>
+              <p>100% secure transactions</p>
+            </div>
+          </div>
+          <div className="feature-item">
+            <span className="feature-icon">👩‍⚕️</span>
+            <div>
+              <h4>Expert Support</h4>
+              <p>Skincare consultation available</p>
+            </div>
+          </div>
+        </div>
+
         <div className="contact-faq">
           <h3>Frequently Asked Questions</h3>
           <div className="faq-grid">
             <div className="faq-item">
               <h4>How long does shipping take?</h4>
-              <p>We typically ship within 1-2 business days, and delivery takes 3-7 business days depending on your location.</p>
+              <p>We typically ship within 1-2 working days, and delivery takes 3-7 working days depending on your location.</p>
             </div>
             <div className="faq-item">
               <h4>What is your return policy?</h4>
@@ -184,10 +235,16 @@ function ContactPage() {
               <p>Most of our products are formulated for all skin types, but we recommend patch testing for sensitive skin.</p>
             </div>
             <div className="faq-item">
-              <h4>Do you offer wholesale pricing?</h4>
-              <p>Yes! Please contact us directly for wholesale and bulk order pricing information.</p>
+              <h4>Do you supply products to retailers?</h4>
+              <p>Yes! We are a production company with our own factory. We supply herbal products in bulk to shops and retailers. Please contact us for bulk supply and pricing information.</p>
             </div>
           </div>
+        </div>
+
+        <div className="back-to-home-section">
+          <button className="back-btn" onClick={() => navigate('/')}>
+            ← Back to Home
+          </button>
         </div>
       </div>
     </div>

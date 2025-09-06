@@ -121,7 +121,10 @@
 .admin-content {
   max-width: 1200px;
   margin: 2rem auto;
-  padding: 0 2rem;
+  padding: 0 2rem 220px 2rem; /* Increased bottom padding for footer space */
+  min-height: calc(100vh - 300px);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Dashboard Overview */
@@ -185,28 +188,39 @@
 }
 
 /* User Management */
+.user-management,
+.order-management {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px); /* Further increased height for better visibility */
+  overflow: hidden;
+}
+
 .user-management h2,
 .order-management h2 {
   color: white;
   margin-bottom: 1rem;
   font-size: 2rem;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
 }
 
 .section-subtitle {
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 2rem;
   font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
-.users-table-container,
-.orders-table-container {
+.users-table-container {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  overflow-x: auto;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .users-table,
@@ -257,18 +271,28 @@
 
 /* Enhanced Order Management */
 .orders-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 600px; /* Increased minimum height */
+  max-height: calc(100vh - 280px); /* Significantly increased max height for better visibility */
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 .order-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: white;
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: all 0.3s ease;
+  flex-shrink: 0;
+  min-height: 150px; /* Further increased minimum height for better visibility */
 }
 
 .order-card:hover {
@@ -277,9 +301,10 @@
 }
 
 .order-header {
-  padding: 1.5rem;
+  padding: 2rem;
   cursor: pointer;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: block;
 }
 
 .order-main-info {
@@ -287,6 +312,7 @@
   grid-template-columns: auto 1fr auto auto auto;
   gap: 2rem;
   align-items: center;
+  min-height: 60px;
 }
 
 .order-id-section {
