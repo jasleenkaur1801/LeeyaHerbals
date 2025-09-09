@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AddToCartButton from './components/AddToCartButton';
 
 // Import ALL_PRODUCTS from App.jsx - we'll need to pass this as props
 function BathBodyPage({ products = [], cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
@@ -123,12 +124,13 @@ function BathBodyPage({ products = [], cart, setCart, wishlist, setWishlist, isA
                 </div>
                 <div className="product-footer">
                   <span className="price">₹{product.price}</span>
-                  <button 
-                    className="btn small" 
-                    onClick={() => addToCart(product)}
-                  >
-                    Add to Cart
-                  </button>
+                  <AddToCartButton 
+                    product={product}
+                    cart={cart}
+                    setCart={setCart}
+                    isAuthenticated={isAuthenticated}
+                    onShowAuth={onOpenAuth}
+                  />
                 </div>
               </div>
             ))}

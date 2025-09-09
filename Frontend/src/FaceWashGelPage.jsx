@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AddToCartButton from './components/AddToCartButton';
 
 function FaceWashGelPage({ products = [], cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
   const navigate = useNavigate();
@@ -104,12 +105,13 @@ function FaceWashGelPage({ products = [], cart, setCart, wishlist, setWishlist, 
               </div>
               <div className="product-price">₹{product.price}</div>
               <div className="product-weight">{product.weight}</div>
-              <button 
-                className="add-to-cart-btn"
-                onClick={() => addToCart(product)}
-              >
-                Add to Cart
-              </button>
+              <AddToCartButton 
+                product={product}
+                cart={cart}
+                setCart={setCart}
+                isAuthenticated={isAuthenticated}
+                onShowAuth={onOpenAuth}
+              />
             </div>
           </div>
         ))}

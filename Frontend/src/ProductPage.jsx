@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ALL_PRODUCTS, CATEGORIES } from './products'
+import AddToCartButton from './components/AddToCartButton'
 import './App.css'
 
 function StarRating({ value }) {
@@ -40,7 +41,6 @@ function ProductPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, on
   const { productId } = useParams();
   const navigate = useNavigate();
   const product = ALL_PRODUCTS.find(p => p.id === parseInt(productId, 10));
-  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -55,20 +55,6 @@ function ProductPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, on
     );
   }
 
-  const handleAddToCart = () => {
-    if (!isAuthenticated) {
-      onOpenAuth();
-      return;
-    }
-    setCart(prev => {
-      const found = prev.find(i => i.id === product.id)
-      if (found) {
-        return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + quantity } : i)
-      }
-      return [...prev, { ...product, qty: quantity }]
-    })
-    alert(`${quantity} x ${product.name} added to cart!`);
-  };
 
   const toggleWishlist = () => {
     if (!isAuthenticated) {
@@ -88,7 +74,6 @@ function ProductPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, on
 
   return (
     <div className="container product-page">
-      <button className="back-btn" onClick={() => navigate(-1)}>← Back to products</button>
       <div className="product-details">
         <div className="product-images">
           <img src={product.image} alt={product.name} className="main-image" />
@@ -105,72 +90,36 @@ function ProductPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, on
           <p className="product-description">{product.description}</p>
           <div className="product-price">₹{product.price}</div>
           <div className="product-actions">
-            <button 
-              className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}
-              onClick={toggleWishlist}
-              style={{
-                padding: '0.8rem 1.5rem',
-                fontSize: '1rem',
-                fontWeight: '600',
-                backgroundColor: isInWishlist ? '#ff4757' : '#f8f9fa',
-                color: isInWishlist ? '#ffffff' : '#495057',
-                border: `2px solid ${isInWishlist ? '#ff4757' : '#dee2e6'}`,
-                borderRadius: '8px',
-                cursor: 'pointer',
-                marginBottom: '1rem',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-            >
-              {isInWishlist ? '❤️' : '♡'} {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-            </button>
-            <div className="quantity-selector">
-              <label htmlFor="quantity">Quantity:</label>
-              <div className="quantity-controls">
-                <button className="qty-btn" onClick={() => setQuantity(prev => Math.max(1, prev - 1))} disabled={quantity === 1}>-</button>
-                <span className="quantity-value">{quantity}</span>
-                <button className="qty-btn" onClick={() => setQuantity(prev => prev + 1)}>+</button>
-              </div>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '1rem' }}>
+              <AddToCartButton 
+                product={product}
+                cart={cart}
+                setCart={setCart}
+                isAuthenticated={isAuthenticated}
+                onShowAuth={onOpenAuth}
+              />
+              <button 
+                className={`product-wishlist-btn ${isInWishlist ? 'active' : ''}`}
+                onClick={toggleWishlist}
+                style={{
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.9rem',
+                  fontWeight: '600',
+                  backgroundColor: isInWishlist ? '#ff4757' : '#f8f9fa',
+                  color: isInWishlist ? '#ffffff' : '#495057',
+                  border: `1px solid ${isInWishlist ? '#ff4757' : '#dee2e6'}`,
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {isInWishlist ? '❤️' : '♡'} {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              </button>
             </div>
-            <button 
-              onClick={handleAddToCart}
-              style={{
-                display: 'block',
-                width: '100%',
-                maxWidth: '300px',
-                padding: '1.2rem 2.5rem',
-                fontSize: '1.2rem',
-                fontWeight: '700',
-                backgroundColor: isAuthenticated ? '#1dbf73' : '#6c757d',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                marginTop: '1rem',
-                boxShadow: `0 4px 15px ${isAuthenticated ? 'rgba(24,167,99,.3)' : 'rgba(108,117,125,.3)'}`,
-                transition: 'all 0.3s ease',
-                opacity: '1',
-                visibility: 'visible',
-                position: 'relative',
-                zIndex: '10'
-              }}
-              onMouseEnter={(e) => {
-                if (isAuthenticated) {
-                  e.target.style.transform = 'translateY(-3px)';
-                  e.target.style.boxShadow = '0 10px 30px rgba(24,167,99,.4)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (isAuthenticated) {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 4px 15px rgba(24,167,99,.3)';
-                }
-              }}
-            >
-              {isAuthenticated ? `Add to Cart - ₹${product.price * quantity}` : 'Login to Add to Cart'}
-            </button>
           </div>
           <div className="product-features">
             <h3>Key Benefits</h3>
@@ -180,6 +129,25 @@ function ProductPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, on
               <li>Cruelty-free</li>
               <li>Suitable for all skin types</li>
             </ul>
+          </div>
+          <div style={{ marginTop: '2rem', marginBottom: '1rem' }}>
+            <button 
+              className="back-btn" 
+              onClick={() => navigate(-1)}
+              style={{
+                padding: '0.6rem 1.2rem',
+                fontSize: '0.9rem',
+                fontWeight: '500',
+                backgroundColor: '#f8f9fa',
+                color: '#495057',
+                border: '1px solid #dee2e6',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              ← Back to products
+            </button>
           </div>
         </div>
       </div>

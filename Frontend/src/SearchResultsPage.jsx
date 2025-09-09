@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import './App.css'
 import { ALL_PRODUCTS, CATEGORIES } from './products'
+import AddToCartButton from './components/AddToCartButton'
 
 function StarRating({ value }) {
   const fullStars = Math.round(value)
@@ -14,17 +15,8 @@ function StarRating({ value }) {
   )
 }
 
-function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated, onShowAuth }) {
+function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated, onShowAuth, cart, setCart }) {
   const navigate = useNavigate()
-
-  const handleAddToCart = (e) => {
-    e.stopPropagation()
-    if (!isAuthenticated) {
-      onShowAuth()
-      return
-    }
-    onAdd(product)
-  }
 
   const handleWishlist = (e) => {
     e.stopPropagation()
@@ -39,28 +31,31 @@ function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated
     <article className="card product" onClick={() => navigate(`/product/${product.id}`)} style={{ cursor: 'pointer' }}>
       <div className="badge-row">
         {product.tag ? <span className="badge">{product.tag}</span> : null}
+        <button 
+          className={`wishlist-btn ${isInWishlist ? 'active' : ''}`} 
+          onClick={handleWishlist}
+          aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          {isInWishlist ? '❤️' : '🤍'}
+        </button>
       </div>
       <div className="product-image-wrap">
         <img src={product.image} alt={product.name} className="product-image" loading="lazy" />
-        <button 
-          className={`wishlist ${isInWishlist ? 'active' : ''} ${!isAuthenticated ? 'auth-required' : ''}`} 
-          aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
-          onClick={handleWishlist}
-          title={isAuthenticated ? (isInWishlist ? "Remove from wishlist" : "Add to wishlist") : "Login to manage wishlist"}
-        >
-          {isInWishlist ? '❤️' : '♡'}
-        </button>
       </div>
       <h3 className="product-name">{product.name}</h3>
+      <p className="product-category">{product.category} • {product.weight}</p>
       <StarRating value={product.rating} />
       <div className="product-footer">
         <span className="price">₹{product.price}</span>
-        <button 
-          className={`btn small ${isAuthenticated ? 'authenticated' : 'auth-required'}`}
-          onClick={handleAddToCart}
-        >
-          {isAuthenticated ? 'Add to cart' : 'Login to Add'}
-        </button>
+        <div onClick={(e) => e.stopPropagation()}>
+          <AddToCartButton 
+            product={product}
+            cart={cart}
+            setCart={setCart}
+            isAuthenticated={isAuthenticated}
+            onShowAuth={onShowAuth}
+          />
+        </div>
       </div>
     </article>
   )
@@ -285,6 +280,8 @@ function SearchResultsPage({ cart, setCart, wishlist, setWishlist, isAuthenticat
                     isInWishlist={isProductInWishlist(product)}
                     isAuthenticated={isAuthenticated}
                     onShowAuth={onOpenAuth}
+                    cart={cart}
+                    setCart={setCart}
                   />
                 ))}
               </div>

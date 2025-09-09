@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AddToCartButton from './components/AddToCartButton';
 
 function CollectionsPage({ products = [], cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
   const navigate = useNavigate();
@@ -142,12 +143,13 @@ function CollectionsPage({ products = [], cart, setCart, wishlist, setWishlist, 
                 </div>
                 <div className="product-footer">
                   <span className="price">₹{product.price}</span>
-                  <button 
-                    className="btn small" 
-                    onClick={() => addToCart(product)}
-                  >
-                    Add Collection
-                  </button>
+                  <AddToCartButton 
+                    product={product}
+                    cart={cart}
+                    setCart={setCart}
+                    isAuthenticated={isAuthenticated}
+                    onShowAuth={onOpenAuth}
+                  />
                 </div>
               </div>
             ))}

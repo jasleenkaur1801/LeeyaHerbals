@@ -5,13 +5,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .auth-modal {
@@ -131,6 +130,35 @@
 
 .auth-input::placeholder {
   color: #999;
+}
+
+/* Password Requirements Styles */
+.password-requirements {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.requirement {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.requirement:last-child {
+  margin-bottom: 0;
+}
+
+.requirement.valid {
+  color: #28a745;
+}
+
+.requirement.invalid {
+  color: #dc3545;
 }
 
 .auth-error {

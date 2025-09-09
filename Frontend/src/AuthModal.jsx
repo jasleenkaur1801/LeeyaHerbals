@@ -12,12 +12,36 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    hasUppercase: false,
+    hasDigit: false,
+    hasSpecialChar: false
+  });
+
+  const validatePassword = (password) => {
+    const validation = {
+      minLength: password.length >= 5,
+      hasUppercase: /[A-Z]/.test(password),
+      hasDigit: /\d/.test(password),
+      hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    };
+    setPasswordValidation(validation);
+    return validation;
+  };
 
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+    
+    // Validate password in real-time for signup
+    if (name === 'password' && !isLogin) {
+      validatePassword(value);
+    }
+    
     setError('');
     setSuccess('');
   };
@@ -34,10 +58,21 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
         ? { email: formData.email, password: formData.password }
         : { name: formData.name, email: formData.email, password: formData.password };
 
-      if (!isLogin && formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match');
-        setLoading(false);
-        return;
+      if (!isLogin) {
+        // Validate password requirements
+        const validation = validatePassword(formData.password);
+        if (!validation.minLength || !validation.hasUppercase || !validation.hasDigit || !validation.hasSpecialChar) {
+          setError('Password must meet all requirements');
+          setLoading(false);
+          return;
+        }
+        
+        // Check password confirmation
+        if (formData.password !== formData.confirmPassword) {
+          setError('Passwords do not match');
+          setLoading(false);
+          return;
+        }
       }
 
       const response = await fetch(`http://localhost:8080${endpoint}`, {
@@ -143,6 +178,22 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
               required
               className="auth-input"
             />
+            {!isLogin && (
+              <div className="password-requirements">
+                <div className={`requirement ${passwordValidation.minLength ? 'valid' : 'invalid'}`}>
+                  {passwordValidation.minLength ? '✓' : '✗'} At least 5 characters
+                </div>
+                <div className={`requirement ${passwordValidation.hasUppercase ? 'valid' : 'invalid'}`}>
+                  {passwordValidation.hasUppercase ? '✓' : '✗'} One uppercase letter
+                </div>
+                <div className={`requirement ${passwordValidation.hasDigit ? 'valid' : 'invalid'}`}>
+                  {passwordValidation.hasDigit ? '✓' : '✗'} One digit
+                </div>
+                <div className={`requirement ${passwordValidation.hasSpecialChar ? 'valid' : 'invalid'}`}>
+                  {passwordValidation.hasSpecialChar ? '✓' : '✗'} One special character (@, #, $, etc.)
+                </div>
+              </div>
+            )}
           </div>
 
           {!isLogin && (

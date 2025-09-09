@@ -26,7 +26,7 @@ async function createAdminUser() {
         const adminData = {
             name: 'Leeya Admin',
             email: 'admin@leeyaherbals.com',
-            password: 'admin123', // This will be hashed
+            password: 'Admin@123', // This will be hashed
             role: 'admin',
             phone: '+91-90000-00000',
             address: 'Mumbai, India'
@@ -45,7 +45,7 @@ async function createAdminUser() {
 
         console.log('✅ Admin user created successfully!');
         console.log('📧 Email:', adminData.email);
-        console.log('🔑 Password:', 'admin123');
+        console.log('🔑 Password:', 'Admin@123');
         console.log('');
         console.log('You can now login to the admin panel at: http://localhost:3000/admin');
         console.log('');

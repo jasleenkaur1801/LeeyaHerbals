@@ -481,15 +481,9 @@ function CategoryPills({ selected, onSelect }) {
   )
 }
 
-function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated, onShowAuth }) {
-  const handleAddToCart = () => {
-    if (!isAuthenticated) {
-      onShowAuth();
-      return;
-    }
-    onAdd(product);
-  };
+import AddToCartButton from './components/AddToCartButton';
 
+function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated, onShowAuth, cart, setCart }) {
   const handleWishlist = (e) => {
     e.stopPropagation();
     if (!isAuthenticated) {
@@ -500,37 +494,40 @@ function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated
   };
 
   return (
-    <article className="card product">
+    <article className="card product" onClick={() => window.location.href = `/product/${product.id}`}>
       <div className="badge-row">
         {product.tag ? <span className="badge">{product.tag}</span> : null}
-      </div>
-      <div className="product-image-wrap">
-        <img src={product.image} alt={product.name} className="product-image" loading="lazy" />
         <button 
-          className={`wishlist ${isInWishlist ? 'active' : ''} ${!isAuthenticated ? 'auth-required' : ''}`} 
-          aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+          className={`wishlist-btn ${isInWishlist ? 'active' : ''}`} 
           onClick={handleWishlist}
-          title={isAuthenticated ? (isInWishlist ? "Remove from wishlist" : "Add to wishlist") : "Login to manage wishlist"}
+          aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
         >
-          {isInWishlist ? '❤️' : '♡'}
+          {isInWishlist ? '❤️' : '🤍'}
         </button>
       </div>
+      <div className="product-image-wrap">
+        <img src={product.image} alt={product.name} className="product-image" />
+      </div>
       <h3 className="product-name">{product.name}</h3>
+      <p className="product-category">{product.category} • {product.weight}</p>
       <StarRating value={product.rating} />
       <div className="product-footer">
         <span className="price">₹{product.price}</span>
-        <button 
-          className={`btn small ${isAuthenticated ? 'authenticated' : 'auth-required'}`}
-          onClick={handleAddToCart}
-        >
-          {isAuthenticated ? 'Add to cart' : 'Login to Add'}
-        </button>
+        <div onClick={(e) => e.stopPropagation()}>
+          <AddToCartButton 
+            product={product}
+            cart={cart}
+            setCart={setCart}
+            isAuthenticated={isAuthenticated}
+            onShowAuth={onShowAuth}
+          />
+        </div>
       </div>
     </article>
   )
 }
 
-function ProductsGrid({ products, onAdd, onWishlist, wishlist, isAuthenticated, onShowAuth }) {
+function ProductsGrid({ products, onAdd, onWishlist, wishlist, isAuthenticated, onShowAuth, cart, setCart }) {
   return (
     <section id="shop" className="section">
       <div className="container">
@@ -544,10 +541,12 @@ function ProductsGrid({ products, onAdd, onWishlist, wishlist, isAuthenticated, 
               key={p.id} 
               product={p} 
               onAdd={onAdd} 
-              onWishlist={onWishlist}
+              onWishlist={onWishlist} 
               isInWishlist={wishlist.some(item => item.id === p.id)}
               isAuthenticated={isAuthenticated}
               onShowAuth={onShowAuth}
+              cart={cart}
+              setCart={setCart}
             />
           ))}
         </div>
@@ -1078,6 +1077,8 @@ function App() {
                 wishlist={wishlist}
                 isAuthenticated={isAuthenticated}
                 onShowAuth={() => setShowAuth(true)}
+                cart={cart}
+                setCart={setCart}
               />
             </section>
             <section className="section reveal">
@@ -1112,6 +1113,8 @@ function App() {
                         isInWishlist={wishlist.some(item => item.id === p.id)}
                         isAuthenticated={isAuthenticated}
                         onShowAuth={() => setShowAuth(true)}
+                        cart={cart}
+                        setCart={setCart}
                       />
                     </div>
                   ))}
