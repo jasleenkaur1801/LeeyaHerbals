@@ -21,6 +21,8 @@ import SkinCarePage from './SkinCarePage'
 import CollectionsPage from './CollectionsPage';
 import AboutPage from './AboutPage';
 import ContactPage from './ContactPage';
+import VisitUsPage from './VisitUsPage';
+import FAQPage from './FAQPage';
 import FaceWashGelPage from './FaceWashGelPage';
 
 function AuthRedirect() {
@@ -762,7 +764,7 @@ function Footer() {
             <h4>Company</h4>
             <a href="#about">About us</a>
             <a href="#care">Ingredients</a>
-            <a href="#faq">FAQ</a>
+            <a href="/faq" onClick={(e) => { e.preventDefault(); navigate('/faq'); }}>FAQ</a>
           </div>
           <div>
             <h4>Support</h4>
@@ -1139,121 +1141,6 @@ function App() {
                 <p>We craft nature-first skincare using clinically-backed herbal actives. Every formula is cruelty-free, free from parabens, sulfates, and mineral oils, and made in small batches for freshness. Our mission is to simplify routines with high-performance essentials that let your skin breathe and glow.</p>
               </div>
             </section>
-            <section id="contact" className="section reveal">
-              <div className="container section-head"><h2>Contact Us</h2><p>We'd love to hear from you and help with your skincare journey</p></div>
-              <div className="container contact-content">
-                <div className="contact-grid">
-                  <div className="contact-info">
-                    <div className="contact-card">
-                      <div className="contact-icon">📧</div>
-                      <h3>Email Us</h3>
-                      <p>care@leeyaherbals.com</p>
-                      <p>support@leeyaherbals.com</p>
-                      <small>We respond within 24 hours</small>
-                    </div>
-                    
-                    <div className="contact-card">
-                      <div className="contact-icon">📞</div>
-                      <h3>Call Us</h3>
-                      <p>+91-98765 43210</p>
-                      <p>+91-87654 32109</p>
-                      <small>Mon-Sat: 9 AM - 7 PM IST</small>
-                    </div>
-                    
-                    <div className="contact-card">
-                      <div className="contact-icon">📍</div>
-                      <h3>Visit Us</h3>
-                      <p>Leeya Herbals Pvt. Ltd.</p>
-                      <p>123 Herbal Street, Green Valley</p>
-                      <p>Mumbai, Maharashtra 400001</p>
-                      <small>India</small>
-                    </div>
-                    
-                    <div className="contact-card">
-                      <div className="contact-icon">🕒</div>
-                      <h3>Business Hours</h3>
-                      <p>Monday - Friday: 9:00 AM - 7:00 PM</p>
-                      <p>Saturday: 10:00 AM - 5:00 PM</p>
-                      <p>Sunday: Closed</p>
-                      <small>All times in IST</small>
-                    </div>
-                    
-                    <div className="contact-card social-card">
-                      <div className="contact-icon">🌐</div>
-                      <h3>Follow Us</h3>
-                      <div className="social-links">
-                        <a href="#" className="social-link">📘 Facebook</a>
-                        <a href="#" className="social-link">📷 Instagram</a>
-                        <a href="#" className="social-link">🐦 Twitter</a>
-                        <a href="#" className="social-link">💼 LinkedIn</a>
-                      </div>
-                    </div>
-                    
-                    <div className="contact-card">
-                      <div className="contact-icon">💬</div>
-                      <h3>WhatsApp</h3>
-                      <p>+91-98765 43210</p>
-                      <small>Quick support & order updates</small>
-                    </div>
-                  </div>
-                  
-                  <div className="contact-form-section">
-                    <div className="form-container">
-                      <h3>Send us a Message</h3>
-                      <form className="contact-form" onSubmit={(e)=>e.preventDefault()}>
-                        <div className="form-row">
-                          <input type="text" placeholder="Your Name *" required />
-                          <input type="email" placeholder="Your Email *" required />
-                        </div>
-                        <input type="tel" placeholder="Phone Number" />
-                        <select>
-                          <option value="">Select Subject</option>
-                          <option value="product">Product Inquiry</option>
-                          <option value="order">Order Support</option>
-                          <option value="skincare">Skincare Consultation</option>
-                          <option value="wholesale">Wholesale/Business</option>
-                          <option value="feedback">Feedback</option>
-                          <option value="other">Other</option>
-                        </select>
-                        <textarea placeholder="Your Message *" rows="5" required></textarea>
-                        <button className="btn primary" type="submit">Send Message</button>
-                      </form>
-                    </div>
-                    
-                    <div className="contact-features">
-                      <div className="feature-item">
-                        <span className="feature-icon">🚚</span>
-                        <div>
-                          <h4>Free Shipping</h4>
-                          <p>On orders above ₹799</p>
-                        </div>
-                      </div>
-                      <div className="feature-item">
-                        <span className="feature-icon">🔄</span>
-                        <div>
-                          <h4>Easy Returns</h4>
-                          <p>Only damaged/expired products return within 7 days</p>
-                        </div>
-                      </div>
-                      <div className="feature-item">
-                        <span className="feature-icon">🛡️</span>
-                        <div>
-                          <h4>Secure Payment</h4>
-                          <p>100% secure transactions</p>
-                        </div>
-                      </div>
-                      <div className="feature-item">
-                        <span className="feature-icon">👩‍⚕️</span>
-                        <div>
-                          <h4>Expert Support</h4>
-                          <p>Skincare consultation available</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
             <Newsletter />
             <button className="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Back to top">↑</button>
           </>
@@ -1272,6 +1159,8 @@ function App() {
         <Route path="/collections" element={<CollectionsPage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/contact/visitus" element={<VisitUsPage />} />
+        <Route path="/faq" element={<FAQPage />} />
         <Route path="/myorders" element={<OrdersPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />

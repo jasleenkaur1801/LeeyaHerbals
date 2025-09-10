@@ -1,48 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './ContactUs.css';
 
 function ContactPage() {
   const navigate = useNavigate();
-  const [activeAccordion, setActiveAccordion] = useState(null);
-
-  const toggleAccordion = (index) => {
-    setActiveAccordion(activeAccordion === index ? null : index);
-  };
-
-  const faqData = [
-    {
-      question: "How long does shipping take?",
-      answer: "We typically ship within 1-2 working days, and delivery takes 3-7 working days depending on your location. We provide tracking information for all orders."
-    },
-    {
-      question: "What is your return policy?",
-      answer: "We only accept returns for damaged or expired products within 7 days of delivery. Please contact us with photos of the damaged product for return instructions."
-    },
-    {
-      question: "Are your products suitable for sensitive skin?",
-      answer: "Most of our products are formulated for all skin types using natural herbal ingredients. However, we recommend patch testing for sensitive skin before full application."
-    },
-    {
-      question: "Do you supply products to retailers?",
-      answer: "Yes! We are a production company with our own factory. We supply herbal products in bulk to shops and retailers. Contact us for bulk pricing and minimum order quantities."
-    },
-    {
-      question: "What payment methods do you accept?",
-      answer: "We accept all major payment methods including UPI, Credit/Debit Cards, Net Banking, and Cash on Delivery (COD) for orders above ₹500."
-    },
-    {
-      question: "How can I track my order?",
-      answer: "Once your order is shipped, you'll receive a tracking number via SMS and email. You can also check your order status in the 'My Orders' section of your account."
-    },
-    {
-      question: "Do you offer skincare consultations?",
-      answer: "Yes! Our expert team provides free skincare consultations. You can chat with us or call during business hours for personalized product recommendations."
-    },
-    {
-      question: "Are your products certified organic?",
-      answer: "Our products are made with natural herbal ingredients. While we follow organic practices, specific certifications vary by product. Check individual product descriptions for details."
-    }
-  ];
 
   return (
     <div className="contact-page">
@@ -53,12 +14,13 @@ function ContactPage() {
         </div>
 
         <div className="contact-content">
-          <div className="contact-methods">
+          <div className="contact-grid-unified">
             <div className="contact-item">
               <div className="contact-icon">📧</div>
               <div>
                 <h3>Email Us</h3>
                 <p>kpherbals300@gmail.com</p>
+                <small>We respond within 24 hours</small>
               </div>
             </div>
 
@@ -67,103 +29,70 @@ function ContactPage() {
               <div>
                 <h3>Call Us</h3>
                 <p>+91 9254473593</p>
-                <p>Mon-Fri: 9:00 AM - 6:00 PM</p>
+                <small>Mon-Fri: 9:00 AM - 6:00 PM IST</small>
               </div>
             </div>
 
-            <div className="contact-item">
+            <div className="contact-item visit-us-clickable" onClick={() => navigate('/contact/visitus')}>
               <div className="contact-icon">📍</div>
               <div>
                 <h3>Visit Us</h3>
-                <p>123 Herbal Street</p>
-                <p>Natural City, NC 12345</p>
-                <p>India</p>
+                <p>Leeya Herbals Pvt. Ltd.</p>
+                <p>Mini Bypass, Shanti Nagar, Surya Nagar</p>
+                <p>Near C R Resort, Surya Nagar</p>
+                <p>Bhiwani, Haryana 127021</p>
+                <small>Click to view on map</small>
               </div>
             </div>
 
             <div className="contact-item">
-              <div className="contact-icon">💬</div>
+              <div className="contact-icon">🕒</div>
               <div>
-                <h3>Live Chat</h3>
-                <p>Available 24/7</p>
-                <button className="btn small" onClick={() => navigate('/chat')}>
-                  Start Chat
-                </button>
+                <h3>Business Hours</h3>
+                <p>Monday - Sunday: 9:30 AM - 8:15 PM</p>
+                <small>All times in IST</small>
               </div>
             </div>
-          </div>
 
-          <div className="faq-accordion-section">
-            <div className="faq-header">
-              <h3>Frequently Asked Questions</h3>
-              <p>Find quick answers to common questions about our products and services</p>
-            </div>
-            
-            <div className="faq-accordion">
-              {faqData.map((faq, index) => (
-                <div key={index} className={`faq-item ${activeAccordion === index ? 'active' : ''}`}>
-                  <button 
-                    className="faq-question"
-                    onClick={() => toggleAccordion(index)}
-                    aria-expanded={activeAccordion === index}
-                  >
-                    <span className="question-text">{faq.question}</span>
-                    <span className={`faq-icon ${activeAccordion === index ? 'rotate' : ''}`}>
-                      ▼
-                    </span>
-                  </button>
-                  <div className={`faq-answer ${activeAccordion === index ? 'show' : ''}`}>
-                    <div className="answer-content">
-                      <p>{faq.answer}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="contact-item whatsapp-card">
+              <div className="contact-icon">💬</div>
+              <div>
+                <h3>WhatsApp Support</h3>
+                <p>+91-9254473593</p>
+                <small>Quick support & order updates</small>
+                <a href="https://wa.me/919254473593" target="_blank" rel="noopener noreferrer" className="whatsapp-btn">
+                  Chat on WhatsApp
+                </a>
+              </div>
             </div>
 
-            <div className="faq-footer">
-              <div className="help-section">
-                <h4>Still have questions?</h4>
-                <p>Our support team is here to help you</p>
-                <div className="help-actions">
-                  <button 
-                    className="btn primary" 
-                    onClick={() => navigate('/chat')}
-                  >
-                    💬 Start Live Chat
-                  </button>
-                  <a 
-                    href="tel:+919254473593" 
-                    className="btn secondary"
-                  >
-                    📞 Call Us Now
+            <div className="contact-item follow-us-card">
+              <div className="contact-icon">🌐</div>
+              <div>
+                <h3>Follow Us</h3>
+                <p>Stay connected for updates & tips</p>
+                <div className="social-links">
+                  <a href="https://www.facebook.com/leeyaherbalsofficial?rdid=NtSw720FcKpPbzU8&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1CNMek2Gjd%2F" target="_blank" rel="noopener noreferrer" className="social-link facebook">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" className="social-logo" />
+                    Facebook
+                  </a>
+                  <a href="https://www.instagram.com/leeyaherbals/?igsh=OGQyZmF2N2lzd2kz" target="_blank" rel="noopener noreferrer" className="social-link instagram">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" className="social-logo" />
+                    Instagram
                   </a>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="social-whatsapp-section">
-          <div className="whatsapp-card">
-            <div className="contact-icon">💬</div>
-            <h3>WhatsApp</h3>
-            <p>+91-9254473593</p>
-            <small>Quick support & order updates</small>
-          </div>
-
-          <div className="follow-us-card">
-            <div className="contact-icon">🌐</div>
-            <h3>Follow Us</h3>
-            <div className="social-links">
-              <a href="https://www.facebook.com/leeyaherbalsofficial?rdid=NtSw720FcKpPbzU8&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1CNMek2Gjd%2F" target="_blank" rel="noopener noreferrer" className="social-link facebook">
-                <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" className="social-logo" />
-                Facebook
-              </a>
-              <a href="https://www.instagram.com/leeyaherbals/?igsh=OGQyZmF2N2lzd2kz" target="_blank" rel="noopener noreferrer" className="social-link instagram">
-                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" className="social-logo" />
-                Instagram
-              </a>
+            <div className="contact-item live-chat-card">
+              <div className="contact-icon">🤖</div>
+              <div>
+                <h3>AI Assistant</h3>
+                <p>Get instant answers 24/7</p>
+                <button className="chat-btn" onClick={() => navigate('/chat')}>
+                  Start Live Chat
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -199,25 +128,13 @@ function ContactPage() {
           </div>
         </div>
 
-        <div className="contact-faq">
-          <h3>Frequently Asked Questions</h3>
-          <div className="faq-grid">
-            <div className="faq-item">
-              <h4>How long does shipping take?</h4>
-              <p>We typically ship within 1-2 working days, and delivery takes 3-7 working days depending on your location.</p>
-            </div>
-            <div className="faq-item">
-              <h4>What is your return policy?</h4>
-              <p>We only accept returns for damaged or expired products within 7 days of delivery. Please contact us for return instructions.</p>
-            </div>
-            <div className="faq-item">
-              <h4>Are your products suitable for sensitive skin?</h4>
-              <p>Most of our products are formulated for all skin types, but we recommend patch testing for sensitive skin.</p>
-            </div>
-            <div className="faq-item">
-              <h4>Do you supply products to retailers?</h4>
-              <p>Yes! We are a production company with our own factory. We supply herbal products in bulk to shops and retailers. Please contact us for bulk supply and pricing information.</p>
-            </div>
+        <div className="faq-cta">
+          <div className="faq-cta-content">
+            <h3>Have Questions?</h3>
+            <p>Check out our comprehensive FAQ section for quick answers</p>
+            <button className="btn primary" onClick={() => navigate('/faq')}>
+              View All FAQs
+            </button>
           </div>
         </div>
 
