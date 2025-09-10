@@ -168,7 +168,13 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
   return (
     <header>
       <div className="promo">
-        <div className="promo-inner">Free shipping on orders over ₹799 • Use code LEEYA10 for 10% off</div>
+        <div className="promo-inner">
+          <div className="promo-text">
+            <span className="promo-icon">🚚</span>
+            <span>FREE DELIVERY on ALL Orders • 10% OFF on Online Payments</span>
+            <span className="promo-icon">💳</span>
+          </div>
+        </div>
       </div>
       
       {/* Top navbar with branding, search, and user actions */}

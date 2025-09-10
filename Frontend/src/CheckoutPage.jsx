@@ -7,7 +7,7 @@ const CheckoutPage = () => {
   const [cart, setCart] = useState([]);
   const [address, setAddress] = useState({
     fullName: '',
-    phone: '',
+    phone: '91',
     addressLine1: '',
     addressLine2: '',
     city: '',
@@ -18,10 +18,12 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('');
   const [cardPaymentCompleted, setCardPaymentCompleted] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const shipping = 0;
-  const total = subtotal + shipping;
+  const discount = paymentMethod === 'card' ? subtotal * 0.1 : 0;
+  const total = subtotal + shipping - discount;
 
   useEffect(() => {
     // Try to get cart from multiple sources
@@ -47,9 +49,54 @@ const CheckoutPage = () => {
     }
   }, [navigate]);
 
+  const validatePhoneNumber = (phone) => {
+    // Remove any non-digit characters
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    // Check if it starts with 91 and has exactly 12 digits (91 + 10 digits)
+    if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      return { isValid: true, error: '' };
+    }
+    
+    // Check if it's just 10 digits (without country code)
+    if (cleanPhone.length === 10) {
+      return { isValid: false, error: 'Please include country code 91 (e.g., 919876543210)' };
+    }
+    
+    // Check if it starts with 91 but wrong length
+    if (cleanPhone.startsWith('91') && cleanPhone.length !== 12) {
+      return { isValid: false, error: 'Phone number must be exactly 10 digits after country code 91' };
+    }
+    
+    // Other cases
+    if (cleanPhone.length < 10) {
+      return { isValid: false, error: 'Phone number is too short' };
+    }
+    
+    if (cleanPhone.length > 12) {
+      return { isValid: false, error: 'Phone number is too long' };
+    }
+    
+    return { isValid: false, error: 'Phone number must start with 91 followed by 10 digits' };
+  };
+
   const validateAddress = () => {
     const required = ['fullName', 'phone', 'addressLine1', 'city', 'state', 'pincode'];
-    return required.every(field => address[field].trim() !== '');
+    const basicValidation = required.every(field => address[field].trim() !== '');
+    
+    if (!basicValidation) {
+      return false;
+    }
+    
+    // Validate phone number
+    const phoneValidation = validatePhoneNumber(address.phone);
+    if (!phoneValidation.isValid) {
+      setPhoneError(phoneValidation.error);
+      return false;
+    }
+    
+    setPhoneError('');
+    return true;
   };
 
   const handleCardPayment = async () => {
@@ -254,13 +301,27 @@ const CheckoutPage = () => {
                     onChange={(e) => setAddress({...address, fullName: e.target.value})}
                     required
                   />
-                  <input
-                    type="tel"
-                    placeholder="Phone Number"
-                    value={address.phone}
-                    onChange={(e) => setAddress({...address, phone: e.target.value})}
-                    required
-                  />
+                  <div className="phone-input-container">
+                    <div className={`phone-input-wrapper ${phoneError ? 'error' : ''}`}>
+                      <span className="country-code">+91</span>
+                      <input
+                        type="tel"
+                        placeholder="Enter 10 digit mobile number"
+                        value={address.phone.substring(2)} // Display only the digits after "91"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, ''); // Only allow digits
+                          
+                          if (value.length <= 10) { // Limit to 10 digits after country code
+                            setAddress({...address, phone: '91' + value});
+                            // Clear error when user starts typing
+                            if (phoneError) setPhoneError('');
+                          }
+                        }}
+                        required
+                      />
+                    </div>
+                    {phoneError && <div className="error-message">{phoneError}</div>}
+                  </div>
                 </div>
                 <input
                   type="text"
@@ -328,9 +389,7 @@ const CheckoutPage = () => {
                   <label htmlFor="cod">
                     <span className="payment-icon">💵</span>
                     <div>
-                      <strong>Cash on Delivery/Pay on Delivery</strong>
-                      <p>Cash, UPI and Cards accepted. <span className="know-more">Know more.</span></p>
-                      <p className="convenience-fee">A convenience fee of ₹7 will apply.</p>
+                      <strong>Cash on Delivery</strong>
                     </div>
                   </label>
                 </div>
@@ -350,10 +409,8 @@ const CheckoutPage = () => {
                   <label htmlFor="card">
                     <span className="payment-icon">💳</span>
                     <div>
-                      <strong>Credit or debit card</strong>
-                      <div className="card-icons">
-                        <span>💳 Cards Accepted</span>
-                      </div>
+                      <strong>Online Payment (Cards Accepted)</strong>
+                      <p className="discount-text">10% OFF</p>
                       {paymentMethod === 'card' && !cardPaymentCompleted && (
                         <div className="card-payment-section">
                           <button 
@@ -403,9 +460,15 @@ const CheckoutPage = () => {
                   <span>Shipping:</span>
                   <span className="free-shipping">FREE</span>
                 </div>
+                {paymentMethod === 'card' && discount > 0 && (
+                  <div className="summary-row discount">
+                    <span>Online Payment Discount (10%):</span>
+                    <span className="discount-amount">-₹{Math.round(discount)}</span>
+                  </div>
+                )}
                 <div className="summary-row total">
                   <span>Order Total:</span>
-                  <span>₹{total}</span>
+                  <span>₹{Math.round(total)}</span>
                 </div>
               </div>
 
