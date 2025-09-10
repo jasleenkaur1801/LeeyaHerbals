@@ -3,47 +3,46 @@ import { useNavigate } from 'react-router-dom';
 
 function ContactPage() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [activeAccordion, setActiveAccordion] = useState(null);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const toggleAccordion = (index) => {
+    setActiveAccordion(activeAccordion === index ? null : index);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Here you would typically send the form data to your backend
-    console.log('Contact form submitted:', formData);
-    setIsSubmitted(true);
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 3000);
-  };
-
-  if (isSubmitted) {
-    return (
-      <div className="contact-page">
-        <div className="container">
-          <div className="success-message">
-            <span className="success-icon">✅</span>
-            <h2>Thank you for contacting us!</h2>
-            <p>We've received your message and will get back to you within 24 hours.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const faqData = [
+    {
+      question: "How long does shipping take?",
+      answer: "We typically ship within 1-2 working days, and delivery takes 3-7 working days depending on your location. We provide tracking information for all orders."
+    },
+    {
+      question: "What is your return policy?",
+      answer: "We only accept returns for damaged or expired products within 7 days of delivery. Please contact us with photos of the damaged product for return instructions."
+    },
+    {
+      question: "Are your products suitable for sensitive skin?",
+      answer: "Most of our products are formulated for all skin types using natural herbal ingredients. However, we recommend patch testing for sensitive skin before full application."
+    },
+    {
+      question: "Do you supply products to retailers?",
+      answer: "Yes! We are a production company with our own factory. We supply herbal products in bulk to shops and retailers. Contact us for bulk pricing and minimum order quantities."
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept all major payment methods including UPI, Credit/Debit Cards, Net Banking, and Cash on Delivery (COD) for orders above ₹500."
+    },
+    {
+      question: "How can I track my order?",
+      answer: "Once your order is shipped, you'll receive a tracking number via SMS and email. You can also check your order status in the 'My Orders' section of your account."
+    },
+    {
+      question: "Do you offer skincare consultations?",
+      answer: "Yes! Our expert team provides free skincare consultations. You can chat with us or call during business hours for personalized product recommendations."
+    },
+    {
+      question: "Are your products certified organic?",
+      answer: "Our products are made with natural herbal ingredients. While we follow organic practices, specific certifications vary by product. Check individual product descriptions for details."
+    }
+  ];
 
   return (
     <div className="contact-page">
@@ -94,74 +93,55 @@ function ContactPage() {
             </div>
           </div>
 
-          <form className="contact-form" onSubmit={handleSubmit}>
-            <h3>Send us a Message</h3>
+          <div className="faq-accordion-section">
+            <div className="faq-header">
+              <h3>Frequently Asked Questions</h3>
+              <p>Find quick answers to common questions about our products and services</p>
+            </div>
             
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="name">Full Name *</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter your full name"
-                />
+            <div className="faq-accordion">
+              {faqData.map((faq, index) => (
+                <div key={index} className={`faq-item ${activeAccordion === index ? 'active' : ''}`}>
+                  <button 
+                    className="faq-question"
+                    onClick={() => toggleAccordion(index)}
+                    aria-expanded={activeAccordion === index}
+                  >
+                    <span className="question-text">{faq.question}</span>
+                    <span className={`faq-icon ${activeAccordion === index ? 'rotate' : ''}`}>
+                      ▼
+                    </span>
+                  </button>
+                  <div className={`faq-answer ${activeAccordion === index ? 'show' : ''}`}>
+                    <div className="answer-content">
+                      <p>{faq.answer}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="faq-footer">
+              <div className="help-section">
+                <h4>Still have questions?</h4>
+                <p>Our support team is here to help you</p>
+                <div className="help-actions">
+                  <button 
+                    className="btn primary" 
+                    onClick={() => navigate('/chat')}
+                  >
+                    💬 Start Live Chat
+                  </button>
+                  <a 
+                    href="tel:+919254473593" 
+                    className="btn secondary"
+                  >
+                    📞 Call Us Now
+                  </a>
+                </div>
               </div>
-              
-              <div className="form-group">
-                <label htmlFor="email">Email Address *</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter your email"
-                />
-              </div>
             </div>
-
-            <div className="form-group">
-              <label htmlFor="subject">Subject *</label>
-              <select
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select a subject</option>
-                <option value="product-inquiry">Product Inquiry</option>
-                <option value="order-support">Order Support</option>
-                <option value="shipping">Shipping & Delivery</option>
-                <option value="returns">Returns & Refunds</option>
-                <option value="partnership">Partnership Opportunities</option>
-                <option value="feedback">Feedback & Suggestions</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="message">Message *</label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                rows="6"
-                placeholder="Tell us how we can help you..."
-              ></textarea>
-            </div>
-
-            <button type="submit" className="btn">
-              Send Message
-            </button>
-          </form>
+          </div>
         </div>
 
         <div className="social-whatsapp-section">

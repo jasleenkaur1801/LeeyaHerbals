@@ -392,6 +392,233 @@
   filter: brightness(0) invert(1);
 }
 
+/* FAQ Accordion Section */
+.faq-accordion-section {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  border-radius: 20px;
+  padding: 35px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.faq-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.faq-header h3 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 10px;
+}
+
+.faq-header p {
+  color: #718096;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.faq-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+  border-color: #cbd5e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.faq-item.active {
+  border-color: #667eea;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+}
+
+.faq-question {
+  width: 100%;
+  padding: 20px 25px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  transition: all 0.3s ease;
+}
+
+.faq-question:hover {
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.faq-item.active .faq-question {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.question-text {
+  flex: 1;
+  margin-right: 15px;
+}
+
+.faq-icon {
+  font-size: 0.9rem;
+  color: #718096;
+  transition: transform 0.3s ease, color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.faq-icon.rotate {
+  transform: rotate(180deg);
+  color: #667eea;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.faq-answer.show {
+  max-height: 200px;
+  padding: 0 25px 20px 25px;
+}
+
+.answer-content p {
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.faq-footer {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 25px;
+  text-align: center;
+}
+
+.help-section h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+.help-section p {
+  color: #718096;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.help-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.help-actions .btn {
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.help-actions .btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.help-actions .btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.help-actions .btn.secondary {
+  background: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.help-actions .btn.secondary:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive for FAQ Section */
+@media (max-width: 768px) {
+  .faq-accordion-section {
+    padding: 25px 20px;
+  }
+  
+  .faq-header h3 {
+    font-size: 1.5rem;
+  }
+  
+  .faq-question {
+    padding: 16px 20px;
+    font-size: 1rem;
+  }
+  
+  .faq-answer.show {
+    padding: 0 20px 16px 20px;
+  }
+  
+  .help-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .help-actions .btn {
+    width: 100%;
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .faq-accordion-section {
+    padding: 20px 15px;
+  }
+  
+  .faq-question {
+    padding: 14px 16px;
+    font-size: 0.95rem;
+  }
+  
+  .question-text {
+    margin-right: 10px;
+  }
+  
+  .faq-answer.show {
+    padding: 0 16px 14px 16px;
+  }
+  
+  .answer-content p {
+    font-size: 0.9rem;
+  }
+}
+
 /* Responsive for Social WhatsApp Section */
 @media (max-width: 768px) {
   .social-whatsapp-section {
