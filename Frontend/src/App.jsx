@@ -169,15 +169,6 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
 
   return (
     <header>
-      <div className="promo">
-        <div className="promo-inner">
-          <div className="promo-text">
-            <span className="promo-icon">🚚</span>
-            <span>FREE DELIVERY on ALL Orders • 10% OFF on Online Payments</span>
-            <span className="promo-icon">💳</span>
-          </div>
-        </div>
-      </div>
       
       {/* Top navbar with branding, search, and user actions */}
       <div className="nav-top">
@@ -334,12 +325,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
           <button className="hamburger" aria-label="Menu" onClick={onToggleMenu}>☰</button>
           
           <nav className="nav-links-main">
-            {user?.role === 'admin' ? (
-              // Admin-only navigation
-              <a href="#admin" onClick={(e) => { e.preventDefault(); navigate('/admin') }} style={{ color: '#e74c3c', fontWeight: 'bold', margin: '0 auto' }}>
-                🛡️ Admin Panel
-              </a>
-            ) : (
+            {user?.role !== 'admin' && (
               // Regular user navigation
               <>
                 <a href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>Home</a>
@@ -837,6 +823,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Clear search when navigating to different routes and ensure category is set to 'all'
   useEffect(() => {
@@ -845,6 +832,22 @@ function App() {
       setCategory('all') // Ensure category is properly initialized
     }
   }, [location.pathname])
+
+  // Admin redirect logic - redirect admin users from homepage to admin dashboard
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
+    if (token && savedUser && location.pathname === '/') {
+      try {
+        const userData = JSON.parse(savedUser);
+        if (userData.role === 'admin') {
+          navigate('/admin');
+        }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+  }, [location.pathname, navigate])
 
   useEffect(() => { document.body.dataset.theme = dark ? 'dark' : 'light'; }, [dark]);
   
@@ -917,14 +920,25 @@ function App() {
       const savedWishlist = localStorage.getItem(`leeya_wishlist_${userData.email}`);
       setWishlist(savedWishlist ? JSON.parse(savedWishlist) : []);
     }
+    // Redirect admin users directly to admin dashboard
+    if (userData.role === 'admin') {
+      navigate('/admin');
+    }
   }
 
   const handleLogout = () => {
+    const currentUser = user;
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null)
     setIsAuthenticated(false)
     setShowAuth(false)
     setCart([])
     setWishlist([])
+    // Redirect admin users to homepage after logout
+    if (currentUser?.role === 'admin') {
+      navigate('/');
+    }
   }
 
   useEffect(() => {
@@ -1008,20 +1022,22 @@ function App() {
 
   return (
     <>
-                      <Navbar 
-                  active={category} 
-                  search={search} 
-                  onSearch={setSearch} 
-                  onOpenCart={() => setShowCart(true)} 
-                  onOpenWishlist={() => setShowWishlist(true)} 
-                  onOpenAuth={() => setShowAuth(true)} 
-                  onToggleMenu={() => setShowMenu(s => !s)} 
-                  wishlistCount={wishlist.length}
-                  isAuthenticated={isAuthenticated}
-                  user={user}
-                  onLogout={handleLogout}
-                  cart={cart}
-                />
+      {location.pathname !== '/admin' && (
+        <Navbar 
+          active={category} 
+          search={search} 
+          onSearch={setSearch} 
+          onOpenCart={() => setShowCart(true)} 
+          onOpenWishlist={() => setShowWishlist(true)} 
+          onOpenAuth={() => setShowAuth(true)} 
+          onToggleMenu={() => setShowMenu(s => !s)} 
+          wishlistCount={wishlist.length}
+          isAuthenticated={isAuthenticated}
+          user={user}
+          onLogout={handleLogout}
+          cart={cart}
+        />
+      )}
       <Routes>
         <Route path="/" element={
           <>
@@ -1256,7 +1272,7 @@ function App() {
           🔒 Login to access cart & wishlist
         </div>
       )}
-      <Footer />
+      {location.pathname !== '/admin' && <Footer />}
     </>
   )
 }

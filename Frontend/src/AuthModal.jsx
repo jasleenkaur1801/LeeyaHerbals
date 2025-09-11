@@ -92,7 +92,8 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
           localStorage.setItem('leeya_jwt', data.jwtToken);
           localStorage.setItem('user', JSON.stringify({
             name: data.name,
-            email: data.email
+            email: data.email,
+            role: data.role
           }));
           setTimeout(() => {
             onLoginSuccess(data);

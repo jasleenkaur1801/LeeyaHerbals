@@ -143,38 +143,67 @@ function AdminDashboard({ user, onLogout }) {
 
   return (
     <div className="admin-dashboard">
-      <header className="admin-header">
-        <div className="admin-header-content">
-          <h1>🌿 Leeya Herbals Admin Dashboard</h1>
-          <div className="admin-user-info">
-            <span>Welcome, {user.name}</span>
-            <button onClick={onLogout} className="logout-btn">Logout</button>
-          </div>
+      {/* Top Header */}
+      <header className="admin-top-header">
+        <div className="header-brand">
+          <span className="brand-icon">🌿</span>
+          <span className="brand-text">Leeya Herbals Admin</span>
+        </div>
+        <div className="header-actions">
+          <span className="welcome-text">Welcome, {user.name}</span>
+          <button onClick={onLogout} className="logout-btn">Logout</button>
         </div>
       </header>
 
-      <nav className="admin-nav">
-        <button 
-          className={activeTab === 'dashboard' ? 'active' : ''}
-          onClick={() => handleTabChange('dashboard')}
-        >
-          📊 Dashboard
-        </button>
-        <button 
-          className={activeTab === 'users' ? 'active' : ''}
-          onClick={() => handleTabChange('users')}
-        >
-          👥 User Management
-        </button>
-        <button 
-          className={activeTab === 'orders' ? 'active' : ''}
-          onClick={() => handleTabChange('orders')}
-        >
-          📦 Order Management
-        </button>
-      </nav>
+      <div className="admin-layout">
+        {/* Sidebar Navigation */}
+        <aside className="admin-sidebar">
+          <div className="sidebar-header">
+            <h3>Admin Dashboard</h3>
+          </div>
+          <nav className="sidebar-nav">
+            <button 
+              className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => handleTabChange('dashboard')}
+            >
+              <span className="nav-icon">📊</span>
+              <span className="nav-text">Overview</span>
+            </button>
+            <button 
+              className={`nav-item ${activeTab === 'users' ? 'active' : ''}`}
+              onClick={() => handleTabChange('users')}
+            >
+              <span className="nav-icon">👥</span>
+              <span className="nav-text">User Management</span>
+            </button>
+            <button 
+              className={`nav-item ${activeTab === 'orders' ? 'active' : ''}`}
+              onClick={() => handleTabChange('orders')}
+            >
+              <span className="nav-icon">📦</span>
+              <span className="nav-text">Order Management</span>
+            </button>
+          </nav>
+        </aside>
 
-      <main className="admin-content">
+        {/* Main Content Area */}
+        <main className="admin-main">
+          <div className="content-header">
+            <div className="content-title-section">
+              <h1 className="content-title">
+                {activeTab === 'dashboard' && 'Dashboard Overview'}
+                {activeTab === 'users' && 'User Management'}
+                {activeTab === 'orders' && 'Order Management'}
+              </h1>
+              {activeTab === 'orders' && (
+                <button className="action-btn primary">
+                  <span>📋</span> Export Orders
+                </button>
+              )}
+            </div>
+          </div>
+          
+          <div className="admin-content">
         {activeTab === 'dashboard' && (
           <DashboardOverview stats={stats} />
         )}
@@ -194,7 +223,9 @@ function AdminDashboard({ user, onLogout }) {
             onUpdateStatus={updateOrderStatus}
           />
         )}
-      </main>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
@@ -202,8 +233,6 @@ function AdminDashboard({ user, onLogout }) {
 function DashboardOverview({ stats }) {
   return (
     <div className="dashboard-overview">
-      <h2>Dashboard Overview</h2>
-      
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon">👥</div>
@@ -238,6 +267,34 @@ function DashboardOverview({ stats }) {
             <h3>₹{stats.totalRevenue?.toLocaleString() || 0}</h3>
             <p>Total Revenue</p>
             <small>₹{stats.monthlyRevenue?.toLocaleString() || 0} this month</small>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity Section */}
+      <div className="recent-activity">
+        <h3>Recent Activity</h3>
+        <div className="activity-cards">
+          <div className="activity-card">
+            <div className="activity-icon">🛒</div>
+            <div className="activity-content">
+              <h4>New Orders</h4>
+              <p>{stats.monthlyOrders || 0} orders this month</p>
+            </div>
+          </div>
+          <div className="activity-card">
+            <div className="activity-icon">👤</div>
+            <div className="activity-content">
+              <h4>New Users</h4>
+              <p>{stats.monthlyUsers || 0} users joined</p>
+            </div>
+          </div>
+          <div className="activity-card">
+            <div className="activity-icon">💹</div>
+            <div className="activity-content">
+              <h4>Revenue Growth</h4>
+              <p>₹{stats.monthlyRevenue?.toLocaleString() || 0} earned</p>
+            </div>
           </div>
         </div>
       </div>
