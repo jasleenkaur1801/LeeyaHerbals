@@ -1,11 +1,69 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './App.css';
 import AddToCartButton from './components/AddToCartButton';
 
-// Import ALL_PRODUCTS from App.jsx - we'll need to pass this as props
+function StarRating({ value }) {
+  const fullStars = Math.round(value)
+  return (
+    <div className="stars" aria-label={`Rated ${value} out of 5`}>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <span key={i} className={i < fullStars ? 'star filled' : 'star'}>★</span>
+      ))}
+    </div>
+  )
+}
+
+function ProductCard({ product, onWishlist, isInWishlist, isAuthenticated, onShowAuth, cart, setCart }) {
+  const navigate = useNavigate()
+
+  const handleWishlist = (e) => {
+    e.stopPropagation()
+    if (!isAuthenticated) {
+      onShowAuth()
+      return
+    }
+    onWishlist(product)
+  }
+
+  return (
+    <article className="card product" onClick={() => navigate(`/product/${product.id}`)} style={{ cursor: 'pointer' }}>
+      <div className="badge-row">
+        {product.tag ? <span className="badge">{product.tag}</span> : null}
+        <button 
+          className={`wishlist-btn ${isInWishlist ? 'active' : ''}`} 
+          onClick={handleWishlist}
+          aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          {isInWishlist ? '❤️' : '🤍'}
+        </button>
+      </div>
+      <div className="product-image-wrap">
+        <img src={product.image} alt={product.name} className="product-image" loading="lazy" />
+      </div>
+      <h3 className="product-name">{product.name}</h3>
+      <p className="product-category">{product.category} • {product.weight}</p>
+      <StarRating value={product.rating} />
+      <div className="product-footer">
+        <span className="price">₹{product.price}</span>
+        <div onClick={(e) => e.stopPropagation()}>
+          <AddToCartButton 
+            product={product}
+            cart={cart}
+            setCart={setCart}
+            isAuthenticated={isAuthenticated}
+            onShowAuth={onShowAuth}
+          />
+        </div>
+      </div>
+    </article>
+  )
+}
+
 function BathBodyPage({ products = [], cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState('name');
+  const [sortBy, setSortBy] = useState('relevance');
+  const [priceRange, setPriceRange] = useState('all');
 
   // Filter products for Bath & Body category
   const bathBodyProducts = products.filter(product => 
@@ -13,129 +71,129 @@ function BathBodyPage({ products = [], cart, setCart, wishlist, setWishlist, isA
     product.category === 'scrub'
   );
 
+  // Apply price filter
+  const filteredProducts = bathBodyProducts.filter(product => {
+    let matchesPrice = true
+    if (priceRange === 'under500') matchesPrice = product.price < 500
+    else if (priceRange === '500to1000') matchesPrice = product.price >= 500 && product.price <= 1000
+    else if (priceRange === 'over1000') matchesPrice = product.price > 1000
+    return matchesPrice
+  });
+
   // Sort products
-  const sortedProducts = [...bathBodyProducts].sort((a, b) => {
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
       case 'price-low':
         return a.price - b.price;
       case 'price-high':
         return b.price - a.price;
       case 'name':
-      default:
         return a.name.localeCompare(b.name);
+      case 'rating':
+        return b.rating - a.rating;
+      default:
+        return 0;
     }
   });
 
-  const addToCart = (product) => {
-    if (!isAuthenticated) {
-      onOpenAuth();
-      return;
-    }
-    
-    setCart(prev => {
-      const found = prev.find(item => item.id === product.id);
-      if (found) {
-        return prev.map(item => 
-          item.id === product.id ? { ...item, qty: item.qty + 1 } : item
-        );
-      }
-      return [...prev, { ...product, qty: 1 }];
-    });
-    alert(`${product.name} added to cart!`);
-  };
+  const clearAllFilters = () => {
+    setPriceRange('all')
+    setSortBy('relevance')
+  }
+
+  const hasActiveFilters = priceRange !== 'all'
 
   const toggleWishlist = (product) => {
-    if (!isAuthenticated) {
-      onOpenAuth();
-      return;
-    }
-    
-    const isInWishlist = wishlist.some(item => item.id === product.id);
-    if (isInWishlist) {
-      setWishlist(prev => prev.filter(item => item.id !== product.id));
-    } else {
-      setWishlist(prev => [...prev, product]);
-    }
-  };
+    setWishlist(prev => {
+      const found = prev.find(i => i.id === product.id)
+      if (found) {
+        return prev.filter(i => i.id !== product.id)
+      }
+      return [...prev, product]
+    })
+  }
+
+  const isProductInWishlist = (product) => {
+    return wishlist.some(item => item.id === product.id)
+  }
 
   return (
-    <div className="category-page">
+    <div className="search-results-page">
       <div className="container">
-        <div className="page-header">
-          <button className="back-btn" onClick={() => navigate('/categories')}>
-            ← Back to Categories
-          </button>
+        <div className="search-header">
           <h1>Bath & Body Collection</h1>
-          <p>Luxurious body care products for complete wellness</p>
+          <p>Showing {sortedProducts.length} bath & body products</p>
         </div>
 
-        <div className="category-controls">
-          <div className="results-info">
-            <span>{sortedProducts.length} products found</span>
-          </div>
-          <div className="sort-controls">
-            <label htmlFor="sort">Sort by:</label>
-            <select 
-              id="sort" 
-              value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value)}
-            >
-              <option value="name">Name A-Z</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-            </select>
-          </div>
-        </div>
+        <div className="search-layout">
+          {/* Sidebar Filters */}
+          <aside className="search-filters">
+            <div className="filter-actions">
+              {hasActiveFilters && (
+                <button className="btn secondary" onClick={clearAllFilters} style={{ marginBottom: '1rem', width: '100%' }}>
+                  Clear all filters
+                </button>
+              )}
+            </div>
 
-        {sortedProducts.length === 0 ? (
-          <div className="no-products">
-            <div className="no-products-icon">🛁</div>
-            <h3>No Bath & Body products found</h3>
-            <p>Check back soon for new arrivals!</p>
-            <button className="btn" onClick={() => navigate('/categories')}>
-              Browse Other Categories
-            </button>
-          </div>
-        ) : (
-          <div className="grid products">
-            {sortedProducts.map(product => (
-              <div key={product.id} className="card product">
-                <div className="product-image-wrap">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="product-image"
-                    onClick={() => navigate(`/product/${product.id}`)}
-                    style={{ cursor: 'pointer' }}
-                  />
-                  <button 
-                    className={`wishlist ${wishlist.some(item => item.id === product.id) ? 'active' : ''}`}
-                    onClick={() => toggleWishlist(product)}
-                    title={wishlist.some(item => item.id === product.id) ? "Remove from wishlist" : "Add to wishlist"}
-                  >
-                    💖
-                  </button>
-                </div>
-                <h3 className="product-name">{product.name}</h3>
-                <div className="stars">
-                  {'★'.repeat(5).split('').map((star, i) => (
-                    <span key={i} className={`star ${i < 4 ? 'filled' : ''}`}>★</span>
-                  ))}
-                </div>
-                <div className="product-footer">
-                  <span className="price">₹{product.price}</span>
-                  <AddToCartButton 
-                    product={product}
-                    cart={cart}
-                    setCart={setCart}
+            <div className="filter-section">
+              <h3>Price Range</h3>
+              <select value={priceRange} onChange={(e) => setPriceRange(e.target.value)}>
+                <option value="all">All Prices</option>
+                <option value="under500">Under ₹500</option>
+                <option value="500to1000">₹500 - ₹1000</option>
+                <option value="over1000">Over ₹1000</option>
+              </select>
+            </div>
+
+            <div className="filter-section">
+              <h3>Sort By</h3>
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="relevance">Relevance</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Customer Rating</option>
+                <option value="name">Name: A to Z</option>
+              </select>
+            </div>
+
+            <div className="filter-summary" style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f8f9fa', borderRadius: '8px', fontSize: '0.9rem' }}>
+              <div><strong>Active Filters:</strong></div>
+              {priceRange !== 'all' && (
+                <div>Price: {priceRange === 'under500' ? 'Under ₹500' : priceRange === '500to1000' ? '₹500-₹1000' : 'Over ₹1000'}</div>
+              )}
+              {!hasActiveFilters && <div>No filters applied</div>}
+            </div>
+          </aside>
+
+          {/* Main Results */}
+          <main className="search-results">
+            {sortedProducts.length === 0 ? (
+              <div className="no-results">
+                <h2>No bath & body products found</h2>
+                <p>Try adjusting your filters</p>
+                <button className="btn primary" onClick={clearAllFilters}>
+                  Clear all filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid products">
+                {sortedProducts.map(product => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    onWishlist={toggleWishlist} 
+                    isInWishlist={isProductInWishlist(product)}
                     isAuthenticated={isAuthenticated}
                     onShowAuth={onOpenAuth}
+                    cart={cart}
+                    setCart={setCart}
                   />
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );

@@ -91,18 +91,6 @@ function FAQPage() {
           <div className="faq-hero-content">
             <h1>Frequently Asked Questions</h1>
             <p>Find answers to common questions about our herbal skincare products and services</p>
-            <div className="faq-search">
-              <div className="search-input-wrapper">
-                <span className="search-icon">🔍</span>
-                <input
-                  type="text"
-                  placeholder="Search for answers..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="faq-search-input"
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -187,7 +187,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                   <span className="search-icon">🔍</span>
                   <input 
                     className="search" 
-                    placeholder="Search products, categories..." 
+                    placeholder="    Search products, categories..." 
                     value={search} 
                     onChange={(e) => handleSearchChange(e.target.value)}
                     onFocus={() => search.trim() && setShowSuggestions(true)}
@@ -731,6 +731,8 @@ function ImageGallery() {
 }
 
 function Footer() {
+  const navigate = useNavigate();
+  
   return (
     <footer className="footer">
       <div className="container footer-inner">
@@ -1272,7 +1274,7 @@ function App() {
           🔒 Login to access cart & wishlist
         </div>
       )}
-      {location.pathname !== '/admin' && <Footer />}
+      {location.pathname !== '/admin' && location.pathname !== '/faq' && location.pathname !== '/contact' && location.pathname !== '/contact/visitus' && <Footer />}
     </>
   )
 }

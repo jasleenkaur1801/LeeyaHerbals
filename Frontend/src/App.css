@@ -1349,7 +1349,6 @@ body {
 
 .search-icon {
   position: absolute;
-  left: 16px;
   color: var(--muted);
   font-size: 14px;
   pointer-events: none;
