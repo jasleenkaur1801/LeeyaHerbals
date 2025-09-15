@@ -38,7 +38,7 @@ function VisitUsPage() {
             </div>
 
             <div className="info-card">
-              <div className="info-icon">📞</div>
+              <div className="info-icon"> 📞</div>
               <div>
                 <h3>Contact Before Visit</h3>
                 <p>+91 9254473593</p>
@@ -58,7 +58,7 @@ function VisitUsPage() {
                 allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Leeya Herbals Location"
+                title="Location"
               ></iframe>
             </div>
             
