@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
 import './App.css'
 import './ContactUs.css'
+import './responsive.css'
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import ProductPage from './ProductPage'
 import SearchResultsPage from './SearchResultsPage'
@@ -48,7 +49,7 @@ function StarRating({ value }) {
   )
 }
 
-function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAuth, onToggleMenu, wishlistCount, isAuthenticated, user, onLogout, cart }) {
+function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAuth, onToggleMenu, wishlistCount, isAuthenticated, user, onLogout, cart, showMenu }) {
   const navigate = useNavigate()
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [suggestions, setSuggestions] = useState([])
@@ -168,11 +169,10 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
   }, [])
 
   return (
-    <header>
-      
+    <header className="site-header">
       {/* Top navbar with branding, search, and user actions */}
-      <div className="nav-top">
-        <div className="container nav-top-inner">
+      <div className="nav-top" style={{ '--header-height': '60px' }}>
+        <div className="container nav-top-inner responsive-nav">
           <div className="brand-section">
             <div className="brand" onClick={() => navigate(user?.role === 'admin' ? '/admin' : '/')} style={{ cursor: 'pointer' }}>
               <span className="leaf">✿</span>
@@ -181,7 +181,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
           </div>
           
           {user?.role !== 'admin' && (
-            <div className="search-container" ref={searchRef}>
+            <div className="search-container mobile-search" ref={searchRef}>
               <form onSubmit={handleSearchSubmit} className="search-form">
                 <div className="search-input-wrapper">
                   <span className="search-icon">🔍</span>
@@ -256,7 +256,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
             </div>
           )}
           
-          <div className="user-actions">
+          <div className="user-actions mobile-actions">
             {user?.role !== 'admin' && (
               <>
                 <button 
@@ -321,76 +321,128 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
 
       {/* Bottom navbar with main navigation */}
       <div className="nav-bottom">
-        <div className="container nav-bottom-inner">
-          <button className="hamburger" aria-label="Menu" onClick={onToggleMenu}>☰</button>
-          
-          <nav className="nav-links-main">
-            {user?.role !== 'admin' && (
-              // Regular user navigation
-              <>
-                <a href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>Home</a>
-                <a href="#profile" onClick={(e) => { e.preventDefault(); navigate('/profile') }}>Profile</a>
-                <div className="nav-dropdown">
-                  <a href="#categories" onClick={(e) => { e.preventDefault(); navigate('/categories') }}>
-                    Categories <span className="dropdown-arrow">▼</span>
-                  </a>
-                  <div className="dropdown-content">
-                    <a href="#cat-serum" onClick={(e) => { e.preventDefault(); navigate('/search?q=serum') }}>Serums</a>
-                    <a href="#cat-cleanser" onClick={(e) => { e.preventDefault(); navigate('/search?q=cleanser') }}>Cleansers</a>
-                    <a href="#cat-toner" onClick={(e) => { e.preventDefault(); navigate('/search?q=toner') }}>Toners</a>
-                    <a href="#cat-facemask" onClick={(e) => { e.preventDefault(); navigate('/search?q=facemask') }}>Face Masks</a>
-                    <a href="#cat-facewashgel" onClick={(e) => { e.preventDefault(); navigate('/search?q=facewashgel') }}>Face Wash Gel</a>
-                    <a href="#cat-acneoilgel" onClick={(e) => { e.preventDefault(); navigate('/search?q=acneoilgel') }}>Acne Oil Gel</a>
-                  </div>
-                </div>
-                <div className="nav-dropdown">
-                  <a href="#bath-body" onClick={(e) => { e.preventDefault(); navigate('/categories/bath-body') }}>
-                    Bath & Body <span className="dropdown-arrow">▼</span>
-                  </a>
-                  <div className="dropdown-content">
-                    <a href="#body-wash" onClick={(e) => { e.preventDefault(); navigate('/search?q=body wash') }}>Body Wash</a>
-                    <a href="#body-lotion" onClick={(e) => { e.preventDefault(); navigate('/search?q=body lotion') }}>Body Lotion</a>
-                    <a href="#bath-salts" onClick={(e) => { e.preventDefault(); navigate('/search?q=bath salts') }}>Bath Salts</a>
-                    <a href="#scrubs" onClick={(e) => { e.preventDefault(); navigate('/search?q=scrubs') }}>Body Scrubs</a>
-                  </div>
-                </div>
-                <div className="nav-dropdown">
-                  <a href="#skincare" onClick={(e) => { e.preventDefault(); navigate('/categories/skin-care') }}>
-                    Skin Care <span className="dropdown-arrow">▼</span>
-                  </a>
-                  <div className="dropdown-content">
-                    <a href="#anti-aging" onClick={(e) => { e.preventDefault(); navigate('/search?q=anti aging') }}>Anti-Aging</a>
-                    <a href="#moisturizers" onClick={(e) => { e.preventDefault(); navigate('/search?q=moisturizers') }}>Moisturizers</a>
-                    <a href="#sun-protection" onClick={(e) => { e.preventDefault(); navigate('/search?q=sunscreen') }}>Sun Protection</a>
-                    <a href="#treatments" onClick={(e) => { e.preventDefault(); navigate('/search?q=treatments') }}>Treatments</a>
-                  </div>
-                </div>
-                <div className="nav-dropdown">
-                  <a href="#collections" onClick={(e) => { e.preventDefault(); navigate('/collections') }}>
-                    Collections <span className="dropdown-arrow">▼</span>
-                  </a>
-                  <div className="dropdown-content">
-                    <a href="#face-kits" onClick={(e) => { 
-                      e.preventDefault(); 
-                      e.stopPropagation();
-                      setShowMenu(false); 
-                      setCategory('facialkit'); 
-                      setSearch('');
-                      setTimeout(() => { 
-                        document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' }); 
-                      }, 200); 
-                    }}>Facial Kits</a>
-                    <a href="#gift-sets" onClick={(e) => { e.preventDefault(); navigate('/search?q=gift set') }}>Gift Sets</a>
-                    <a href="#travel-kits" onClick={(e) => { e.preventDefault(); navigate('/search?q=travel kit') }}>Travel Kits</a>
-                    <a href="#seasonal" onClick={(e) => { e.preventDefault(); navigate('/search?q=seasonal') }}>Seasonal Collections</a>
-                  </div>
-                </div>
-                <a href="#about" onClick={(e) => { e.preventDefault(); navigate('/about') }}>About Us</a>
-                <a href="#contact" onClick={(e) => { e.preventDefault(); navigate('/contact') }}>Contact</a>
-              </>
-            )}
-          </nav>
+<div className="container nav-bottom-inner">
+  <button 
+    className="hamburger" 
+    aria-label="Toggle Menu" 
+    aria-expanded={showMenu}
+    aria-controls="mobile-menu"
+    onClick={() => setShowMenu(!showMenu)}
+  >
+    <span className="hamburger-icon">
+      <span className={`hamburger-line ${showMenu ? 'open' : ''}`}></span>
+    </span>
+  </button>
+  
+  {/* Desktop Navigation - Hidden on mobile */}
+  <nav className="nav-links-main desktop-nav">
+    {user?.role !== 'admin' && (
+      <>
+        <a href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>Home</a>
+        <a href="#profile" onClick={(e) => { e.preventDefault(); navigate('/profile') }}>Profile</a>
+        <div className="nav-dropdown">
+          <a href="#categories" onClick={(e) => { e.preventDefault(); navigate('/categories') }}>
+            Categories <span className="dropdown-arrow">▼</span>
+          </a>
+          <div className="dropdown-content">
+            <a href="#cat-serum" onClick={(e) => { e.preventDefault(); navigate('/search?q=serum') }}>Serums</a>
+            <a href="#cat-cleanser" onClick={(e) => { e.preventDefault(); navigate('/search?q=cleanser') }}>Cleansers</a>
+            <a href="#cat-toner" onClick={(e) => { e.preventDefault(); navigate('/search?q=toner') }}>Toners</a>
+            <a href="#cat-facemask" onClick={(e) => { e.preventDefault(); navigate('/search?q=facemask') }}>Face Masks</a>
+            <a href="#cat-facewashgel" onClick={(e) => { e.preventDefault(); navigate('/search?q=facewashgel') }}>Face Wash Gel</a>
+            <a href="#cat-acneoilgel" onClick={(e) => { e.preventDefault(); navigate('/search?q=acneoilgel') }}>Acne Oil Gel</a>
+          </div>
         </div>
+        <div className="nav-dropdown">
+          <a href="#bath-body" onClick={(e) => { e.preventDefault(); navigate('/categories/bath-body') }}>
+            Bath & Body <span className="dropdown-arrow">▼</span>
+          </a>
+          <div className="dropdown-content">
+            <a href="#body-wash" onClick={(e) => { e.preventDefault(); navigate('/search?q=body wash') }}>Body Wash</a>
+            <a href="#body-lotion" onClick={(e) => { e.preventDefault(); navigate('/search?q=body lotion') }}>Body Lotion</a>
+            <a href="#bath-salts" onClick={(e) => { e.preventDefault(); navigate('/search?q=bath salts') }}>Bath Salts</a>
+            <a href="#scrubs" onClick={(e) => { e.preventDefault(); navigate('/search?q=scrubs') }}>Body Scrubs</a>
+          </div>
+        </div>
+        <div className="nav-dropdown">
+          <a href="#skincare" onClick={(e) => { e.preventDefault(); navigate('/categories/skin-care') }}>
+            Skin Care <span className="dropdown-arrow">▼</span>
+          </a>
+          <div className="dropdown-content">
+            <a href="#anti-aging" onClick={(e) => { e.preventDefault(); navigate('/search?q=anti aging') }}>Anti-Aging</a>
+            <a href="#moisturizers" onClick={(e) => { e.preventDefault(); navigate('/search?q=moisturizers') }}>Moisturizers</a>
+            <a href="#sun-protection" onClick={(e) => { e.preventDefault(); navigate('/search?q=sunscreen') }}>Sun Protection</a>
+            <a href="#treatments" onClick={(e) => { e.preventDefault(); navigate('/search?q=treatments') }}>Treatments</a>
+          </div>
+        </div>
+        <div className="nav-dropdown">
+          <a href="#collections" onClick={(e) => { e.preventDefault(); navigate('/collections') }}>
+            Collections <span className="dropdown-arrow">▼</span>
+          </a>
+          <div className="dropdown-content">
+            <a href="#face-kits" onClick={(e) => { 
+              e.preventDefault(); 
+              e.stopPropagation();
+              setShowMenu(false); 
+              setCategory('facialkit'); 
+              setSearch('');
+              setTimeout(() => { 
+                document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' }); 
+              }, 200); 
+            }}>Facial Kits</a>
+            <a href="#gift-sets" onClick={(e) => { e.preventDefault(); navigate('/search?q=gift set') }}>Gift Sets</a>
+            <a href="#travel-kits" onClick={(e) => { e.preventDefault(); navigate('/search?q=travel kit') }}>Travel Kits</a>
+            <a href="#seasonal" onClick={(e) => { e.preventDefault(); navigate('/search?q=seasonal') }}>Seasonal Collections</a>
+          </div>
+        </div>
+        <a href="#about" onClick={(e) => { e.preventDefault(); navigate('/about') }}>About Us</a>
+        <a href="#contact" onClick={(e) => { e.preventDefault(); navigate('/contact') }}>Contact</a>
+      </>
+    )}
+  </nav>
+
+  {/* Mobile Menu Overlay */}
+  {showMenu && (
+    <div className="mobile-menu-overlay" onClick={() => setShowMenu(false)}>
+      <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
+        <div className="mobile-menu-header">
+          <h3>Menu</h3>
+          <button className="mobile-menu-close" onClick={() => setShowMenu(false)}>×</button>
+        </div>
+        <nav className="mobile-nav-links">
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/'); setShowMenu(false); }}>Home</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/profile'); setShowMenu(false); }}>Profile</a>
+          
+          <div className="mobile-nav-section">
+            <h4>Categories</h4>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=serum'); setShowMenu(false); }}>Serums</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=cleanser'); setShowMenu(false); }}>Cleansers</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=toner'); setShowMenu(false); }}>Toners</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=facemask'); setShowMenu(false); }}>Face Masks</a>
+          </div>
+          
+          <div className="mobile-nav-section">
+            <h4>Bath & Body</h4>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=body wash'); setShowMenu(false); }}>Body Wash</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=body lotion'); setShowMenu(false); }}>Body Lotion</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=scrubs'); setShowMenu(false); }}>Body Scrubs</a>
+          </div>
+          
+          <div className="mobile-nav-section">
+            <h4>Skin Care</h4>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=moisturizers'); setShowMenu(false); }}>Moisturizers</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=sunscreen'); setShowMenu(false); }}>Sun Protection</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=treatments'); setShowMenu(false); }}>Treatments</a>
+          </div>
+          
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/collections'); setShowMenu(false); }}>Collections</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/about'); setShowMenu(false); }}>About Us</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/contact'); setShowMenu(false); }}>Contact</a>
+        </nav>
+      </div>
+    </div>
+  )}
+</div>
       </div>
     </header>
   )
@@ -410,7 +462,15 @@ function Hero() {
         </div>
         <div className="hero-art" aria-hidden>
           <div className="hero-image-wrap">
-            <img src="/image1.jpeg" alt="Herbal skincare" className="hero-img" />
+            <img 
+              src="/image1.jpeg" 
+              alt="Herbal skincare" 
+              className="hero-img" 
+              loading="lazy"
+              width="600"
+              height="400"
+              style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
+            />
             <span className="chip">Herbal Active</span>
             <span className="chip rating">★ Trusted by 2k+</span>
           </div>
@@ -478,6 +538,12 @@ function CategoryPills({ selected, onSelect }) {
 import AddToCartButton from './components/AddToCartButton';
 
 function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated, onShowAuth, cart, setCart }) {
+  // Add touch interaction state
+  const [isTouched, setIsTouched] = useState(false);
+  
+  // Handle touch events
+  const handleTouchStart = () => setIsTouched(true);
+  const handleTouchEnd = () => setIsTouched(false);
   const handleWishlist = (e) => {
     e.stopPropagation();
     if (!isAuthenticated) {
@@ -488,7 +554,12 @@ function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated
   };
 
   return (
-    <article className="card product" onClick={() => window.location.href = `/product/${product.id}`}>
+    <article 
+      className={`card product ${isTouched ? 'touched' : ''}`}
+      onClick={() => window.location.href = `/product/${product.id}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}>
       <div className="badge-row">
         {product.tag ? <span className="badge">{product.tag}</span> : null}
         <button 
@@ -500,7 +571,19 @@ function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated
         </button>
       </div>
       <div className="product-image-wrap">
-        <img src={product.image} alt={product.name} className="product-image" />
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          className="product-image" 
+          loading="lazy"
+          width="300"
+          height="300"
+          style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+          onError={(e) => {
+            e.target.src = '/placeholder-product.png';
+            e.target.onerror = null;
+          }}
+        />
       </div>
       <h3 className="product-name">{product.name}</h3>
       <p className="product-category">{product.category} • {product.weight}</p>
@@ -1038,6 +1121,7 @@ function App() {
           user={user}
           onLogout={handleLogout}
           cart={cart}
+          showMenu={showMenu}
         />
       )}
       <Routes>

@@ -529,9 +529,16 @@
   border-radius: 0 0 8px 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   max-height: 400px;
-  overflow-y: auto;
+  overflow-y: auto;`n  /* Hide scrollbar */`n  scrollbar-width: none; /* Firefox */`n  -ms-overflow-style: none; /* Internet Explorer 10+ */
   z-index: 1000;
   margin-top: 1px;
+  /* Hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.amazon-search-dropdown::-webkit-scrollbar {
+  display: none; /* WebKit */
 }
 
 .amazon-suggestion-item {
@@ -2334,7 +2341,7 @@ body {
   margin-top: 4px;
   z-index: 1000;
   max-height: 400px;
-  overflow-y: auto;
+  overflow-y: auto;`n  /* Hide scrollbar */`n  scrollbar-width: none; /* Firefox */`n  -ms-overflow-style: none; /* Internet Explorer 10+ */
   animation: slideDown 0.2s ease-out;
 }
 
@@ -2575,7 +2582,7 @@ body {
   margin-top: 4px;
   z-index: 1000;
   max-height: 400px;
-  overflow-y: auto;
+  overflow-y: auto;`n  /* Hide scrollbar */`n  scrollbar-width: none; /* Firefox */`n  -ms-overflow-style: none; /* Internet Explorer 10+ */
   animation: slideDown 0.2s ease-out;
 }
 
@@ -3130,8 +3137,15 @@ body[data-theme="dark"] .brand-pill {
   max-width: 90%;
   width: 350px;
   max-height: 80vh;
-  overflow-y: auto;
+  overflow-y: auto;`n  /* Hide scrollbar */`n  scrollbar-width: none; /* Firefox */`n  -ms-overflow-style: none; /* Internet Explorer 10+ */
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  /* Hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.mobile-menu-content::-webkit-scrollbar {
+  display: none; /* WebKit */
 }
 
 .mobile-menu-header {
