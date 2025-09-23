@@ -1695,13 +1695,14 @@ body {
   transform: scale(1.05);
 }
 
-/* Bottom Navigation Bar */
+/* Bottom Navigation Bar - Fixed to prevent scrollbar */
 .nav-bottom {
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
   position: sticky;
   top: 80px;
   z-index: 20;
+  overflow: visible !important;
 }
 
 .nav-bottom-inner {
@@ -1710,12 +1711,16 @@ body {
   gap: 1rem;
   padding: 0.8rem 0;
   justify-content: center;
+  overflow: visible !important;
+  position: relative;
 }
 
 .nav-links-main {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .nav-links-main > a,
@@ -1769,15 +1774,18 @@ body {
   visibility: hidden;
   transform: translateX(-50%) translateY(-10px);
   transition: all 0.3s ease;
-  z-index: 100;
+  z-index: 1000 !important;
   margin-top: 8px;
+  pointer-events: none;
 }
 
 .nav-dropdown:hover .dropdown-content {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(0);
+   transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
 }
+
 
 .dropdown-content a {
   display: block;
@@ -3230,4 +3238,13 @@ body[data-theme="dark"] .brand-pill {
   .hamburger {
     display: none !important;
   }
+}
+.nav-bottom,
+.nav-bottom-inner,
+.container {
+  overflow: visible !important;
+}
+
+body {
+  overflow-x: hidden;
 }
