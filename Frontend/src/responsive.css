@@ -171,7 +171,8 @@ html {
   }
 
   .search-input-wrapper {
-    margin: 0 -1rem;
+    /* Avoid pushing the input beyond the viewport which causes horizontal scrollbar */
+    margin: 0;
   }
 
   /* User actions */
@@ -205,6 +206,21 @@ html {
 @media (max-width: 480px) {
   .grid {
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+/* Ensure product listing shows two cards per row on mobile */
+@media (max-width: 768px) {
+  .grid.products {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid.products {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
   }
 }
 

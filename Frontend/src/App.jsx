@@ -173,6 +173,18 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
       {/* Top navbar with branding, search, and user actions */}
       <div className="nav-top" style={{ '--header-height': '60px' }}>
         <div className="container nav-top-inner responsive-nav">
+          {/* Mobile Hamburger - left aligned */}
+          <button 
+            className="hamburger mobile-only" 
+            aria-label="Toggle Menu" 
+            aria-expanded={showMenu}
+            aria-controls="mobile-menu"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            <span className="hamburger-icon">
+              <span className={`hamburger-line ${showMenu ? 'open' : ''}`}></span>
+            </span>
+          </button>
           <div className="brand-section">
             <div className="brand" onClick={() => navigate(user?.role === 'admin' ? '/admin' : '/')} style={{ cursor: 'pointer' }}>
               <span className="leaf">✿</span>
@@ -403,41 +415,41 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
 
   {/* Mobile Menu Overlay */}
   {showMenu && (
-    <div className="mobile-menu-overlay" onClick={() => setShowMenu(false)}>
+    <div className={`mobile-menu-overlay ${showMenu ? 'open' : ''}`} onClick={() => setShowMenu(false)}>
       <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
         <div className="mobile-menu-header">
           <h3>Menu</h3>
           <button className="mobile-menu-close" onClick={() => setShowMenu(false)}>×</button>
         </div>
         <nav className="mobile-nav-links">
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/'); setShowMenu(false); }}>Home</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/profile'); setShowMenu(false); }}>Profile</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/'); setShowMenu(false); }}>🏠 Home</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/profile'); setShowMenu(false); }}>👤 Profile</a>
           
           <div className="mobile-nav-section">
             <h4>Categories</h4>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=serum'); setShowMenu(false); }}>Serums</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=cleanser'); setShowMenu(false); }}>Cleansers</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=toner'); setShowMenu(false); }}>Toners</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=facemask'); setShowMenu(false); }}>Face Masks</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=serum'); setShowMenu(false); }}>💧 Serums</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=cleanser'); setShowMenu(false); }}>🫧 Cleansers</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=toner'); setShowMenu(false); }}>🌸 Toners</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=facemask'); setShowMenu(false); }}>🎭 Face Masks</a>
           </div>
           
           <div className="mobile-nav-section">
             <h4>Bath & Body</h4>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=body wash'); setShowMenu(false); }}>Body Wash</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=body lotion'); setShowMenu(false); }}>Body Lotion</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=scrubs'); setShowMenu(false); }}>Body Scrubs</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=body wash'); setShowMenu(false); }}>🛁 Body Wash</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=body lotion'); setShowMenu(false); }}>🧴 Body Lotion</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=scrubs'); setShowMenu(false); }}>🧽 Body Scrubs</a>
           </div>
           
           <div className="mobile-nav-section">
             <h4>Skin Care</h4>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=moisturizers'); setShowMenu(false); }}>Moisturizers</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=sunscreen'); setShowMenu(false); }}>Sun Protection</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=treatments'); setShowMenu(false); }}>Treatments</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=moisturizers'); setShowMenu(false); }}>🧴 Moisturizers</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=sunscreen'); setShowMenu(false); }}>🌞 Sun Protection</a>
+            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=treatments'); setShowMenu(false); }}>🪄 Treatments</a>
           </div>
           
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/collections'); setShowMenu(false); }}>Collections</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/about'); setShowMenu(false); }}>About Us</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/contact'); setShowMenu(false); }}>Contact</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/collections'); setShowMenu(false); }}>🌿 Collections</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/about'); setShowMenu(false); }}>ℹ️ About Us</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/contact'); setShowMenu(false); }}>✉️ Contact</a>
         </nav>
       </div>
     </div>
