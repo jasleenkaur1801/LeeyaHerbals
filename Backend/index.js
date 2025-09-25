@@ -12,8 +12,7 @@ const cors = require('cors');
 const AuthRouter = require('./Routes/AuthRouter');
 const OrderRouter = require('./Routes/OrderRouter');
 const ProductRouter = require('./Routes/ProductRouter');
-const StripeRouter = require('./Routes/StripeRouter');  // ✅ merged
-const AdminRouter = require('./Routes/AdminRouter');    // ✅ merged
+const AdminRouter = require('./Routes/AdminRouter');
 
 const PORT = process.env.PORT || 8080;
 require('./Models/db');
@@ -25,13 +24,10 @@ app.get("/ping",(req,res)=>{
 app.use(bodyParser.json());
 app.use(cors());
 
-// Stripe webhook needs raw body, so handle it before other middleware
-app.use('/api/webhook', express.raw({type: 'application/json'}));
 
 app.use('/auth', AuthRouter);
 app.use('/api/orders', OrderRouter);
 app.use('/products', ProductRouter);
-app.use('/api', StripeRouter);
 app.use('/admin', AdminRouter);
 
 app.listen(PORT,()=>{

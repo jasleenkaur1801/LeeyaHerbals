@@ -1,21 +1,28 @@
 /* Cart Page Styles */
 .cart-page {
-  min-height: 100vh;
-  padding: 100px 0 50px;
+  min-height: auto;
+  height: auto;
+  padding: 20px 0 20px;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .cart-page .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .cart-page h1 {
   font-size: 2.5rem;
   font-weight: 700;
   color: #2d3748;
-  margin-bottom: 30px;
+  margin: 10px 0 20px 0;
   text-align: center;
 }
 
@@ -43,6 +50,10 @@
   grid-template-columns: 2fr 1fr;
   gap: 40px;
   align-items: start;
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 20px;
+  position: relative;
 }
 
 /* Cart Items */
@@ -51,28 +62,12 @@
   border-radius: 20px;
   padding: 30px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  max-height: 600px;
-  overflow-y: auto;
+  min-height: fit-content;
+  height: auto;
+  overflow: visible;
 }
 
-/* Custom scrollbar for cart items */
-.cart-items::-webkit-scrollbar {
-  width: 8px;
-}
-
-.cart-items::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.cart-items::-webkit-scrollbar-thumb {
-  background: #2d5a27;
-  border-radius: 10px;
-}
-
-.cart-items::-webkit-scrollbar-thumb:hover {
-  background: #1a3d1a;
-}
+/* Cart items expand naturally with content - no scrollbar needed */
 
 .cart-items h2 {
   font-size: 1.5rem;
@@ -176,17 +171,24 @@
   background: #c53030;
 }
 
-/* Cart Summary */
-.cart-summary {
+/* Order Summary */
+.order-summary {
   background: white;
   border-radius: 20px;
   padding: 30px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 120px;
+  align-self: start;
+  height: fit-content;
+  min-height: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: static;
+  max-height: none;
+  overflow: visible;
 }
 
-.cart-summary h2 {
+.order-summary h3 {
   font-size: 1.5rem;
   font-weight: 600;
   color: #2d3748;
@@ -212,14 +214,28 @@
   margin-top: 20px;
 }
 
-.free-shipping-note {
+.free-shipping {
+  color: #48bb78;
+  font-weight: 600;
+}
+
+.order-summary-content {
+  flex: 1;
+}
+
+.order-summary-actions {
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
+.shipping-message {
   background: linear-gradient(135deg, #48bb78, #38a169);
   color: white;
   padding: 10px 15px;
   border-radius: 8px;
   font-size: 0.9rem;
   text-align: center;
-  margin: 15px 0;
+  margin: 10px 0 5px 0;
 }
 
 /* Payment Methods */
@@ -362,70 +378,153 @@
   .cart-content {
     grid-template-columns: 1fr;
     gap: 30px;
+    margin-bottom: 20px;
   }
   
-  .cart-summary {
+  .cart-items {
+    height: auto;
+    min-height: fit-content;
+  }
+  
+  .order-summary {
     position: static;
+    max-height: none;
   }
 }
 
 @media (max-width: 768px) {
   .cart-page {
-    padding: 80px 0 30px;
+    padding: 15px 0 20px;
+    min-height: auto;
   }
   
   .cart-page h1 {
     font-size: 2rem;
+    margin: 5px 0 15px 0;
   }
   
-  .cart-items,
-  .cart-summary {
+  .cart-content {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    margin-bottom: 20px;
+  }
+  
+  .cart-items {
     padding: 20px;
+    height: auto;
+    min-height: fit-content;
+    order: 1;
+  }
+  
+  .order-summary {
+    padding: 20px;
+    order: 2;
+    position: static;
+    margin-bottom: 0;
+    max-height: none;
   }
   
   .cart-item {
-    grid-template-columns: 60px 1fr auto;
+    grid-template-columns: 80px 1fr;
     gap: 15px;
+    align-items: center;
   }
   
-  .item-total,
-  .remove-btn {
-    grid-column: span 3;
-    justify-self: end;
+  .quantity-controls {
+    grid-column: 1 / -1;
+    justify-self: start;
     margin-top: 10px;
   }
   
-  .form-grid {
-    grid-template-columns: 1fr;
+  .item-total {
+    grid-column: 1 / -1;
+    justify-self: end;
+    margin-top: 5px;
+    font-size: 1.2rem;
   }
   
-  .form-grid input.full-width {
-    grid-column: span 1;
+  .remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  
+  .cart-item {
+    position: relative;
+    padding: 15px;
+    margin-bottom: 15px;
   }
 }
 
 @media (max-width: 480px) {
-  .cart-page .container {
-    padding: 0 15px;
+  .cart-page {
+    padding: 10px 0 20px;
+    min-height: auto;
   }
   
-  .cart-items,
-  .cart-summary {
+  .cart-page .container {
+    padding: 0 10px;
+  }
+  
+  .cart-page h1 {
+    font-size: 1.8rem;
+    margin: 0 0 10px 0;
+  }
+  
+  .cart-content {
+    gap: 15px !important;
+    margin-bottom: 20px;
+  }
+  
+  .cart-items {
     padding: 15px;
+    height: auto;
+    min-height: fit-content;
+  }
+  
+  .order-summary {
+    padding: 15px;
+    margin-bottom: 0;
+    max-height: none;
   }
   
   .cart-item {
-    grid-template-columns: 1fr;
-    text-align: center;
+    grid-template-columns: 70px 1fr;
     gap: 10px;
+    padding: 12px;
+    text-align: left;
   }
   
   .item-image {
-    justify-self: center;
+    width: 70px;
+    height: 70px;
+  }
+  
+  .item-details h3 {
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+  
+  .item-weight, .item-price {
+    font-size: 0.8rem;
   }
   
   .quantity-controls {
-    justify-self: center;
+    margin-top: 8px;
+  }
+  
+  .qty-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+  
+  .remove-btn {
+    width: 28px;
+    height: 28px;
+    top: 8px;
+    right: 8px;
+    font-size: 0.9rem;
   }
 }
 
@@ -446,6 +545,8 @@
   pointer-events: auto !important;
   z-index: 10;
   position: relative;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .proceed-to-buy-btn:hover {
@@ -458,3 +559,38 @@
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(255, 149, 0, 0.3);
 }
+
+/* Additional improvements for better layout */
+
+/* Ensure proper spacing and layout for all screen sizes */
+.cart-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Enhanced order summary for better visual hierarchy */
+.order-summary {
+  border: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.order-summary-content {
+  min-height: 200px;
+}
+
+/* Improved button styling for better interaction */
+.proceed-to-buy-btn {
+  margin-top: 15px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure cart page doesn't overlap with footer */
+.cart-page {
+  margin-bottom: 3rem;
+}
+
+/* Make sure the page has proper minimum height to push footer down */
+.cart-page .container {
+  min-height: calc(100vh - 300px);
+}
+
+/* Cart page layout ensures proper footer spacing through calculated heights */

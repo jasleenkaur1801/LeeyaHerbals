@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AddToCartButton from './components/AddToCartButton';
 
-function CollectionsPage({ products = [], cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
+function CollectionsPage({ products = [], cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth, showCartSuccessMessage }) {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState('name');
 
@@ -39,7 +39,7 @@ function CollectionsPage({ products = [], cart, setCart, wishlist, setWishlist, 
       }
       return [...prev, { ...product, qty: 1 }];
     });
-    alert(`${product.name} added to cart!`);
+    showCartSuccessMessage(product.name);
   };
 
   const toggleWishlist = (product) => {

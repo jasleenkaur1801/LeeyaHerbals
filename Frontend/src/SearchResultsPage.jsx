@@ -61,7 +61,7 @@ function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated
   )
 }
 
-function SearchResultsPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
+function SearchResultsPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth, showCartSuccessMessage }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const [sortBy, setSortBy] = useState('relevance')
@@ -168,7 +168,7 @@ function SearchResultsPage({ cart, setCart, wishlist, setWishlist, isAuthenticat
       return [...prev, { ...product, qty: 1 }]
     })
 
-    alert(`${product.name} added to cart!`)
+    showCartSuccessMessage(product.name)
   }
 
   const toggleWishlist = (product) => {

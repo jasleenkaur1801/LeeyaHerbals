@@ -15,14 +15,14 @@ const CheckoutPage = () => {
     pincode: '',
     landmark: ''
   });
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [cardPaymentCompleted, setCardPaymentCompleted] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isProcessing, setIsProcessing] = useState(false);
   const [phoneError, setPhoneError] = useState('');
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const shipping = 0;
-  const discount = paymentMethod === 'card' ? subtotal * 0.1 : 0;
+  const discount = 0; // Removed card payment discount
   const total = subtotal + shipping - discount;
 
   useEffect(() => {
@@ -99,63 +99,14 @@ const CheckoutPage = () => {
     return true;
   };
 
-  const handleCardPayment = async () => {
+  const handleOnlinePayment = async () => {
     if (!validateAddress()) {
       alert('Please fill in all required address fields');
       return;
     }
-
-    setIsProcessing(true);
-
-    try {
-      // Store order details and address for Stripe
-      localStorage.setItem('checkoutOrderTotal', total.toString());
-      localStorage.setItem('checkoutOrderItems', JSON.stringify(cart));
-      localStorage.setItem('checkoutOrderAddress', JSON.stringify(address));
-      localStorage.setItem('tempCheckoutAddress', JSON.stringify(address)); // Store for form restoration
-      
-      // Create Stripe checkout session
-      const stripeResponse = await fetch('http://localhost:8080/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          orderId: Date.now(),
-          items: cart.map(item => ({
-            name: item.name,
-            price: item.price,
-            quantity: item.qty,
-            image: item.image,
-            weight: item.weight
-          })),
-          total,
-          customerEmail: 'customer@example.com'
-        })
-      });
-
-      if (!stripeResponse.ok) {
-        throw new Error('Failed to create payment session');
-      }
-
-      const { url, sessionId } = await stripeResponse.json();
-      
-      if (url) {
-        // Store session ID for later use
-        if (sessionId) {
-          localStorage.setItem('stripeSessionId', sessionId);
-        }
-        // Redirect to Stripe checkout
-        window.location.href = url;
-      } else {
-        throw new Error('No checkout URL received');
-      }
-      
-    } catch (error) {
-      console.error('Payment error:', error);
-      alert(`Payment failed: ${error.message}. Please try again.`);
-      setIsProcessing(false);
-    }
+    
+    // Razorpay integration will be added here
+    alert('Razorpay integration will be implemented here');
   };
 
   const handleSubmitOrder = async () => {
@@ -230,8 +181,14 @@ const CheckoutPage = () => {
         // Dispatch cart update event
         window.dispatchEvent(new Event('cartUpdated'));
 
-        alert('Order submitted successfully! You will receive a confirmation call within 24 hours.');
-        navigate('/myorders');
+        // Show success message
+        setShowSuccessMessage(true);
+        
+        // Hide success message after 4 seconds and navigate
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          navigate('/myorders');
+        }, 8000);
       } else {
         throw new Error(result.error || 'Failed to create order');
       }
@@ -287,7 +244,20 @@ const CheckoutPage = () => {
       <div className="container">
         <h1>Secure Checkout</h1>
         
-        <div className="checkout-content">
+        {/* Success Message */}
+        {showSuccessMessage && (
+          <div className="success-message">
+            <div className="success-content">
+              <span className="success-icon">✅</span>
+              <div className="success-text">
+                <h3>Order Placed Successfully!</h3>
+                <p>Your order has been placed. You can check it in My Orders. You will receive a confirmation call within 24 hours.</p>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="checkout-content">
           <div className="checkout-main">
             {/* Delivery Address Section */}
             <div className="checkout-section">
@@ -395,38 +365,22 @@ const CheckoutPage = () => {
                 </div>
 
                 <div 
-                  className={`payment-option ${paymentMethod === 'card' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('card')}
+                  className={`payment-option ${paymentMethod === 'online' ? 'selected' : ''}`}
+                  onClick={() => setPaymentMethod('online')}
                 >
                   <input 
                     type="radio" 
-                    id="card" 
+                    id="online" 
                     name="payment" 
-                    value="card" 
-                    checked={paymentMethod === 'card'}
-                    onChange={() => setPaymentMethod('card')}
+                    value="online" 
+                    checked={paymentMethod === 'online'}
+                    onChange={() => setPaymentMethod('online')}
                   />
-                  <label htmlFor="card">
+                  <label htmlFor="online">
                     <span className="payment-icon">💳</span>
                     <div>
-                      <strong>Online Payment (Cards Accepted)</strong>
-                      <p className="discount-text">10% OFF</p>
-                      {paymentMethod === 'card' && !cardPaymentCompleted && (
-                        <div className="card-payment-section">
-                          <button 
-                            className="card-payment-btn"
-                            onClick={handleCardPayment}
-                            disabled={isProcessing}
-                          >
-                            {isProcessing ? 'Processing...' : 'Click here for payment'}
-                          </button>
-                        </div>
-                      )}
-                      {cardPaymentCompleted && (
-                        <div className="payment-completed">
-                          ✅ Payment completed successfully
-                        </div>
-                      )}
+                      <strong>Online Payment (Razorpay)</strong>
+                      <p>Credit/Debit Cards, UPI, NetBanking</p>
                     </div>
                   </label>
                 </div>
@@ -473,15 +427,21 @@ const CheckoutPage = () => {
               </div>
 
               <button 
-                className="submit-order-btn"
-                onClick={handleSubmitOrder}
-                disabled={!paymentMethod || isProcessing || (paymentMethod === 'card' && !cardPaymentCompleted)}
+                type="submit" 
+                className="place-order-btn"
+                disabled={isProcessing}
+                onClick={(e) => {
+                  if (!paymentMethod) {
+                    e.preventDefault();
+                    alert('Please select a payment method');
+                  }
+                }}
               >
-                {isProcessing ? 'Submitting...' : 'Submit Order'}
+                {isProcessing ? 'Processing...' : 'Place Order'}
               </button>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

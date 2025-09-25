@@ -58,63 +58,21 @@ const CartPage = ({ cart, setCart }) => {
     return required.every(field => address[field].trim() !== '');
   };
 
-  const handleStripePayment = async () => {
+  const handleOnlinePayment = async () => {
     if (!validateAddress()) {
       alert('Please fill in all required address fields');
       return;
     }
 
-    setIsProcessing(true);
-
-    try {
-      // Store order details for after payment
-      localStorage.setItem('lastOrderTotal', total.toString());
-      localStorage.setItem('lastOrderItems', JSON.stringify(cart));
-      localStorage.setItem('lastOrderAddress', JSON.stringify(address));
-      
-      // Create Stripe checkout session directly without creating order first
-      const stripeResponse = await fetch('http://localhost:8080/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          orderId: Date.now(), // Temporary order ID
-          items: cart.map(item => ({
-            name: item.name,
-            price: item.price,
-            quantity: item.qty,
-            image: item.image,
-            weight: item.weight
-          })),
-          total,
-          customerEmail: 'customer@example.com'
-        })
-      });
-
-      if (!stripeResponse.ok) {
-        const errorData = await stripeResponse.text();
-        console.error('Stripe response error:', errorData);
-        throw new Error('Failed to create payment session');
-      }
-
-      const { url } = await stripeResponse.json();
-      
-      if (url) {
-        // Redirect to Stripe checkout
-        window.location.href = url;
-      } else {
-        throw new Error('No checkout URL received');
-      }
-      
-    } catch (error) {
-      console.error('Payment error:', error);
-      alert(`Payment failed: ${error.message}. Please try again.`);
-      setIsProcessing(false);
-    }
+    // Store order details for the checkout page
+    localStorage.setItem('checkoutCart', JSON.stringify(cart));
+    localStorage.setItem('checkoutAddress', JSON.stringify(address));
+    
+    // Redirect to checkout page for online payment
+    navigate('/checkout', { state: { paymentMethod: 'online' } });
   };
 
-  const handleCODOrder = async () => {
+  const handleCODPayment = async () => {
     if (!validateAddress()) {
       alert('Please fill in all required address fields');
       return;
@@ -222,51 +180,56 @@ const CartPage = ({ cart, setCart }) => {
           </div>
 
           <div className="order-summary">
-            <h3>Order Summary</h3>
-            <div className="summary-row">
-              <span>Subtotal ({cart.reduce((sum, item) => sum + item.qty, 0)} items):</span>
-              <span>₹{subtotal}</span>
+            <div className="order-summary-content">
+              <h3>Order Summary</h3>
+              <div className="summary-row">
+                <span>Subtotal ({cart.reduce((sum, item) => sum + item.qty, 0)} items):</span>
+                <span>₹{subtotal}</span>
+              </div>
+              <div className="summary-row">
+                <span>Shipping:</span>
+                <span className="free-shipping">FREE</span>
+              </div>
+              <div className="summary-row total">
+                <span>Total:</span>
+                <span>₹{total}</span>
+              </div>
             </div>
-            <div className="summary-row">
-              <span>Shipping:</span>
-              <span className="free-shipping">FREE</span>
-            </div>
-            <div className="summary-row total">
-              <span>Total:</span>
-              <span>₹{total}</span>
-            </div>
-            <div className="shipping-message">
-              You saved ₹50 on shipping!
-            </div>
+            
+            <div className="order-summary-actions">
+              <div className="shipping-message">
+                You saved ₹50 on shipping!
+              </div>
 
-            <button 
-              className="proceed-to-buy-btn"
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Proceed to Buy clicked - navigating to checkout');
-                
-                // Store cart data for checkout page
-                localStorage.setItem('checkoutCart', JSON.stringify(cart));
-                
-                // Navigate to checkout
-                try {
-                  navigate('/checkout');
-                  console.log('Navigation successful');
-                } catch (error) {
-                  console.error('Navigation error:', error);
-                  // Force page navigation as fallback
-                  window.location.href = window.location.origin + '/checkout';
-                }
-              }}
-              style={{
-                cursor: 'pointer',
-                pointerEvents: 'auto'
-              }}
-            >
-              Proceed to Buy
-            </button>
+              <button 
+                className="proceed-to-buy-btn"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('Proceed to Buy clicked - navigating to checkout');
+                  
+                  // Store cart data for checkout page
+                  localStorage.setItem('checkoutCart', JSON.stringify(cart));
+                  
+                  // Navigate to checkout
+                  try {
+                    navigate('/checkout');
+                    console.log('Navigation successful');
+                  } catch (error) {
+                    console.error('Navigation error:', error);
+                    // Force page navigation as fallback
+                    window.location.href = window.location.origin + '/checkout';
+                  }
+                }}
+                style={{
+                  cursor: 'pointer',
+                  pointerEvents: 'auto'
+                }}
+              >
+                Proceed to Buy
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -863,7 +863,7 @@ function Footer() {
 }
 
 
-function WishlistPage({ wishlist, setWishlist, setCart }) {
+function WishlistPage({ wishlist, setWishlist, setCart, showCartSuccessMessage }) {
   return (
     <div className="cart-page-container">
       <div className="container">
@@ -893,7 +893,9 @@ function WishlistPage({ wishlist, setWishlist, setCart }) {
                       }
                       return [...prev, { ...item, qty: 1 }];
                     });
-                    alert(`${item.name} added to cart!`);
+                    // Remove item from wishlist when added to cart
+                    setWishlist(prev => prev.filter(i => i.id !== item.id));
+                    showCartSuccessMessage(item.name);
                   }}>Add to Cart</button>
                   <button className="wishlist-remove" onClick={() => setWishlist(prev => prev.filter(i => i.id !== item.id))}>Remove</button>
                 </div>
@@ -916,6 +918,8 @@ function App() {
   const [dark, setDark] = useState(false);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [cartSuccessMessage, setCartSuccessMessage] = useState('');
+  const [showCartSuccess, setShowCartSuccess] = useState(false);
 
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -1038,6 +1042,17 @@ function App() {
     }
   }
 
+  const showCartSuccessMessage = (productName) => {
+    setCartSuccessMessage(`${productName} added to cart!`);
+    setShowCartSuccess(true);
+    
+    // Hide message after 4 seconds
+    setTimeout(() => {
+      setShowCartSuccess(false);
+      setCartSuccessMessage('');
+    }, 4000);
+  }
+
   useEffect(() => {
     // Always re-apply reveal animation on navigation
     const els = document.querySelectorAll('.reveal');
@@ -1136,6 +1151,17 @@ function App() {
           showMenu={showMenu}
         />
       )}
+      
+      {/* Cart Success Message */}
+      {showCartSuccess && (
+        <div className="cart-success-message">
+          <div className="cart-success-content">
+            <span className="cart-success-icon">✅</span>
+            <span className="cart-success-text">{cartSuccessMessage}</span>
+          </div>
+        </div>
+      )}
+      
       <Routes>
         <Route path="/" element={
           <>
@@ -1183,7 +1209,7 @@ function App() {
                     return [...prev, { ...p, qty: 1 }];
                   });
                   // Show success message instead of opening cart
-                  alert(`${p.name} added to cart!`);
+                  showCartSuccessMessage(p.name);
                 }}
                 onWishlist={(p) => {
                   setWishlist(prev => {
@@ -1219,7 +1245,7 @@ function App() {
                             return [...prev, { ...p, qty: 1 }]
                           })
                           // Show success message instead of opening cart
-                          alert(`${p.name} added to cart!`)
+                          showCartSuccessMessage(p.name)
                         }}
                         onWishlist={(p) => {
                           setWishlist(prev => {
@@ -1259,10 +1285,10 @@ function App() {
             <button className="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Back to top">↑</button>
           </>
         } />
-        <Route path="/search" element={<SearchResultsPage cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
+        <Route path="/search" element={<SearchResultsPage cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} showCartSuccessMessage={showCartSuccessMessage} />} />
         <Route path="/product/:productId" element={<ProductPage cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
         <Route path="/cart" element={<CartPage cart={cart} setCart={setCart} />} />
-        <Route path="/wishlist" element={<WishlistPage wishlist={wishlist} setWishlist={setWishlist} setCart={setCart} />} />
+        <Route path="/wishlist" element={<WishlistPage wishlist={wishlist} setWishlist={setWishlist} setCart={setCart} showCartSuccessMessage={showCartSuccessMessage} />} />
         <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <AuthRedirect />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/profile" element={<ProfilePage user={user} onLogout={handleLogout} />} />
@@ -1270,7 +1296,7 @@ function App() {
         <Route path="/categories/bath-body" element={<BathBodyPage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
         <Route path="/categories/skin-care" element={<SkinCarePage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
         <Route path="/categories/face-wash-gel" element={<FaceWashGelPage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
-        <Route path="/collections" element={<CollectionsPage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
+        <Route path="/collections" element={<CollectionsPage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} showCartSuccessMessage={showCartSuccessMessage} />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/contact/visitus" element={<VisitUsPage />} />
@@ -1331,7 +1357,9 @@ function App() {
                           }
                           return [...prev, { ...item, qty: 1 }];
                         });
-                        alert(`${item.name} added to cart!`);
+                        // Remove item from wishlist when added to cart
+                        setWishlist(prev => prev.filter(i => i.id !== item.id));
+                        showCartSuccessMessage(item.name);
                       }}>Add to Cart</button>
                       <button className="wishlist-remove" onClick={() => setWishlist(prev => prev.filter(i => i.id !== item.id))}>Remove</button>
                     </div>

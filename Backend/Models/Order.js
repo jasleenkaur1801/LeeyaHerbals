@@ -23,17 +23,13 @@ const OrderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['cod', 'online', 'stripe'],
+    enum: ['cod', 'online'],
     required: true
   },
   paymentStatus: {
     type: String,
     enum: ['pending', 'completed', 'failed'],
     default: 'completed'
-  },
-  stripeSessionId: {
-    type: String,
-    required: false
   },
   subtotal: {
     type: Number,

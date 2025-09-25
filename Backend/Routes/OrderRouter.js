@@ -10,7 +10,6 @@ router.post('/', verifyToken, async (req, res) => {
       orderId, 
       paymentMethod, 
       paymentStatus,
-      stripeSessionId,
       subtotal, 
       shipping, 
       total, 
@@ -23,14 +22,10 @@ router.post('/', verifyToken, async (req, res) => {
     
     // Generate orderId if not provided
     const finalOrderId = orderId || `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
     const order = new Order({
       userId,
       orderId: finalOrderId,
       paymentMethod,
-      paymentStatus: paymentStatus || 'completed',
-      stripeSessionId,
-      subtotal,
       shipping: shipping || 0,
       total,
       items,

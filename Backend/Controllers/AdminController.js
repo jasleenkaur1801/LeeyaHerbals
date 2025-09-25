@@ -37,8 +37,9 @@ const getAllOrders = async (req, res) => {
 
         const orderStats = {
             totalOrders: orders.length,
-            pendingOrders: orders.filter(order => order.status === 'Placed').length,
+            pendingOrders: orders.filter(order => order.status !== 'Delivered' && order.status !== 'Cancelled').length,
             completedOrders: orders.filter(order => order.status === 'Delivered').length,
+            cancelledOrders: orders.filter(order => order.status === 'Cancelled').length,
             totalRevenue: orders.reduce((sum, order) => sum + order.total, 0)
         };
 
@@ -94,7 +95,9 @@ const getDashboardStats = async (req, res) => {
     try {
         const totalUsers = await UserModel.countDocuments({ role: 'user' });
         const totalOrders = await Order.countDocuments();
-        const pendingOrders = await Order.countDocuments({ status: 'Placed' });
+        const pendingOrders = await Order.countDocuments({ 
+            status: { $nin: ['Delivered', 'Cancelled'] } 
+        });
         
         const orders = await Order.find();
         const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);

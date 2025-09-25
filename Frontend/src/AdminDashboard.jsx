@@ -351,10 +351,28 @@ function UserManagement({ users, loading, onDeleteUser }) {
 
 function OrderManagement({ orders, loading, onUpdateStatus }) {
   const [expandedOrders, setExpandedOrders] = useState(new Set());
+  const [activeOrderTab, setActiveOrderTab] = useState('pending');
 
   if (loading) {
     return <div className="loading">Loading orders...</div>;
   }
+
+  // Filter orders based on status
+  const pendingOrders = orders.filter(order => 
+    order.status !== 'Delivered' && order.status !== 'Cancelled'
+  );
+  const completedOrders = orders.filter(order => order.status === 'Delivered');
+  const cancelledOrders = orders.filter(order => order.status === 'Cancelled');
+
+  const getCurrentOrders = () => {
+    switch (activeOrderTab) {
+      case 'pending': return pendingOrders;
+      case 'completed': return completedOrders;
+      case 'cancelled': return cancelledOrders;
+      case 'all': return orders;
+      default: return orders;
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -399,18 +417,48 @@ function OrderManagement({ orders, loading, onUpdateStatus }) {
 
   console.log('Orders data:', orders); // Debug log
   
+  const currentOrders = getCurrentOrders();
+  
   return (
     <div className="order-management">
       <h2>Order Management</h2>
       <p className="section-subtitle">Total Orders: {orders.length}</p>
       
+      {/* Order Status Tabs */}
+      <div className="order-tabs">
+        <button 
+          className={`order-tab ${activeOrderTab === 'pending' ? 'active' : ''}`}
+          onClick={() => setActiveOrderTab('pending')}
+        >
+          Pending Orders ({pendingOrders.length})
+        </button>
+        <button 
+          className={`order-tab ${activeOrderTab === 'completed' ? 'active' : ''}`}
+          onClick={() => setActiveOrderTab('completed')}
+        >
+          Completed Orders ({completedOrders.length})
+        </button>
+        <button 
+          className={`order-tab ${activeOrderTab === 'cancelled' ? 'active' : ''}`}
+          onClick={() => setActiveOrderTab('cancelled')}
+        >
+          Cancelled Orders ({cancelledOrders.length})
+        </button>
+        <button 
+          className={`order-tab ${activeOrderTab === 'all' ? 'active' : ''}`}
+          onClick={() => setActiveOrderTab('all')}
+        >
+          All Orders ({orders.length})
+        </button>
+      </div>
+      
       <div className="orders-container">
-        {orders.length === 0 ? (
+        {currentOrders.length === 0 ? (
           <div style={{padding: '2rem', textAlign: 'center', color: '#666'}}>
-            No orders found. Make sure the backend is running and orders exist in the database.
+            No {activeOrderTab} orders found.
           </div>
         ) : (
-          orders.map(order => (
+          currentOrders.map(order => (
           <div key={order._id} className="order-card">
             <div className="order-header" onClick={() => toggleOrderExpansion(order._id)}>
               <div className="order-main-info">
