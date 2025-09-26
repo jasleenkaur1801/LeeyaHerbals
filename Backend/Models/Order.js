@@ -23,7 +23,7 @@ const OrderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['cod', 'online'],
+    enum: ['cod', 'razorpay', 'online'],
     required: true
   },
   paymentStatus: {
@@ -105,7 +105,38 @@ const OrderSchema = new mongoose.Schema({
         required: true
       }
     }
-  ]
+  ],
+  // Razorpay specific fields
+  razorpayOrderId: {
+    type: String
+  },
+  razorpayPaymentId: {
+    type: String
+  },
+  razorpaySignature: {
+    type: String
+  },
+  // Additional fields for compatibility
+  userEmail: {
+    type: String
+  },
+  userName: {
+    type: String
+  },
+  totalAmount: {
+    type: Number
+  },
+  shippingAddress: {
+    type: Object
+  },
+  orderStatus: {
+    type: String,
+    default: 'pending'
+  },
+  orderDate: {
+    type: Date,
+    default: Date.now
+  }
 }, {
   timestamps: true
 });

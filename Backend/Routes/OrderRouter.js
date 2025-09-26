@@ -6,6 +6,10 @@ const { verifyToken } = require('../Middlewares/Auth');
 // Create a new order
 router.post('/', verifyToken, async (req, res) => {
   try {
+    console.log('=== ORDER CREATION API CALLED ===');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    console.log('User from token:', req.user);
+    
     const { 
       orderId, 
       paymentMethod, 
@@ -19,6 +23,7 @@ router.post('/', verifyToken, async (req, res) => {
     } = req.body;
     
     const userId = req.user._id;
+    console.log('Creating order for userId:', userId);
     
     // Generate orderId if not provided
     const finalOrderId = orderId || `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -26,6 +31,8 @@ router.post('/', verifyToken, async (req, res) => {
       userId,
       orderId: finalOrderId,
       paymentMethod,
+      paymentStatus: paymentStatus || 'completed',
+      subtotal,
       shipping: shipping || 0,
       total,
       items,
@@ -34,6 +41,10 @@ router.post('/', verifyToken, async (req, res) => {
     });
     
     await order.save();
+    console.log('=== ORDER SAVED SUCCESSFULLY ===');
+    console.log('Order ID:', order._id);
+    console.log('Order details:', JSON.stringify(order.toObject(), null, 2));
+    
     res.status(201).json({
       success: true,
       message: 'Order created successfully',
@@ -52,8 +63,13 @@ router.post('/', verifyToken, async (req, res) => {
 // Get all orders for the logged-in user
 router.get('/my', verifyToken, async (req, res) => {
   try {
+    console.log('=== FETCHING USER ORDERS ===');
+    console.log('User from token:', req.user);
     const userId = req.user._id;
-    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
+    console.log('Searching for orders with userId:', userId);
+    const orders = await Order.find({ userId }).sort({ createdAt: -1, orderDate: -1 });
+    console.log('Found orders:', orders.length);
+    console.log('Orders:', JSON.stringify(orders, null, 2));
     res.json({
       success: true,
       orders

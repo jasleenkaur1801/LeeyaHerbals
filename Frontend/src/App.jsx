@@ -1004,9 +1004,11 @@ function App() {
     };
 
     window.addEventListener('cartUpdated', handleCartUpdate);
+    window.addEventListener('cartUpdate', handleCartUpdate);
     
     return () => {
       window.removeEventListener('cartUpdated', handleCartUpdate);
+      window.removeEventListener('cartUpdate', handleCartUpdate);
     };
   }, []);
 

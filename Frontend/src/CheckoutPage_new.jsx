@@ -30,24 +30,19 @@ const CheckoutPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [phoneError, setPhoneError] = useState('');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [cardPaymentCompleted, setCardPaymentCompleted] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const shipping = 0;
-  const discount = 0;
-  const total = subtotal + shipping - discount;
+  const total = subtotal + shipping;
 
   useEffect(() => {
     // Load cart data
     let cartData = null;
-    
-    // First try checkoutCart (set by Proceed to Buy button)
     const checkoutCart = localStorage.getItem('checkoutCart');
     if (checkoutCart) {
       cartData = JSON.parse(checkoutCart);
     } else {
-      // Fallback to regular cart
       const savedCart = localStorage.getItem('cart');
       if (savedCart) {
         cartData = JSON.parse(savedCart);
@@ -57,7 +52,6 @@ const CheckoutPage = () => {
     if (cartData && cartData.length > 0) {
       setCart(cartData);
     } else {
-      console.log('No cart data found, redirecting to cart');
       navigate('/cart');
     }
   }, [navigate]);
@@ -65,9 +59,7 @@ const CheckoutPage = () => {
   // Load Razorpay script
   useEffect(() => {
     const initRazorpay = async () => {
-      console.log('Loading Razorpay script...');
       const loaded = await loadRazorpayScript();
-      console.log('Razorpay script loaded:', loaded);
       setRazorpayLoaded(loaded);
       if (!loaded) {
         console.error('Failed to load Razorpay script');
@@ -77,33 +69,13 @@ const CheckoutPage = () => {
   }, []);
 
   const validatePhoneNumber = (phone) => {
-    // Remove any non-digit characters
     const cleanPhone = phone.replace(/\D/g, '');
-    
-    // Check if it starts with 91 and has exactly 12 digits (91 + 10 digits)
     if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
       return { isValid: true, error: '' };
     }
-    
-    // Check if it's just 10 digits (without country code)
     if (cleanPhone.length === 10) {
-      return { isValid: false, error: 'Please include country code 91 (e.g., 919876543210)' };
+      return { isValid: false, error: 'Please include country code 91' };
     }
-    
-    // Check if it starts with 91 but wrong length
-    if (cleanPhone.startsWith('91') && cleanPhone.length !== 12) {
-      return { isValid: false, error: 'Phone number must be exactly 10 digits after country code 91' };
-    }
-    
-    // Other cases
-    if (cleanPhone.length < 10) {
-      return { isValid: false, error: 'Phone number is too short' };
-    }
-    
-    if (cleanPhone.length > 12) {
-      return { isValid: false, error: 'Phone number is too long' };
-    }
-    
     return { isValid: false, error: 'Phone number must start with 91 followed by 10 digits' };
   };
 
@@ -115,7 +87,6 @@ const CheckoutPage = () => {
       return false;
     }
     
-    // Validate phone number
     const phoneValidation = validatePhoneNumber(address.phone);
     if (!phoneValidation.isValid) {
       setPhoneError(phoneValidation.error);
@@ -179,7 +150,6 @@ const CheckoutPage = () => {
         order_id: orderData.order.id,
         handler: async function (response) {
           try {
-            console.log('Payment successful, verifying...', response);
             const verifyResponse = await fetch('http://localhost:8080/api/payment/verify-payment', {
               method: 'POST',
               headers: {
@@ -210,24 +180,16 @@ const CheckoutPage = () => {
             });
 
             const verifyData = await verifyResponse.json();
-            console.log('Verification response:', verifyData);
 
             if (verifyData.success) {
-              // Clear cart from localStorage
               localStorage.removeItem('cart');
               localStorage.removeItem('checkoutCart');
               localStorage.setItem('lastOrderId', verifyData.orderId);
               
-              // Trigger cart update event for other components
-              window.dispatchEvent(new Event('cartUpdate'));
-              
-              // Clear local cart state
-              setCart([]);
-              
               setShowSuccessMessage(true);
               setTimeout(() => {
-                navigate('/myorders');
-              }, 1500);
+                navigate('/payment-success');
+              }, 2000);
             } else {
               throw new Error(verifyData.message || 'Payment verification failed');
             }
@@ -266,13 +228,7 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleSubmitOrder = async () => {
-    if (paymentMethod === 'online') {
-      await handleRazorpayPayment();
-      return;
-    }
-
-    // Handle COD orders
+  const handleCODOrder = async () => {
     if (!validateAddress()) {
       alert('Please fill in all required address fields');
       return;
@@ -281,7 +237,6 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
-      // Get auth token
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Please login to place an order');
@@ -289,11 +244,9 @@ const CheckoutPage = () => {
         return;
       }
 
-      // Prepare order data for API
       const orderData = {
-        paymentMethod: paymentMethod === 'card' ? 'online' : 'cod',
-        paymentStatus: 'completed',
-        stripeSessionId: paymentMethod === 'card' ? localStorage.getItem('stripeSessionId') : null,
+        paymentMethod: 'cod',
+        paymentStatus: 'pending',
         subtotal,
         shipping,
         total,
@@ -310,112 +263,43 @@ const CheckoutPage = () => {
         status: 'placed'
       };
 
-      // Try to create order via API, with fallback to local storage
-      let orderCreated = false;
-      
-      console.log('=== COD ORDER CREATION START ===');
-      console.log('Order data:', JSON.stringify(orderData, null, 2));
-      console.log('Token:', token);
-      
-      try {
-        const response = await fetch('http://localhost:8080/api/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(orderData)
-        });
+      const response = await fetch('http://localhost:8080/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
 
-        console.log('API Response status:', response.status);
-        const result = await response.json();
-        console.log('API Response data:', result);
+      const result = await response.json();
 
-        if (response.ok && result.success) {
-          console.log('COD Order created successfully via API');
-          orderCreated = true;
-        } else {
-          throw new Error(result.error || 'API order creation failed');
-        }
-      } catch (apiError) {
-        console.log('API not available, using local storage fallback:', apiError.message);
-        
-        // Fallback: Store order in localStorage for demo purposes
-        const existingOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
-        const newOrder = {
-          ...orderData,
-          id: Date.now().toString(),
-          orderNumber: `LH${Date.now()}`,
-          createdAt: new Date().toISOString(),
-          paymentMethod: paymentMethod
-        };
-        
-        // Add new order at the beginning (latest first)
-        existingOrders.unshift(newOrder);
-        localStorage.setItem('userOrders', JSON.stringify(existingOrders));
-        orderCreated = true;
-      }
-
-      if (orderCreated) {
-        // Clear cart and temporary data
+      if (response.ok && result.success) {
         localStorage.removeItem('cart');
         localStorage.removeItem('checkoutCart');
-        localStorage.removeItem('checkoutOrderTotal');
-        localStorage.removeItem('checkoutOrderItems');
-        localStorage.removeItem('checkoutOrderAddress');
-        localStorage.removeItem('stripeSessionId');
-        localStorage.removeItem('tempCheckoutAddress'); // Clean up address backup
         
-        // Trigger cart update event for other components
-        window.dispatchEvent(new Event('cartUpdate'));
-        
-        // Clear local cart state
-        setCart([]);
-
-        // Show success message
         setShowSuccessMessage(true);
-        setIsProcessing(false);
-        
-        // Navigate to My Orders after brief success message
         setTimeout(() => {
           navigate('/myorders');
-        }, 1500);
+        }, 2000);
       } else {
-        throw new Error('Failed to create order');
+        throw new Error(result.error || 'Failed to create order');
       }
       
     } catch (error) {
       console.error('Order submission error:', error);
-      alert(`Failed to submit order: ${error.message}. Please try again.`);
+      alert(`Failed to submit order: ${error.message}`);
       setIsProcessing(false);
     }
   };
 
-  // Check if returning from successful Stripe payment
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const cardPaymentStatus = localStorage.getItem('cardPaymentCompleted');
-    
-    if (urlParams.get('payment_success') === 'true' || cardPaymentStatus === 'true') {
-      setCardPaymentCompleted(true);
-      setPaymentMethod('card');
-      
-      // Restore address data if available
-      const savedAddress = localStorage.getItem('tempCheckoutAddress');
-      if (savedAddress) {
-        try {
-          const parsedAddress = JSON.parse(savedAddress);
-          setAddress(parsedAddress);
-        } catch (error) {
-          console.error('Error restoring address:', error);
-        }
-      }
-      
-      localStorage.removeItem('cardPaymentCompleted'); // Clean up
-      // Clear URL params
-      window.history.replaceState({}, document.title, window.location.pathname);
+  const handleSubmitOrder = async () => {
+    if (paymentMethod === 'online') {
+      await handleRazorpayPayment();
+    } else {
+      await handleCODOrder();
     }
-  }, []);
+  };
 
   if (cart.length === 0) {
     return (
@@ -435,20 +319,19 @@ const CheckoutPage = () => {
       <div className="container">
         <h1>Secure Checkout</h1>
         
-        {/* Success Message */}
         {showSuccessMessage && (
           <div className="success-message">
             <div className="success-content">
               <span className="success-icon">✅</span>
               <div className="success-text">
                 <h3>Order Placed Successfully!</h3>
-                <p>Your order has been placed successfully. Redirecting you to My Orders...</p>
+                <p>Your order has been placed. You can check it in My Orders.</p>
               </div>
             </div>
           </div>
         )}
         
-        <form onSubmit={async (e) => { e.preventDefault(); await handleSubmitOrder(); }} className="checkout-content">
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmitOrder(); }} className="checkout-content">
           <div className="checkout-main">
             {/* Delivery Address Section */}
             <div className="checkout-section">
@@ -468,13 +351,11 @@ const CheckoutPage = () => {
                       <input
                         type="tel"
                         placeholder="Enter 10 digit mobile number"
-                        value={address.phone.substring(2)} // Display only the digits after "91"
+                        value={address.phone.substring(2)}
                         onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, ''); // Only allow digits
-                          
-                          if (value.length <= 10) { // Limit to 10 digits after country code
+                          const value = e.target.value.replace(/\D/g, '');
+                          if (value.length <= 10) {
                             setAddress({...address, phone: '91' + value});
-                            // Clear error when user starts typing
                             if (phoneError) setPhoneError('');
                           }
                         }}
@@ -512,8 +393,6 @@ const CheckoutPage = () => {
                     onChange={(e) => setAddress({...address, state: e.target.value})}
                     required
                   />
-                </div>
-                <div className="form-row">
                   <input
                     type="text"
                     placeholder="Pincode"
@@ -521,13 +400,13 @@ const CheckoutPage = () => {
                     onChange={(e) => setAddress({...address, pincode: e.target.value})}
                     required
                   />
-                  <input
-                    type="text"
-                    placeholder="Landmark (Optional)"
-                    value={address.landmark}
-                    onChange={(e) => setAddress({...address, landmark: e.target.value})}
-                  />
                 </div>
+                <input
+                  type="text"
+                  placeholder="Landmark (Optional)"
+                  value={address.landmark}
+                  onChange={(e) => setAddress({...address, landmark: e.target.value})}
+                />
               </div>
             </div>
 
@@ -535,15 +414,11 @@ const CheckoutPage = () => {
             <div className="checkout-section">
               <h2>2. Payment Method</h2>
               <div className="payment-methods">
-                <div 
-                  className={`payment-option ${paymentMethod === 'cod' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('cod')}
-                >
-                  <input 
-                    type="radio" 
-                    id="cod" 
-                    name="payment" 
-                    value="cod" 
+                <div className="payment-option">
+                  <input
+                    type="radio"
+                    id="cod"
+                    name="payment"
                     checked={paymentMethod === 'cod'}
                     onChange={() => setPaymentMethod('cod')}
                   />
@@ -551,19 +426,15 @@ const CheckoutPage = () => {
                     <span className="payment-icon">💵</span>
                     <div>
                       <strong>Cash on Delivery</strong>
+                      <p>Pay when you receive your order</p>
                     </div>
                   </label>
                 </div>
-
-                <div 
-                  className={`payment-option ${paymentMethod === 'online' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('online')}
-                >
-                  <input 
-                    type="radio" 
-                    id="online" 
-                    name="payment" 
-                    value="online" 
+                <div className="payment-option">
+                  <input
+                    type="radio"
+                    id="online"
+                    name="payment"
                     checked={paymentMethod === 'online'}
                     onChange={() => setPaymentMethod('online')}
                   />
@@ -611,12 +482,6 @@ const CheckoutPage = () => {
                   <span>Shipping:</span>
                   <span className="free-shipping">FREE</span>
                 </div>
-                {paymentMethod === 'card' && discount > 0 && (
-                  <div className="summary-row discount">
-                    <span>Online Payment Discount (10%):</span>
-                    <span className="discount-amount">-₹{Math.round(discount)}</span>
-                  </div>
-                )}
                 <div className="summary-row total">
                   <span>Order Total:</span>
                   <span>₹{Math.round(total)}</span>
@@ -626,15 +491,9 @@ const CheckoutPage = () => {
               <button 
                 type="submit" 
                 className="place-order-btn"
-                disabled={isProcessing || (paymentMethod === 'online' && !razorpayLoaded)}
-                onClick={(e) => {
-                  if (!paymentMethod) {
-                    e.preventDefault();
-                    alert('Please select a payment method');
-                  }
-                }}
+                disabled={isProcessing}
                 style={{
-                  background: (isProcessing || (paymentMethod === 'online' && !razorpayLoaded))
+                  background: isProcessing 
                     ? 'linear-gradient(135deg, #95a5a6, #7f8c8d)' 
                     : 'linear-gradient(135deg, #1dbf73, #16a085)',
                   border: 'none',
@@ -644,33 +503,11 @@ const CheckoutPage = () => {
                   fontWeight: '600',
                   padding: '16px 32px',
                   width: '100%',
-                  cursor: (isProcessing || (paymentMethod === 'online' && !razorpayLoaded)) ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: isProcessing 
-                    ? '0 4px 15px rgba(149, 165, 166, 0.3)' 
-                    : '0 6px 20px rgba(29, 191, 115, 0.4)',
-                  transform: isProcessing ? 'none' : 'translateY(-2px)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isProcessing) {
-                    e.target.style.background = 'linear-gradient(135deg, #16a085, #1dbf73)';
-                    e.target.style.transform = 'translateY(-3px)';
-                    e.target.style.boxShadow = '0 8px 25px rgba(29, 191, 115, 0.5)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isProcessing) {
-                    e.target.style.background = 'linear-gradient(135deg, #1dbf73, #16a085)';
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 6px 20px rgba(29, 191, 115, 0.4)';
-                  }
+                  cursor: isProcessing ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease'
                 }}
               >
-                <span style={{ position: 'relative', zIndex: 1 }}>
+                <span>
                   {isProcessing ? (
                     <>
                       <span style={{ marginRight: '8px' }}>⏳</span>
@@ -678,12 +515,8 @@ const CheckoutPage = () => {
                     </>
                   ) : (
                     <>
-                      <span style={{ marginRight: '8px' }}>
-                        {paymentMethod === 'online' ? '💳' : '🛒'}
-                      </span>
-                      {paymentMethod === 'online' 
-                        ? (razorpayLoaded ? 'Pay Now' : 'Loading Payment Gateway...') 
-                        : 'Place Order'}
+                      <span style={{ marginRight: '8px' }}>🛒</span>
+                      {paymentMethod === 'online' ? 'Pay Now' : 'Place Order'}
                     </>
                   )}
                 </span>

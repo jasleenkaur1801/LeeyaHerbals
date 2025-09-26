@@ -146,7 +146,7 @@ const OrdersPage = () => {
         ) : (
           <div className="orders-list">
             {orders.map(order => (
-              <div key={order.id} className="order-card">
+              <div key={order._id || order.id} className="order-card">
                 <div className="order-header">
                   <div className="order-info">
                     <h3>Order #{order.id}</h3>
