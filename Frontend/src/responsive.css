@@ -6,6 +6,104 @@
   --nav-height: 50px;
 }
 
+/* Hide hamburger icon globally */
+.hamburger { display: none !important; }
+.hamburger-icon, .hamburger-line { display: none !important; }
+
+/* Disable reveal animations globally to prevent blank sections on load */
+.reveal, .reveal.visible {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Remove chat icon from header actions */
+.user-actions .chat-btn { display: none !important; }
+
+/* Floating chat button (bottom-right) */
+.chat-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 88px; /* lifted above auth notice/back-to-top */
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #4a7c59, #2d5a27);
+  color: #fff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+  z-index: 1001;
+  cursor: pointer;
+}
+
+.chat-fab:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(0,0,0,0.22); }
+
+@media (max-width: 480px) {
+  .chat-fab { width: 52px; height: 52px; right: 16px; bottom: 76px; font-size: 22px; }
+}
+
+/* Offset auth notice to avoid overlapping with back-to-top/chat */
+.auth-notice {
+  right: 92px !important; /* leave space for floating buttons on the right */
+  bottom: 20px !important;
+}
+
+@media (max-width: 480px) {
+  .auth-notice {
+    right: 76px !important;
+  }
+}
+
+/* Align action buttons (chat, wishlist, cart, profile, avatar) */
+.user-actions { 
+  display: flex !important; 
+  align-items: center !important; 
+  gap: 0.6rem !important; 
+}
+
+.user-actions .cart,
+.user-actions .wishlist,
+.user-actions .login-btn,
+.user-actions .profile-btn,
+.user-actions .chat-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border: 1px solid #e6e7ec !important;
+  border-radius: 12px !important;
+  box-sizing: border-box !important;
+}
+
+/* Avatar chip alignment */
+.user-actions .avatar,
+.user-actions .profile-menu-trigger {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+}
+
+@media (max-width: 480px) {
+  .user-actions .cart,
+  .user-actions .wishlist,
+  .user-actions .login-btn,
+  .user-actions .profile-btn,
+  .user-actions .chat-btn,
+  .user-actions .avatar,
+  .user-actions .profile-menu-trigger {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
 /* General responsive utilities */
 .mobile-only {
   display: none;

@@ -276,18 +276,6 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
             {user?.role !== 'admin' && (
               <>
                 <button 
-                  className="chat-btn" 
-                  aria-label="Chatbot"
-                  title="Ask LeeyaBot"
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      onOpenAuth();
-                    } else {
-                      navigate('/chat');
-                    }
-                  }}
-                >💬</button>
-                <button 
                   className={`wishlist ${!isAuthenticated ? 'auth-required' : ''}`} 
                   aria-label={isAuthenticated ? "Wishlist" : "Login to view wishlist"} 
                   onClick={() => {
@@ -1422,28 +1410,25 @@ function App() {
         onLoginSuccess={handleLoginSuccess}
       />
       
-      {/* Authentication Required Prompt */}
-      {!isAuthenticated && (
-        <div className="auth-notice" style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          background: '#2d5a27',
-          color: 'white',
-          padding: '12px 20px',
-          borderRadius: '25px',
-          fontSize: '14px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          zIndex: 1000,
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }} onClick={() => setShowAuth(true)}>
-          🔒 Login to access cart & wishlist
-        </div>
-      )}
+      {/* Authentication Required Prompt removed per request */}
       {location.pathname !== '/admin' && location.pathname !== '/faq' && location.pathname !== '/contact' && location.pathname !== '/contact/visitus' && <Footer />}
+
+      {/* Floating Chat Button */}
+      {location.pathname !== '/admin' && location.pathname !== '/chat' && (
+        <button 
+          className="chat-fab" 
+          aria-label="Chat with us"
+          onClick={() => {
+            if (isAuthenticated) {
+              navigate('/chat');
+            } else {
+              setShowAuth(true);
+            }
+          }}
+        >
+          💬
+        </button>
+      )}
     </>
   )
 }
