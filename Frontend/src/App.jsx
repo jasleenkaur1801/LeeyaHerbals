@@ -36,7 +36,8 @@ function AuthRedirect() {
 }
 
 
-import { ALL_PRODUCTS, CATEGORIES } from './products'
+import { CATEGORIES } from './products'
+import { getAllProducts, searchProducts } from './services/productService'
 
 function StarRating({ value }) {
   const fullStars = Math.round(value)
@@ -49,7 +50,7 @@ function StarRating({ value }) {
   )
 }
 
-function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAuth, onToggleMenu, wishlistCount, isAuthenticated, user, onLogout, cart, showMenu }) {
+function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAuth, onToggleMenu, wishlistCount, isAuthenticated, user, onLogout, cart, showMenu, products }) {
   const navigate = useNavigate()
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [suggestions, setSuggestions] = useState([])
@@ -65,7 +66,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
     }
 
     const queryLower = query.toLowerCase()
-    const productSuggestions = ALL_PRODUCTS
+    const productSuggestions = products
       .filter(product => 
         product.name.toLowerCase().includes(queryLower) ||
         product.category.toLowerCase().includes(queryLower) ||
@@ -584,7 +585,10 @@ function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated
       </div>
       <div className="product-image-wrap">
         <img 
-          src={product.image} 
+          src={product.image?.startsWith('/uploads') 
+            ? `http://localhost:8080${product.image}` 
+            : product.image || '/placeholder-product.png'
+          } 
           alt={product.name} 
           className="product-image" 
           loading="lazy"
@@ -923,6 +927,8 @@ function App() {
 
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -951,6 +957,25 @@ function App() {
   }, [location.pathname, navigate])
 
   useEffect(() => { document.body.dataset.theme = dark ? 'dark' : 'light'; }, [dark]);
+  
+  // Load products from API
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setProductsLoading(true);
+        const fetchedProducts = await getAllProducts();
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error('Error loading products:', error);
+        // Fallback to empty array if API fails
+        setProducts([]);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+    
+    loadProducts();
+  }, []);
   
   // Save cart/wishlist to localStorage for the current user
   useEffect(() => {
@@ -1097,7 +1122,7 @@ function App() {
     
     // If category is 'all', show all products (with search filter if applicable)
     if (category === 'all') {
-      const productsToShow = ALL_PRODUCTS; // Show all products including facewashgel
+      const productsToShow = products; // Show all products including facewashgel
       if (!q) return productsToShow; // No search, show all products
       return productsToShow.filter(p => {
         const name = p.name.toLowerCase();
@@ -1108,7 +1133,7 @@ function App() {
     }
     
     // For specific categories, show all products of that category (including facewashgel if selected)
-    return ALL_PRODUCTS.filter(p => {
+    return products.filter(p => {
       const name = p.name.toLowerCase();
       const nameCompact = name.replace(/\s+/g, '');
       const cat = p.category.toLowerCase();
@@ -1116,20 +1141,20 @@ function App() {
       const matchesCategory = p.category === category;
       return matchesCategory && matchesQuery;
     });
-  }, [category, search]);
+  }, [category, search, products]);
 
   // Featured: show one product of each category (include all categories)
   const featuredByCategory = useMemo(() => {
     const seen = new Set();
     const result = [];
-    for (const p of ALL_PRODUCTS) {
+    for (const p of products) {
       if (!seen.has(p.category)) {
         seen.add(p.category);
         result.push(p);
       }
     }
     return result;
-  }, []);
+  }, [products]);
 
 
   return (
@@ -1149,6 +1174,7 @@ function App() {
           onLogout={handleLogout}
           cart={cart}
           showMenu={showMenu}
+          products={products}
         />
       )}
       
@@ -1200,9 +1226,18 @@ function App() {
               </div>
             </section>
             <section className="section reveal">
-              <ProductsGrid 
-                products={filtered} 
-                onAdd={(p)=>{
+              {productsLoading ? (
+                <div className="container">
+                  <div className="section-head">
+                    <h2>Shop by category</h2>
+                    <p>Loading products...</p>
+                  </div>
+                  <div className="loading-spinner">⏳ Loading...</div>
+                </div>
+              ) : (
+                <ProductsGrid 
+                  products={filtered} 
+                  onAdd={(p)=>{
                   setCart(prev => {
                     const found = prev.find(i => i.id === p.id);
                     if (found) { return prev.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i); }
@@ -1228,12 +1263,18 @@ function App() {
                 cart={cart}
                 setCart={setCart}
               />
+              )}
             </section>
             <section className="section reveal">
               <div className="container section-head"><h2>Featured</h2><p>Best sellers loved by our community</p></div>
-              <div className="container carousel" id="featured">
-                <div className="carousel-track">
-                  {featuredByCategory.map(p => (
+              {productsLoading ? (
+                <div className="container">
+                  <div className="loading-spinner">⏳ Loading featured products...</div>
+                </div>
+              ) : (
+                <div className="container carousel" id="featured">
+                  <div className="carousel-track">
+                    {featuredByCategory.map(p => (
                     <div key={`f-${p.id}`} className="carousel-slide">
                       <ProductCard 
                         key={p.id} 
@@ -1272,6 +1313,7 @@ function App() {
                   <a href="#featured" className="car-btn next" onClick={(e)=>{e.preventDefault(); const t=e.currentTarget.closest('.carousel').querySelector('.carousel-track'); t.scrollBy({left:320,behavior:'smooth'});}}>›</a>
                 </div>
               </div>
+              )}
             </section>
             <section className="reveal"><ProductReviews isAuthenticated={isAuthenticated} user={user} /></section>
             <section id="about" className="section reveal">
@@ -1293,10 +1335,10 @@ function App() {
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/profile" element={<ProfilePage user={user} onLogout={handleLogout} />} />
         <Route path="/categories" element={<CategoriesPage />} />
-        <Route path="/categories/bath-body" element={<BathBodyPage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
-        <Route path="/categories/skin-care" element={<SkinCarePage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
-        <Route path="/categories/face-wash-gel" element={<FaceWashGelPage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
-        <Route path="/collections" element={<CollectionsPage products={ALL_PRODUCTS} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} showCartSuccessMessage={showCartSuccessMessage} />} />
+        <Route path="/categories/bath-body" element={<BathBodyPage products={products} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
+        <Route path="/categories/skin-care" element={<SkinCarePage products={products} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
+        <Route path="/categories/face-wash-gel" element={<FaceWashGelPage products={products} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} />} />
+        <Route path="/collections" element={<CollectionsPage products={products} cart={cart} setCart={setCart} wishlist={wishlist} setWishlist={setWishlist} isAuthenticated={isAuthenticated} onOpenAuth={() => setShowAuth(true)} showCartSuccessMessage={showCartSuccessMessage} />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/contact/visitus" element={<VisitUsPage />} />

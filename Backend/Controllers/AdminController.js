@@ -1,5 +1,47 @@
 const UserModel = require('../Models/User');
 const Order = require('../Models/Order');
+const Product = require('../Models/Product');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const mongoose = require('mongoose');
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, '../uploads/products');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Configure multer for image upload
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+        // Generate unique filename
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'product-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        // Check file type
+        const allowedTypes = /jpeg|jpg|png|webp/;
+        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = allowedTypes.test(file.mimetype);
+        
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb(new Error('Only JPEG, PNG, and WebP images are allowed'));
+        }
+    }
+});
 
 // Get all users for admin dashboard
 const getAllUsers = async (req, res) => {
@@ -187,10 +229,212 @@ const deleteUser = async (req, res) => {
     }
 };
 
+// Get all products for admin dashboard
+const getAllProducts = async (req, res) => {
+    try {
+        const products = await Product.find({ isActive: true })
+            .sort({ createdAt: -1 });
+        
+        res.status(200).json({
+            success: true,
+            products
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error', success: false });
+    }
+};
+
+// Add new product
+const addProduct = async (req, res) => {
+    try {
+        const { id, name, price, category, weight, image, rating, description } = req.body;
+
+        // Validate required fields
+        if (!name || !price || !category || !weight || !description) {
+            return res.status(400).json({ 
+                message: 'Missing required fields', 
+                success: false 
+            });
+        }
+
+        // Check if product ID already exists
+        const existingProduct = await Product.findOne({ id });
+        if (existingProduct) {
+            return res.status(400).json({ 
+                message: 'Product ID already exists', 
+                success: false 
+            });
+        }
+
+        // Create new product
+        const newProduct = new Product({
+            id,
+            name,
+            price,
+            category,
+            weight,
+            image: image || '/placeholder-product.png',
+            rating: rating || 5,
+            description
+        });
+
+        await newProduct.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Product added successfully',
+            product: newProduct
+        });
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ 
+                message: 'Validation error: ' + err.message, 
+                success: false 
+            });
+        }
+        res.status(500).json({ message: 'Internal server error', success: false });
+    }
+};
+
+// Delete product
+const deleteProduct = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        
+        console.log('Attempting to delete product with ID:', productId);
+        
+        let product;
+        
+        // Try to find by MongoDB ObjectId first
+        if (mongoose.Types.ObjectId.isValid(productId)) {
+            product = await Product.findById(productId);
+        }
+        
+        // If not found by ObjectId, try to find by custom id field
+        if (!product && !isNaN(productId)) {
+            product = await Product.findOne({ id: parseInt(productId) });
+        }
+        
+        if (!product) {
+            console.log('Product not found with ID:', productId);
+            return res.status(404).json({ 
+                message: 'Product not found', 
+                success: false 
+            });
+        }
+
+        console.log('Found product:', product.name);
+
+        // Soft delete - mark as inactive instead of removing
+        await Product.findByIdAndUpdate(product._id, { isActive: false });
+        
+        console.log('Product marked as inactive');
+        
+        res.status(200).json({
+            success: true,
+            message: 'Product deleted successfully'
+        });
+    } catch (err) {
+        console.error('Error deleting product:', err);
+        res.status(500).json({ 
+            message: 'Internal server error: ' + err.message, 
+            success: false 
+        });
+    }
+};
+
+// Update product
+const updateProduct = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const updateData = req.body;
+
+        console.log('Attempting to update product with ID:', productId);
+
+        let product;
+        
+        // Try to find and update by MongoDB ObjectId first
+        if (mongoose.Types.ObjectId.isValid(productId)) {
+            product = await Product.findByIdAndUpdate(
+                productId,
+                updateData,
+                { new: true, runValidators: true }
+            );
+        }
+        
+        // If not found by ObjectId, try to find by custom id field
+        if (!product && !isNaN(productId)) {
+            product = await Product.findOneAndUpdate(
+                { id: parseInt(productId) },
+                updateData,
+                { new: true, runValidators: true }
+            );
+        }
+
+        if (!product) {
+            console.log('Product not found with ID:', productId);
+            return res.status(404).json({ 
+                message: 'Product not found', 
+                success: false 
+            });
+        }
+
+        console.log('Product updated:', product.name);
+
+        res.status(200).json({
+            success: true,
+            message: 'Product updated successfully',
+            product
+        });
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ 
+                message: 'Validation error: ' + err.message, 
+                success: false 
+            });
+        }
+        res.status(500).json({ message: 'Internal server error', success: false });
+    }
+};
+
+// Upload product image
+const uploadProductImage = (req, res) => {
+    upload.single('image')(req, res, (err) => {
+        if (err) {
+            return res.status(400).json({
+                success: false,
+                message: err.message
+            });
+        }
+        
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No image file provided'
+            });
+        }
+        
+        // Return the image URL
+        const imageUrl = `/uploads/products/${req.file.filename}`;
+        
+        res.status(200).json({
+            success: true,
+            message: 'Image uploaded successfully',
+            imageUrl: imageUrl
+        });
+    });
+};
+
 module.exports = {
     getAllUsers,
     getAllOrders,
     updateOrderStatus,
     getDashboardStats,
-    deleteUser
+    deleteUser,
+    getAllProducts,
+    addProduct,
+    deleteProduct,
+    updateProduct,
+    uploadProductImage,
+    upload
 };

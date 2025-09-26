@@ -9,6 +9,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 const AuthRouter = require('./Routes/AuthRouter');
 const OrderRouter = require('./Routes/OrderRouter');
 const ProductRouter = require('./Routes/ProductRouter');
@@ -23,6 +24,9 @@ app.get("/ping",(req,res)=>{
 
 app.use(bodyParser.json());
 app.use(cors());
+
+// Serve static files for uploaded images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 app.use('/auth', AuthRouter);

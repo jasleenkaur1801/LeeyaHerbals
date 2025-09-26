@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import './AdminDashboard.css';
+import { CATEGORIES } from './products.js';
 
 function AdminDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [stats, setStats] = useState({});
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const API_BASE = 'http://localhost:8080';
@@ -123,12 +125,86 @@ function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/admin/products`, {
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setProducts(data.products);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+    setLoading(false);
+  };
+
+  const addProduct = async (productData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/admin/products`, {
+        method: 'POST',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(productData)
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchProducts(); // Refresh products list
+        alert('Product added successfully!');
+        return true;
+      } else {
+        alert('Failed to add product: ' + (data.message || 'Unknown error'));
+        return false;
+      }
+    } catch (error) {
+      console.error('Error adding product:', error);
+      alert('Error adding product');
+      return false;
+    }
+  };
+
+  const deleteProduct = async (productId) => {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/admin/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchProducts(); // Refresh products list
+        alert('Product deleted successfully!');
+      } else {
+        alert('Failed to delete product: ' + (data.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Error deleting product: ' + error.message);
+    }
+  };
+
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     if (tab === 'users') {
       fetchUsers();
     } else if (tab === 'orders') {
       fetchOrders();
+    } else if (tab === 'products') {
+      fetchProducts();
     }
   };
 
@@ -183,6 +259,13 @@ function AdminDashboard({ user, onLogout }) {
               <span className="nav-icon">📦</span>
               <span className="nav-text">Order Management</span>
             </button>
+            <button 
+              className={`nav-item ${activeTab === 'products' ? 'active' : ''}`}
+              onClick={() => handleTabChange('products')}
+            >
+              <span className="nav-icon">🛍️</span>
+              <span className="nav-text">Product Management</span>
+            </button>
           </nav>
         </aside>
 
@@ -194,6 +277,7 @@ function AdminDashboard({ user, onLogout }) {
                 {activeTab === 'dashboard' && 'Dashboard Overview'}
                 {activeTab === 'users' && 'User Management'}
                 {activeTab === 'orders' && 'Order Management'}
+                {activeTab === 'products' && 'Product Management'}
               </h1>
               {activeTab === 'orders' && (
                 <button className="action-btn primary">
@@ -221,6 +305,15 @@ function AdminDashboard({ user, onLogout }) {
             orders={orders} 
             loading={loading} 
             onUpdateStatus={updateOrderStatus}
+          />
+        )}
+        
+        {activeTab === 'products' && (
+          <ProductManagement 
+            products={products} 
+            loading={loading} 
+            onAddProduct={addProduct}
+            onDeleteProduct={deleteProduct}
           />
         )}
           </div>
@@ -562,6 +655,352 @@ function OrderManagement({ orders, loading, onUpdateStatus }) {
             )}
           </div>
           ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ProductManagement({ products, loading, onAddProduct, onDeleteProduct }) {
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    price: '',
+    category: '',
+    weight: '',
+    image: '',
+    rating: 5,
+    description: ''
+  });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  if (loading) {
+    return <div className="loading">Loading products...</div>;
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPEG, PNG, or WebP)');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+      }
+      
+      setImageFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/admin/upload-image', {
+        method: 'POST',
+        headers: {
+          'Authorization': token
+        },
+        body: formData
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        return data.imageUrl;
+      } else {
+        throw new Error(data.message || 'Image upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.name || !formData.price || !formData.category || !formData.weight || !formData.description) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      
+      // Generate next available ID
+      const maxId = products.length > 0 ? Math.max(...products.map(p => p.id || 0)) : 0;
+      const newId = maxId + 1;
+
+      let imageUrl = formData.image || '/placeholder-product.png';
+      
+      // Upload image if file is selected
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+
+      const productData = {
+        ...formData,
+        id: newId,
+        price: parseFloat(formData.price),
+        rating: parseInt(formData.rating),
+        image: imageUrl
+      };
+
+      const success = await onAddProduct(productData);
+      if (success) {
+        // Reset form
+        setFormData({
+          name: '',
+          price: '',
+          category: '',
+          weight: '',
+          image: '',
+          rating: 5,
+          description: ''
+        });
+        setImageFile(null);
+        setImagePreview(null);
+        setShowAddForm(false);
+      }
+    } catch (error) {
+      alert('Error adding product: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const getCategoryDisplayName = (category) => {
+    const categoryObj = CATEGORIES.find(cat => cat.key === category);
+    return categoryObj ? categoryObj.label : category;
+  };
+
+  return (
+    <div className="product-management">
+      <div className="product-header">
+        <h2>Product Management</h2>
+        <p className="section-subtitle">Total Products: {products.length}</p>
+        <button 
+          className="add-product-btn"
+          onClick={() => setShowAddForm(!showAddForm)}
+        >
+          {showAddForm ? '❌ Cancel' : '➕ Add New Product'}
+        </button>
+      </div>
+
+      {showAddForm && (
+        <div className="add-product-form-container">
+          <h3>Add New Product</h3>
+          <form onSubmit={handleSubmit} className="add-product-form">
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="name">Product Name *</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter product name"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="price">Price (₹) *</label>
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  placeholder="Enter price"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="category">Category *</label>
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {CATEGORIES.map(cat => (
+                    <option key={cat.key} value={cat.key}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="weight">Weight/Size *</label>
+                <input
+                  type="text"
+                  id="weight"
+                  name="weight"
+                  value={formData.weight}
+                  onChange={handleInputChange}
+                  placeholder="e.g., 100ml, 50gm"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="image">Product Image</label>
+                <div className="image-upload-container">
+                  <input
+                    type="file"
+                    id="image"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleImageChange}
+                    className="image-upload-input"
+                  />
+                  <label htmlFor="image" className="image-upload-label">
+                    {imagePreview ? (
+                      <div className="image-preview">
+                        <img src={imagePreview} alt="Preview" />
+                        <span className="change-image">Click to change image</span>
+                      </div>
+                    ) : (
+                      <div className="upload-placeholder">
+                        <span className="upload-icon">📷</span>
+                        <span>Click to upload image</span>
+                        <small>JPEG, PNG, WebP (Max 5MB)</small>
+                      </div>
+                    )}
+                  </label>
+                </div>
+                <input
+                  type="text"
+                  name="image"
+                  value={formData.image}
+                  onChange={handleInputChange}
+                  placeholder="Or enter image URL"
+                  className="image-url-input"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="rating">Rating</label>
+                <select
+                  id="rating"
+                  name="rating"
+                  value={formData.rating}
+                  onChange={handleInputChange}
+                >
+                  <option value={1}>1 Star</option>
+                  <option value={2}>2 Stars</option>
+                  <option value={3}>3 Stars</option>
+                  <option value={4}>4 Stars</option>
+                  <option value={5}>5 Stars</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="description">Description *</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Enter product description"
+                rows="3"
+                required
+              />
+            </div>
+
+            <div className="form-actions">
+              <button type="submit" className="submit-btn" disabled={uploading}>
+                {uploading ? 'Adding Product...' : 'Add Product'}
+              </button>
+              <button 
+                type="button" 
+                className="cancel-btn"
+                onClick={() => setShowAddForm(false)}
+                disabled={uploading}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      <div className="products-list">
+        <h3>Existing Products</h3>
+        <div className="products-grid">
+          {products.map(product => (
+            <div key={product._id || product.id} className="product-card">
+              <div className="product-image">
+                <img 
+                  src={product.image?.startsWith('/uploads') 
+                    ? `http://localhost:8080${product.image}` 
+                    : product.image || '/placeholder-product.png'
+                  } 
+                  alt={product.name}
+                  onError={(e) => {
+                    e.target.src = '/placeholder-product.png';
+                  }}
+                />
+              </div>
+              <div className="product-info">
+                <h4 className="product-name">{product.name}</h4>
+                <p className="product-category">{getCategoryDisplayName(product.category)}</p>
+                <div className="product-details">
+                  <span className="product-price">₹{product.price}</span>
+                  <span className="product-weight">{product.weight}</span>
+                  <span className="product-rating">⭐ {product.rating}</span>
+                </div>
+                <p className="product-description">{product.description}</p>
+                <button 
+                  className="delete-product-btn"
+                  onClick={() => onDeleteProduct(product._id || product.id)}
+                >
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {products.length === 0 && (
+          <div className="no-products">
+            <p>No products found. Add your first product using the form above.</p>
+          </div>
         )}
       </div>
     </div>
