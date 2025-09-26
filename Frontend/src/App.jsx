@@ -276,6 +276,12 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
             {user?.role !== 'admin' && (
               <>
                 <button 
+                  className="contact-btn" 
+                  aria-label="Contact"
+                  title="Contact Us"
+                  onClick={() => navigate('/contact')}
+                >📞</button>
+                <button 
                   className={`wishlist ${!isAuthenticated ? 'auth-required' : ''}`} 
                   aria-label={isAuthenticated ? "Wishlist" : "Login to view wishlist"} 
                   onClick={() => {

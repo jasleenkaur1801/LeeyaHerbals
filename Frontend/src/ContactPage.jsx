@@ -14,8 +14,8 @@ function ContactPage() {
         </div>
 
         <div className="contact-content">
-          <div className="contact-grid-unified">
-            <div className="contact-item">
+          <div className="contact-info">
+            <div className="contact-card">
               <div className="contact-icon">📧</div>
               <div>
                 <h3>Email Us</h3>
@@ -24,7 +24,7 @@ function ContactPage() {
               </div>
             </div>
 
-            <div className="contact-item">
+            <div className="contact-card">
               <div className="contact-icon">📞</div>
               <div>
                 <h3>Call Us</h3>
@@ -33,7 +33,7 @@ function ContactPage() {
               </div>
             </div>
 
-            <div className="contact-item visit-us-clickable" onClick={() => navigate('/contact/visitus')}>
+            <div className="contact-card visit-us-clickable" onClick={() => navigate('/contact/visitus')}>
               <div className="contact-icon">📍</div>
               <div>
                 <h3>Visit Us</h3>
@@ -45,7 +45,7 @@ function ContactPage() {
               </div>
             </div>
 
-            <div className="contact-item">
+            <div className="contact-card">
               <div className="contact-icon">🕒</div>
               <div>
                 <h3>Business Hours</h3>
@@ -54,7 +54,7 @@ function ContactPage() {
               </div>
             </div>
 
-            <div className="contact-item whatsapp-card">
+            <div className="contact-card whatsapp-card">
               <div className="contact-icon">💬</div>
               <div>
                 <h3>WhatsApp Support</h3>
@@ -66,7 +66,7 @@ function ContactPage() {
               </div>
             </div>
 
-            <div className="contact-item follow-us-card">
+            <div className="contact-card follow-us-card">
               <div className="contact-icon">🌐</div>
               <div>
                 <h3>Follow Us</h3>
@@ -84,7 +84,7 @@ function ContactPage() {
               </div>
             </div>
 
-            <div className="contact-item live-chat-card">
+            <div className="contact-card live-chat-card">
               <div className="contact-icon">🤖</div>
               <div>
                 <h3>AI Assistant</h3>

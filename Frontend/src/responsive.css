@@ -46,6 +46,50 @@
   .chat-fab { width: 52px; height: 52px; right: 16px; bottom: 76px; font-size: 22px; }
 }
 
+/* Mobile-only Contact button (don't affect desktop) */
+@media (min-width: 769px) {
+  .user-actions .contact-btn { display: none !important; }
+}
+@media (max-width: 768px) {
+  .user-actions .contact-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    border: 1px solid #e6e7ec !important;
+    border-radius: 12px !important;
+    background: #fff !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Always-visible helper label for the chat button */
+.chat-fab::before {
+  content: "how can i help u?";
+  position: absolute;
+  right: 68px;
+  bottom: 12px;
+  white-space: nowrap;
+  background: #ffffff;
+  color: #2d5a27;
+  border: 1px solid #e6e7ec;
+  border-radius: 20px;
+  padding: 8px 12px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+@media (max-width: 480px) {
+  .chat-fab::before {
+    right: 60px;
+    bottom: 8px;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
+
 /* Offset auth notice to avoid overlapping with back-to-top/chat */
 .auth-notice {
   right: 92px !important; /* leave space for floating buttons on the right */

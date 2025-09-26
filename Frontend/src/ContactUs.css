@@ -19,6 +19,26 @@
   gap: 20px;
 }
 
+/* Ensure exactly two columns on wide screens */
+@media (min-width: 1024px) {
+  .contact-info {
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
+    gap: 28px;
+    align-items: stretch;
+  }
+  .contact-content { max-width: 1280px; }
+  .contact-card { padding: 32px; height: 320px; }
+  /* Make feature boxes uniform size on desktop */
+  .contact-features .feature-item { min-height: 120px; height: 120px; }
+}
+
+/* Very large screens: widen cards and spacing, keep 2 columns */
+@media (min-width: 1440px) {
+  .contact-content { max-width: 1440px; }
+  .contact-info { grid-template-columns: repeat(2, minmax(380px, 1fr)); gap: 36px; align-items: stretch; }
+  .contact-card { padding: 36px; height: 360px; }
+}
+
 .contact-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
   border-radius: 15px;
