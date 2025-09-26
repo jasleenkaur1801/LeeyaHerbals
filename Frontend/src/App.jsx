@@ -1095,9 +1095,9 @@ function App() {
     const q = search.trim().toLowerCase();
     const qCompact = q.replace(/\s+/g, '');
     
-    // If category is 'all', show all products except facewashgel (with search filter if applicable)
+    // If category is 'all', show all products (with search filter if applicable)
     if (category === 'all') {
-      const productsToShow = ALL_PRODUCTS.filter(p => p.category !== 'facewashgel');
+      const productsToShow = ALL_PRODUCTS; // Show all products including facewashgel
       if (!q) return productsToShow; // No search, show all products
       return productsToShow.filter(p => {
         const name = p.name.toLowerCase();
@@ -1118,12 +1118,12 @@ function App() {
     });
   }, [category, search]);
 
-  // Featured: show one product of each category (exclude face wash gels)
+  // Featured: show one product of each category (include all categories)
   const featuredByCategory = useMemo(() => {
     const seen = new Set();
     const result = [];
     for (const p of ALL_PRODUCTS) {
-      if (!seen.has(p.category) && p.category !== 'facewashgel') {
+      if (!seen.has(p.category)) {
         seen.add(p.category);
         result.push(p);
       }

@@ -3,6 +3,7 @@ export const CATEGORIES = [
   { key: 'cleanser', label: 'Cleansers' },
   { key: 'toner', label: 'Toners' },
   { key: 'facewash', label: 'Face Wash' },
+  { key: 'facewashgel', label: 'Face Wash Gel' },
   { key: 'facemask', label: 'Face Masks' },
   { key: 'acneoilgel', label: 'Acne Oil Gel' },
   { key: 'facialkit', label: 'Facial Kits' },

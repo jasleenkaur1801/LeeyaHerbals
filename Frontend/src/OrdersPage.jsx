@@ -21,38 +21,37 @@ const OrdersPage = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:8080/api/orders/my', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      // Try API first, fallback to localStorage
+      try {
+        const response = await fetch('http://localhost:8080/api/orders/my', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            // Sort API orders by date - latest first
+            const sortedApiOrders = (result.orders || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            setOrders(sortedApiOrders);
+            setLoading(false);
+            return;
+          }
         }
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to fetch orders');
-      }
-
-      if (result.success) {
-        // Transform the orders to match the expected format
-        const transformedOrders = result.orders.map(order => ({
-          id: order.orderId,
-          _id: order._id,
-          createdAt: order.createdAt || order.placedAt,
-          status: order.status,
-          items: order.items,
-          subtotal: order.subtotal,
-          shipping: order.shipping,
-          total: order.total,
-          paymentMethod: order.paymentMethod,
-          address: order.address
-        }));
+        throw new Error('API not available');
+      } catch (apiError) {
+        console.log('API not available, using localStorage fallback');
         
-        setOrders(transformedOrders);
-      } else {
-        throw new Error(result.error || 'Failed to fetch orders');
+        // Fallback to localStorage
+        const localOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+        // Sort orders by date - latest first
+        const sortedOrders = localOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setOrders(sortedOrders);
+        setLoading(false);
+        return;
       }
     } catch (error) {
       console.error('Error loading orders:', error);
