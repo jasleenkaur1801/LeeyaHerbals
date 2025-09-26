@@ -225,10 +225,13 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
                             <>
                               <div className="suggestion-image">
                                 <img 
-                                  src={suggestion.image} 
+                                  src={suggestion.image?.startsWith('/uploads')
+                                    ? `http://localhost:8080${suggestion.image}`
+                                    : suggestion.image || '/placeholder-product.png'} 
                                   alt={suggestion.name}
                                   onError={(e) => {
                                     e.target.src = '/placeholder-product.png'
+                                    e.target.onerror = null
                                   }}
                                 />
                               </div>

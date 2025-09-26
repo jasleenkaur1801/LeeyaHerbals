@@ -165,7 +165,14 @@ const OrdersPage = () => {
                 <div className="order-items">
                   {order.items.map((item, index) => (
                     <div key={item.productId || item.id || `item-${index}`} className="order-item">
-                      <img src={item.image} alt={item.name} className="item-image" />
+                      <img 
+                        src={item.image?.startsWith('/uploads') 
+                          ? `http://localhost:8080${item.image}` 
+                          : item.image || '/placeholder-product.png'} 
+                        alt={item.name} 
+                        className="item-image"
+                        onError={(e) => { e.target.src = '/placeholder-product.png'; e.target.onerror = null; }}
+                      />
                       <div className="item-details">
                         <h4>{item.name}</h4>
                         <p className="item-meta">{item.weight} • Qty: {item.qty}</p>

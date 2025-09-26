@@ -36,6 +36,42 @@ function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  // Add product with image (single-step multipart)
+  const addProductWithImage = async (fields, file) => {
+    try {
+      const token = localStorage.getItem('token');
+      const fd = new FormData();
+      fd.append('name', fields.name);
+      fd.append('price', String(fields.price));
+      fd.append('category', fields.category);
+      fd.append('weight', fields.weight);
+      fd.append('rating', String(fields.rating ?? 5));
+      fd.append('description', fields.description);
+      if (file) fd.append('image', file);
+
+      const response = await fetch(`${API_BASE}/admin/products-with-image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': token
+        },
+        body: fd
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchProducts();
+        alert('Product added successfully!');
+        return true;
+      } else {
+        alert('Failed to add product: ' + (data.message || 'Unknown error'));
+        return false;
+      }
+    } catch (error) {
+      console.error('Error adding product with image:', error);
+      alert('Error adding product with image');
+      return false;
+    }
+  };
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -313,6 +349,7 @@ function AdminDashboard({ user, onLogout }) {
             products={products} 
             loading={loading} 
             onAddProduct={addProduct}
+            onAddProductWithImage={addProductWithImage}
             onDeleteProduct={deleteProduct}
           />
         )}
@@ -661,7 +698,7 @@ function OrderManagement({ orders, loading, onUpdateStatus }) {
   );
 }
 
-function ProductManagement({ products, loading, onAddProduct, onDeleteProduct }) {
+function ProductManagement({ products, loading, onAddProduct, onAddProductWithImage, onDeleteProduct }) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -752,27 +789,26 @@ function ProductManagement({ products, loading, onAddProduct, onDeleteProduct })
 
     try {
       setUploading(true);
-      
-      // Generate next available ID
-      const maxId = products.length > 0 ? Math.max(...products.map(p => p.id || 0)) : 0;
-      const newId = maxId + 1;
-
-      let imageUrl = formData.image || '/placeholder-product.png';
-      
-      // Upload image if file is selected
+      // If a file is selected, use single-step multipart endpoint
+      let success = false;
       if (imageFile) {
-        imageUrl = await uploadImage(imageFile);
+        const fields = {
+          ...formData,
+          price: parseFloat(formData.price),
+          rating: parseInt(formData.rating)
+        };
+        success = await onAddProductWithImage(fields, imageFile);
+      } else {
+        // Otherwise, fall back to JSON path with image URL or placeholder
+        const imageUrl = formData.image || '/placeholder-product.png';
+        const productData = {
+          ...formData,
+          price: parseFloat(formData.price),
+          rating: parseInt(formData.rating),
+          image: imageUrl
+        };
+        success = await onAddProduct(productData);
       }
-
-      const productData = {
-        ...formData,
-        id: newId,
-        price: parseFloat(formData.price),
-        rating: parseInt(formData.rating),
-        image: imageUrl
-      };
-
-      const success = await onAddProduct(productData);
       if (success) {
         // Reset form
         setFormData({

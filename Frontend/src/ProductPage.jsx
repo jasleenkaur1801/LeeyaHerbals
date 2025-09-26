@@ -24,7 +24,15 @@ function ProductCard({ product, onAdd }) {
         {product.tag ? <span className="badge">{product.tag}</span> : null}
       </div>
       <div className="product-image-wrap">
-        <img src={product.image} alt={product.name} className="product-image" loading="lazy" />
+        <img 
+          src={product.image?.startsWith('/uploads') 
+            ? `http://localhost:8080${product.image}` 
+            : product.image || '/placeholder-product.png'} 
+          alt={product.name} 
+          className="product-image" 
+          loading="lazy"
+          onError={(e) => { e.target.src = '/placeholder-product.png'; e.target.onerror = null; }}
+        />
         <button className="wishlist" aria-label="Add to wishlist" onClick={(e) => e.stopPropagation()}>♡</button>
       </div>
       <h3 className="product-name">{product.name}</h3>
@@ -76,7 +84,14 @@ function ProductPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, on
     <div className="container product-page">
       <div className="product-details">
         <div className="product-images">
-          <img src={product.image} alt={product.name} className="main-image" />
+          <img 
+            src={product.image?.startsWith('/uploads') 
+              ? `http://localhost:8080${product.image}` 
+              : product.image || '/placeholder-product.png'} 
+            alt={product.name} 
+            className="main-image"
+            onError={(e) => { e.target.src = '/placeholder-product.png'; e.target.onerror = null; }}
+          />
         </div>
         <div className="product-info">
           <div className="product-header">

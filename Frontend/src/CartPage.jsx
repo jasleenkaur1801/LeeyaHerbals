@@ -145,7 +145,14 @@ const CartPage = ({ cart, setCart }) => {
             <h2>Items in Cart ({cart.length})</h2>
             {cart.map(item => (
               <div key={item.id} className="cart-item">
-                <img src={item.image} alt={item.name} className="item-image" />
+                <img 
+                  src={item.image?.startsWith('/uploads') 
+                    ? `http://localhost:8080${item.image}` 
+                    : item.image || '/placeholder-product.png'} 
+                  alt={item.name} 
+                  className="item-image"
+                  onError={(e) => { e.target.src = '/placeholder-product.png'; e.target.onerror = null; }}
+                />
                 <div className="item-details">
                   <h3>{item.name}</h3>
                   <p className="item-weight">{item.weight}</p>

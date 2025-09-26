@@ -40,7 +40,15 @@ function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated
         </button>
       </div>
       <div className="product-image-wrap">
-        <img src={product.image} alt={product.name} className="product-image" loading="lazy" />
+        <img 
+          src={product.image?.startsWith('/uploads') 
+            ? `http://localhost:8080${product.image}` 
+            : product.image || '/placeholder-product.png'} 
+          alt={product.name} 
+          className="product-image" 
+          loading="lazy"
+          onError={(e) => { e.target.src = '/placeholder-product.png'; e.target.onerror = null; }}
+        />
       </div>
       <h3 className="product-name">{product.name}</h3>
       <p className="product-category">{product.category} • {product.weight}</p>

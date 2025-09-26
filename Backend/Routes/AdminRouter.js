@@ -11,7 +11,9 @@ const {
     addProduct,
     deleteProduct,
     updateProduct,
-    uploadProductImage
+    uploadProductImage,
+    upload,
+    addProductWithImage
 } = require('../Controllers/AdminController');
 
 // All admin routes require authentication and admin privileges
@@ -34,6 +36,9 @@ router.get('/products', getAllProducts);
 router.post('/products', addProduct);
 router.put('/products/:productId', updateProduct);
 router.delete('/products/:productId', deleteProduct);
+
+// Create product with image (single-step)
+router.post('/products-with-image', upload.single('image'), addProductWithImage);
 
 // Image upload
 router.post('/upload-image', uploadProductImage);

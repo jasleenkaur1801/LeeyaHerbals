@@ -247,7 +247,7 @@ const getAllProducts = async (req, res) => {
 // Add new product
 const addProduct = async (req, res) => {
     try {
-        const { id, name, price, category, weight, image, rating, description } = req.body;
+        let { id, name, price, category, weight, image, rating, description } = req.body;
 
         // Validate required fields
         if (!name || !price || !category || !weight || !description) {
@@ -257,9 +257,41 @@ const addProduct = async (req, res) => {
             });
         }
 
-        // Check if product ID already exists
+        // Normalize numeric fields
+        price = Number(price);
+        rating = Number(rating || 5);
+
+        // If client didn't provide an ID, auto-generate the next available one
+        if (id === undefined || id === null || isNaN(Number(id))) {
+            const last = await Product.findOne({}, {}, { sort: { id: -1 } });
+            id = (last?.id || 0) + 1;
+        } else {
+            id = Number(id);
+        }
+
+        // Check if a product with this ID exists
         const existingProduct = await Product.findOne({ id });
         if (existingProduct) {
+            // If it exists but is inactive, restore and update it
+            if (existingProduct.isActive === false) {
+                existingProduct.name = name;
+                existingProduct.price = price;
+                existingProduct.category = category;
+                existingProduct.weight = weight;
+                existingProduct.image = image || existingProduct.image || '/placeholder-product.png';
+                existingProduct.rating = rating || existingProduct.rating || 5;
+                existingProduct.description = description;
+                existingProduct.isActive = true;
+                await existingProduct.save();
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Product restored and updated successfully',
+                    product: existingProduct
+                });
+            }
+
+            // Active product with same ID should block creation
             return res.status(400).json({ 
                 message: 'Product ID already exists', 
                 success: false 
@@ -325,14 +357,13 @@ const deleteProduct = async (req, res) => {
 
         console.log('Found product:', product.name);
 
-        // Soft delete - mark as inactive instead of removing
-        await Product.findByIdAndUpdate(product._id, { isActive: false });
-        
-        console.log('Product marked as inactive');
+        // Hard delete - permanently remove from database
+        await Product.findByIdAndDelete(product._id);
+        console.log('Product hard-deleted from database');
         
         res.status(200).json({
             success: true,
-            message: 'Product deleted successfully'
+            message: 'Product permanently deleted'
         });
     } catch (err) {
         console.error('Error deleting product:', err);
@@ -425,6 +456,91 @@ const uploadProductImage = (req, res) => {
     });
 };
 
+// Add new product with image (multipart/form-data)
+const addProductWithImage = async (req, res) => {
+    // This expects to be called with upload.single('image') middleware in the route
+    try {
+        let { id, name, price, category, weight, rating, description } = req.body;
+
+        // Ensure primitives are in correct types
+        price = Number(price);
+        rating = Number(rating || 5);
+
+        // Validate required fields
+        if (!name || !price || !category || !weight || !description) {
+            return res.status(400).json({ 
+                message: 'Missing required fields', 
+                success: false 
+            });
+        }
+
+        // Determine image URL from uploaded file if available
+        const imageUrl = req.file ? `/uploads/products/${req.file.filename}` : undefined;
+
+        // Auto-generate or normalize ID similar to addProduct
+        if (id === undefined || id === null || isNaN(Number(id))) {
+            const last = await Product.findOne({}, {}, { sort: { id: -1 } });
+            id = (last?.id || 0) + 1;
+        } else {
+            id = Number(id);
+        }
+
+        // Check for existing product with same ID
+        const existingProduct = await Product.findOne({ id });
+        if (existingProduct) {
+            if (existingProduct.isActive === false) {
+                existingProduct.name = name;
+                existingProduct.price = price;
+                existingProduct.category = category;
+                existingProduct.weight = weight;
+                if (imageUrl) existingProduct.image = imageUrl;
+                existingProduct.rating = rating || existingProduct.rating || 5;
+                existingProduct.description = description;
+                existingProduct.isActive = true;
+                await existingProduct.save();
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Product restored and updated successfully',
+                    product: existingProduct
+                });
+            }
+
+            return res.status(400).json({ 
+                message: 'Product ID already exists', 
+                success: false 
+            });
+        }
+
+        const newProduct = new Product({
+            id,
+            name,
+            price,
+            category,
+            weight,
+            image: imageUrl || '/placeholder-product.png',
+            rating: rating || 5,
+            description
+        });
+
+        await newProduct.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Product added successfully',
+            product: newProduct
+        });
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ 
+                message: 'Validation error: ' + err.message, 
+                success: false 
+            });
+        }
+        res.status(500).json({ message: 'Internal server error', success: false });
+    }
+};
+
 module.exports = {
     getAllUsers,
     getAllOrders,
@@ -436,5 +552,6 @@ module.exports = {
     deleteProduct,
     updateProduct,
     uploadProductImage,
-    upload
+    upload,
+    addProductWithImage
 };
