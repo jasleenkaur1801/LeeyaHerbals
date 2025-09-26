@@ -66,7 +66,7 @@
 
 /* Always-visible helper label for the chat button */
 .chat-fab::before {
-  content: "how can i help u?";
+  content: "How can I help you?";
   position: absolute;
   right: 68px;
   bottom: 12px;

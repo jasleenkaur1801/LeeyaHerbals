@@ -197,7 +197,25 @@ function SearchResultsPage({ cart, setCart, wishlist, setWishlist, isAuthenticat
     <div className="search-results-page">
       <div className="container">
         <div className="search-header">
-          <h1>{searchQuery ? 'Search Results' : 'All Products'}</h1>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h1>{searchQuery ? 'Search Results' : 'All Products'}</h1>
+            <button 
+              className="btn primary" 
+              onClick={() => navigate('/')}
+              style={{ 
+                backgroundColor: '#2d5a27', 
+                color: 'white', 
+                border: 'none', 
+                padding: '0.75rem 1.5rem', 
+                borderRadius: '8px', 
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                fontWeight: '500'
+              }}
+            >
+              Continue Shopping
+            </button>
+          </div>
           {searchQuery && (
             <p>Showing {sortedProducts.length} results for "{searchQuery}"</p>
           )}

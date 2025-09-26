@@ -1035,18 +1035,20 @@ function App() {
   }, []);
 
   const handleLoginSuccess = (userData) => {
-    setUser(userData)
-    setIsAuthenticated(true)
-    setShowAuth(false)
+    // Normalize shape in case a full response object was passed (e.g., { success, token, user })
+    const normalizedUser = userData && userData.user ? userData.user : userData;
+    setUser(normalizedUser);
+    setIsAuthenticated(true);
+    setShowAuth(false);
     // Load cart/wishlist for this user
-    if (userData && userData.email) {
-      const savedCart = localStorage.getItem(`leeya_cart_${userData.email}`);
+    if (normalizedUser && normalizedUser.email) {
+      const savedCart = localStorage.getItem(`leeya_cart_${normalizedUser.email}`);
       setCart(savedCart ? JSON.parse(savedCart) : []);
-      const savedWishlist = localStorage.getItem(`leeya_wishlist_${userData.email}`);
+      const savedWishlist = localStorage.getItem(`leeya_wishlist_${normalizedUser.email}`);
       setWishlist(savedWishlist ? JSON.parse(savedWishlist) : []);
     }
     // Redirect admin users directly to admin dashboard
-    if (userData.role === 'admin') {
+    if (normalizedUser && normalizedUser.role === 'admin') {
       navigate('/admin');
     }
   }

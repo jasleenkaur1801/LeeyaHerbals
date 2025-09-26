@@ -4,9 +4,11 @@ import OTPDialog from './components/OTPDialog';
 
 const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isPasswordless, setIsPasswordless] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: ''
   });
@@ -23,6 +25,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   // OTP related states
   const [showOTPDialog, setShowOTPDialog] = useState(false);
   const [otpEmail, setOtpEmail] = useState('');
+  const [otpPhone, setOtpPhone] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
   const [resendLoading, setResendLoading] = useState(false);
@@ -61,9 +64,31 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     setSuccess('');
 
     try {
-      if (isLogin) {
-        // For login, send OTP first
-        const response = await fetch('http://localhost:8080/api/otp/send-login-otp', {
+      if (isPasswordless) {
+        // Temporary: Use existing resend OTP endpoint for forgot password
+        const response = await fetch('http://localhost:8080/api/otp/resend-otp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setOtpEmail(formData.email);
+          setOtpPhone('');
+          setShowOTPDialog(true);
+          setSuccess('OTP sent to your registered email');
+        } else {
+          setError(data.message || 'User not found or email not registered');
+        }
+      } else if (isLogin) {
+        // Direct login without OTP
+        const response = await fetch('http://localhost:8080/auth/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -77,9 +102,19 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
         const data = await response.json();
 
         if (data.success) {
-          setOtpEmail(data.email);
-          setShowOTPDialog(true);
-          setSuccess('OTP sent to your email address');
+          // Store login data
+          localStorage.setItem('token', data.jwtToken);
+          localStorage.setItem('leeya_jwt', data.jwtToken);
+          localStorage.setItem('user', JSON.stringify({
+            _id: data._id,
+            name: data.name,
+            email: data.email,
+            role: data.role
+          }));
+
+          // Close modal and trigger success
+          onLoginSuccess(data);
+          onClose();
         } else {
           setError(data.message);
         }
@@ -134,15 +169,16 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     setOtpError('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/otp/verify-login-otp', {
+      // Use existing OTP verification endpoint for both cases
+      const endpoint = 'http://localhost:8080/api/otp/verify-login-otp';
+      const payload = { email: otpEmail, otp };
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: otpEmail,
-          otp: otp
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -207,16 +243,31 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const handleOTPClose = () => {
     setShowOTPDialog(false);
     setOtpEmail('');
+    setOtpPhone('');
     setOtpError('');
   };
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
-    setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+    setIsPasswordless(false);
+    setFormData({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
     setError('');
     setSuccess('');
     setShowOTPDialog(false);
     setOtpEmail('');
+    setOtpPhone('');
+    setOtpError('');
+  };
+
+  const togglePasswordless = () => {
+    setIsPasswordless(prev => !prev);
+    setIsLogin(true); // Use login heading
+    setFormData({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
+    setError('');
+    setSuccess('');
+    setShowOTPDialog(false);
+    setOtpEmail('');
+    setOtpPhone('');
     setOtpError('');
   };
 
@@ -237,7 +288,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
-          {!isLogin && (
+          {!isLogin && !isPasswordless && (
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
               <input
@@ -261,43 +312,45 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="Enter your email"
+              placeholder={isPasswordless ? 'Enter your registered email' : 'Enter your email'}
               required
               className="auth-input"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="Enter your password"
-              required
-              className="auth-input"
-            />
-            {!isLogin && (
-              <div className="password-requirements">
-                <div className={`requirement ${passwordValidation.minLength ? 'valid' : 'invalid'}`}>
-                  {passwordValidation.minLength ? '✓' : '✗'} At least 5 characters
+          {isPasswordless ? null : (
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your password"
+                required
+                className="auth-input"
+              />
+              {!isLogin && (
+                <div className="password-requirements">
+                  <div className={`requirement ${passwordValidation.minLength ? 'valid' : 'invalid'}`}>
+                    {passwordValidation.minLength ? '✓' : '✗'} At least 5 characters
+                  </div>
+                  <div className={`requirement ${passwordValidation.hasUppercase ? 'valid' : 'invalid'}`}>
+                    {passwordValidation.hasUppercase ? '✓' : '✗'} One uppercase letter
+                  </div>
+                  <div className={`requirement ${passwordValidation.hasDigit ? 'valid' : 'invalid'}`}>
+                    {passwordValidation.hasDigit ? '✓' : '✗'} One digit
+                  </div>
+                  <div className={`requirement ${passwordValidation.hasSpecialChar ? 'valid' : 'invalid'}`}>
+                    {passwordValidation.hasSpecialChar ? '✓' : '✗'} One special character (@, #, $, etc.)
+                  </div>
                 </div>
-                <div className={`requirement ${passwordValidation.hasUppercase ? 'valid' : 'invalid'}`}>
-                  {passwordValidation.hasUppercase ? '✓' : '✗'} One uppercase letter
-                </div>
-                <div className={`requirement ${passwordValidation.hasDigit ? 'valid' : 'invalid'}`}>
-                  {passwordValidation.hasDigit ? '✓' : '✗'} One digit
-                </div>
-                <div className={`requirement ${passwordValidation.hasSpecialChar ? 'valid' : 'invalid'}`}>
-                  {passwordValidation.hasSpecialChar ? '✓' : '✗'} One special character (@, #, $, etc.)
-                </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
-          {!isLogin && (
+          {!isLogin && !isPasswordless && (
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirm Password</label>
               <input
@@ -324,37 +377,46 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
             {loading ? (
               <span className="loading-spinner">⏳</span>
             ) : (
-              isLogin ? 'Sign In' : 'Create Account'
+              isPasswordless ? 'Send OTP' : (isLogin ? 'Sign In' : 'Create Account')
             )}
           </button>
         </form>
 
         <div className="auth-modal-footer">
-          <p>
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button 
-              type="button" 
-              className="auth-toggle-btn"
-              onClick={toggleMode}
-            >
-              {isLogin ? 'Sign Up' : 'Sign In'}
-            </button>
-          </p>
-        </div>
-
-        <div className="auth-divider">
-          <span>or</span>
-        </div>
-
-        <div className="social-auth">
-          <button className="social-btn google">
-            <span>🔍</span>
-            Continue with Google
-          </button>
-          <button className="social-btn facebook">
-            <span>📘</span>
-            Continue with Facebook
-          </button>
+          {isPasswordless ? (
+            <p>
+              <button
+                type="button"
+                className="auth-toggle-btn"
+                onClick={togglePasswordless}
+              >
+                Back to password login
+              </button>
+            </p>
+          ) : (
+            <>
+              <p>
+                Forgot password?{' '}
+                <button
+                  type="button"
+                  className="auth-toggle-btn"
+                  onClick={togglePasswordless}
+                >
+                  Login with OTP
+                </button>
+              </p>
+              <p>
+                {isLogin ? "Don't have an account? " : "Already have an account? "}
+                <button 
+                  type="button" 
+                  className="auth-toggle-btn"
+                  onClick={toggleMode}
+                >
+                  {isLogin ? 'Sign Up' : 'Sign In'}
+                </button>
+              </p>
+            </>
+          )}
         </div>
       </div>
 
