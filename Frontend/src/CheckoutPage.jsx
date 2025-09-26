@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CheckoutPage.css';
+import { downloadInvoice } from './utils/invoiceUtils';
 
 // Load Razorpay script
 const loadRazorpayScript = () => {
@@ -32,6 +33,7 @@ const CheckoutPage = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [cardPaymentCompleted, setCardPaymentCompleted] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const shipping = 0;
@@ -126,6 +128,19 @@ const CheckoutPage = () => {
     return true;
   };
 
+  const handleInvoiceDownload = async (orderId) => {
+    try {
+      setDownloadingInvoice(true);
+      await downloadInvoice(orderId);
+      console.log('Invoice downloaded successfully');
+    } catch (error) {
+      console.error('Failed to download invoice:', error);
+      // Don't show error to user as this is optional
+    } finally {
+      setDownloadingInvoice(false);
+    }
+  };
+
   const handleRazorpayPayment = async () => {
     if (!razorpayLoaded) {
       alert('Payment gateway is loading. Please try again.');
@@ -194,6 +209,8 @@ const CheckoutPage = () => {
                   userId: userData._id || userData.id,
                   userEmail: userData.email,
                   userName: userData.name,
+                  paymentMethod: 'online',
+                  paymentStatus: 'prepaid',
                   items: cart.map(item => ({
                     productId: item.id || item.productId,
                     name: item.name,
@@ -223,6 +240,11 @@ const CheckoutPage = () => {
               
               // Clear local cart state
               setCart([]);
+              
+              // Download invoice
+              if (verifyData.orderId) {
+                handleInvoiceDownload(verifyData.orderId);
+              }
               
               setShowSuccessMessage(true);
               setTimeout(() => {
@@ -292,7 +314,7 @@ const CheckoutPage = () => {
       // Prepare order data for API
       const orderData = {
         paymentMethod: paymentMethod === 'card' ? 'online' : 'cod',
-        paymentStatus: 'completed',
+        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'prepaid',
         stripeSessionId: paymentMethod === 'card' ? localStorage.getItem('stripeSessionId') : null,
         subtotal,
         shipping,
@@ -334,6 +356,11 @@ const CheckoutPage = () => {
         if (response.ok && result.success) {
           console.log('COD Order created successfully via API');
           orderCreated = true;
+          
+          // Store order ID for invoice download
+          if (result.order && (result.order._id || result.order.orderId)) {
+            localStorage.setItem('lastOrderId', result.order._id || result.order.orderId);
+          }
         } else {
           throw new Error(result.error || 'API order creation failed');
         }
@@ -371,6 +398,12 @@ const CheckoutPage = () => {
         
         // Clear local cart state
         setCart([]);
+
+        // Download invoice if order ID is available
+        const lastOrderId = localStorage.getItem('lastOrderId');
+        if (lastOrderId) {
+          handleInvoiceDownload(lastOrderId);
+        }
 
         // Show success message
         setShowSuccessMessage(true);
@@ -442,7 +475,8 @@ const CheckoutPage = () => {
               <span className="success-icon">✅</span>
               <div className="success-text">
                 <h3>Order Placed Successfully!</h3>
-                <p>Your order has been placed successfully. Redirecting you to My Orders...</p>
+                <p>Your order has been placed successfully. {downloadingInvoice ? 'Downloading invoice...' : 'Invoice will be downloaded automatically.'}</p>
+                <p>Redirecting you to My Orders...</p>
               </div>
             </div>
           </div>

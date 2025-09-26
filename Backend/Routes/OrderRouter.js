@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../Models/Order');
+const User = require('../Models/User');
 const { verifyToken } = require('../Middlewares/Auth');
+const InvoiceService = require('../Services/InvoiceService');
 
 // Create a new order
 router.post('/', verifyToken, async (req, res) => {
@@ -160,6 +162,52 @@ router.patch('/:orderId/status', verifyToken, async (req, res) => {
       success: false,
       error: 'Failed to update order', 
       details: err.message 
+    });
+  }
+});
+
+// Download invoice for a specific order
+router.get('/:orderId/invoice', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { orderId } = req.params;
+    
+    // Find the order
+    const order = await Order.findOne({ 
+      $or: [
+        { orderId: orderId },
+        { _id: orderId }
+      ],
+      userId 
+    });
+    
+    if (!order) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Order not found' 
+      });
+    }
+
+    // Get user details
+    const user = await User.findById(userId);
+    
+    // Generate invoice PDF
+    const pdfBuffer = await InvoiceService.generateInvoice(order, user);
+    
+    // Set response headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Invoice-${order.orderId}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    
+    // Send the PDF
+    res.send(pdfBuffer);
+    
+  } catch (error) {
+    console.error('Invoice generation error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to generate invoice', 
+      details: error.message 
     });
   }
 });

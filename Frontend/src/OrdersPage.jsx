@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OrdersPage.css';
+import { downloadInvoice } from './utils/invoiceUtils';
 
 const OrdersPage = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [downloadingInvoices, setDownloadingInvoices] = useState(new Set());
 
   useEffect(() => {
     fetchOrders();
@@ -91,6 +93,24 @@ const OrdersPage = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const handleInvoiceDownload = async (order) => {
+    const orderId = order._id || order.orderId || order.id;
+    
+    try {
+      setDownloadingInvoices(prev => new Set([...prev, orderId]));
+      await downloadInvoice(orderId);
+    } catch (error) {
+      console.error('Failed to download invoice:', error);
+      alert('Failed to download invoice. Please try again.');
+    } finally {
+      setDownloadingInvoices(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(orderId);
+        return newSet;
+      });
+    }
   };
 
   if (loading) {
@@ -228,6 +248,20 @@ const OrdersPage = () => {
                   )}
                   <button className="btn ghost small">
                     Track Order
+                  </button>
+                  <button 
+                    className="btn primary small"
+                    onClick={() => handleInvoiceDownload(order)}
+                    disabled={downloadingInvoices.has(order._id || order.orderId || order.id)}
+                    style={{
+                      background: downloadingInvoices.has(order._id || order.orderId || order.id) 
+                        ? '#95a5a6' : '#1dbf73',
+                      cursor: downloadingInvoices.has(order._id || order.orderId || order.id) 
+                        ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    {downloadingInvoices.has(order._id || order.orderId || order.id) 
+                      ? '📄 Downloading...' : '📄 Download Invoice'}
                   </button>
                 </div>
               </div>

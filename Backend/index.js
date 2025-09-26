@@ -15,6 +15,7 @@ const OrderRouter = require('./Routes/OrderRouter');
 const ProductRouter = require('./Routes/ProductRouter');
 const AdminRouter = require('./Routes/AdminRouter');
 const PaymentRouter = require('./Routes/PaymentRouter');
+const OTPRouter = require('./Routes/OTPRouter');
 
 const PORT = process.env.PORT || 8080;
 require('./Models/db');
@@ -35,6 +36,7 @@ app.use('/api/orders', OrderRouter);
 app.use('/products', ProductRouter);
 app.use('/admin', AdminRouter);
 app.use('/api/payment', PaymentRouter);
+app.use('/api/otp', OTPRouter);
 
 app.listen(PORT,()=>{
     console.log(`Server is running on ${PORT}`);

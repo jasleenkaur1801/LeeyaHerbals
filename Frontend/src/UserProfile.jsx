@@ -16,6 +16,9 @@ const UserProfile = ({ user, onLogout }) => {
   };
 
   const getInitials = (name) => {
+    if (!name || typeof name !== 'string') {
+      return 'U'; // Default initial for undefined/null names
+    }
     return name
       .split(' ')
       .map(word => word.charAt(0))

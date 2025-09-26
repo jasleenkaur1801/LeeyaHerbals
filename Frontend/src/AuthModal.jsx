@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './AuthModal.css';
+import OTPDialog from './components/OTPDialog';
 
 const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,6 +19,13 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     hasDigit: false,
     hasSpecialChar: false
   });
+  
+  // OTP related states
+  const [showOTPDialog, setShowOTPDialog] = useState(false);
+  const [otpEmail, setOtpEmail] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+  const [resendLoading, setResendLoading] = useState(false);
 
   const validatePassword = (password) => {
     const validation = {
@@ -53,13 +61,30 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     setSuccess('');
 
     try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/signup';
-      const payload = isLogin 
-        ? { email: formData.email, password: formData.password }
-        : { name: formData.name, email: formData.email, password: formData.password };
+      if (isLogin) {
+        // For login, send OTP first
+        const response = await fetch('http://localhost:8080/api/otp/send-login-otp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          }),
+        });
 
-      if (!isLogin) {
-        // Validate password requirements
+        const data = await response.json();
+
+        if (data.success) {
+          setOtpEmail(data.email);
+          setShowOTPDialog(true);
+          setSuccess('OTP sent to your email address');
+        } else {
+          setError(data.message);
+        }
+      } else {
+        // For signup, use existing flow
         const validation = validatePassword(formData.password);
         if (!validation.minLength || !validation.hasUppercase || !validation.hasDigit || !validation.hasSpecialChar) {
           setError('Password must meet all requirements');
@@ -67,44 +92,33 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
           return;
         }
         
-        // Check password confirmation
         if (formData.password !== formData.confirmPassword) {
           setError('Passwords do not match');
           setLoading(false);
           return;
         }
-      }
 
-      const response = await fetch(`http://localhost:8080${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+        const response = await fetch('http://localhost:8080/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (data.success) {
-        setSuccess(data.message);
-        if (isLogin) {
-          localStorage.setItem('token', data.jwtToken);
-          localStorage.setItem('leeya_jwt', data.jwtToken);
-          localStorage.setItem('user', JSON.stringify({
-            name: data.name,
-            email: data.email,
-            role: data.role
-          }));
-          setTimeout(() => {
-            onLoginSuccess(data);
-            onClose();
-          }, 1500);
-        } else {
+        if (data.success) {
+          setSuccess(data.message);
           setIsLogin(true);
           setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+        } else {
+          setError(data.message);
         }
-      } else {
-        setError(data.message);
       }
     } catch (err) {
       setError('Network error. Please try again.');
@@ -113,11 +127,97 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     }
   };
 
+  // Handle OTP verification
+  const handleOTPVerify = async (otp) => {
+    console.log('OTP Verify called with:', otp);
+    setOtpLoading(true);
+    setOtpError('');
+
+    try {
+      const response = await fetch('http://localhost:8080/api/otp/verify-login-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: otpEmail,
+          otp: otp
+        }),
+      });
+
+      const data = await response.json();
+      console.log('OTP Verification Response:', data);
+
+      if (data.success) {
+        console.log('Login successful, storing data and closing dialogs...');
+        // Store login data
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('leeya_jwt', data.token);
+        localStorage.setItem('user', JSON.stringify({
+          _id: data.user._id,
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role
+        }));
+
+        // Close dialogs and trigger success
+        setShowOTPDialog(false);
+        onLoginSuccess(data);
+        onClose();
+      } else {
+        console.log('OTP Verification failed:', data.message);
+        setOtpError(data.message);
+      }
+    } catch (err) {
+      setOtpError('Network error. Please try again.');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Handle OTP resend
+  const handleOTPResend = async () => {
+    setResendLoading(true);
+    setOtpError('');
+
+    try {
+      const response = await fetch('http://localhost:8080/api/otp/resend-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: otpEmail
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        setOtpError(data.message);
+      }
+    } catch (err) {
+      setOtpError('Failed to resend OTP. Please try again.');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  // Handle OTP dialog close
+  const handleOTPClose = () => {
+    setShowOTPDialog(false);
+    setOtpEmail('');
+    setOtpError('');
+  };
+
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setFormData({ name: '', email: '', password: '', confirmPassword: '' });
     setError('');
     setSuccess('');
+    setShowOTPDialog(false);
+    setOtpEmail('');
+    setOtpError('');
   };
 
   if (!isOpen) return null;
@@ -257,6 +357,18 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
           </button>
         </div>
       </div>
+
+      {/* OTP Dialog */}
+      <OTPDialog
+        isOpen={showOTPDialog}
+        onClose={handleOTPClose}
+        onVerify={handleOTPVerify}
+        onResend={handleOTPResend}
+        email={otpEmail}
+        loading={otpLoading}
+        error={otpError}
+        resendLoading={resendLoading}
+      />
     </div>
   );
 };
