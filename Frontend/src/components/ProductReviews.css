@@ -1,0 +1,87 @@
+/* Product Reviews Main Component */
+.product-reviews {
+  margin: 40px 0;
+}
+
+.reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+.reviews-header h2 {
+  color: #2d5a27;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.write-review-btn {
+  background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(45, 90, 39, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.write-review-btn:hover {
+  background: linear-gradient(135deg, #1f3d1a 0%, #2d5a27 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 90, 39, 0.3);
+}
+
+.review-form-wrapper {
+  margin-bottom: 32px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .reviews-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .reviews-header h2 {
+    font-size: 1.75rem;
+  }
+  
+  .write-review-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reviews-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .write-review-btn {
+    font-size: 16px;
+    padding: 16px 20px;
+  }
+}

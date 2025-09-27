@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ALL_PRODUCTS, CATEGORIES } from './products'
 import AddToCartButton from './components/AddToCartButton'
+import ProductReviews from './components/ProductReviews'
 import './App.css'
 
 function StarRating({ value }) {
@@ -166,6 +167,13 @@ function ProductPage({ cart, setCart, wishlist, setWishlist, isAuthenticated, on
           </div>
         </div>
       </div>
+      
+      {/* Product Reviews Section */}
+      <ProductReviews 
+        productId={productId}
+        isAuthenticated={isAuthenticated}
+        onOpenAuth={onOpenAuth}
+      />
     </div>
   );
 }

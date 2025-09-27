@@ -1,0 +1,363 @@
+/* Review Form Styles */
+.review-form-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.review-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%);
+  color: white;
+}
+
+.review-form-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.review-form {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Star Rating */
+.star-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.star {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.star:hover {
+  transform: scale(1.1);
+  color: #d97706;
+}
+
+.star.active {
+  color: #f59e0b;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.rating-text {
+  margin-left: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Comment Textarea */
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s ease;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2d5a27;
+  box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+}
+
+.char-count {
+  text-align: right;
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* File Upload Areas */
+.upload-area {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.upload-area:hover {
+  border-color: #9ca3af;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.upload-btn {
+  background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 14px;
+}
+
+.upload-btn:hover {
+  background: linear-gradient(135deg, #1f3d1a 0%, #2d5a27 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 90, 39, 0.3);
+}
+
+.upload-hint {
+  color: #6b7280;
+  font-size: 12px;
+  margin: 0;
+}
+
+.video-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preview-video {
+  width: 100%;
+  max-width: 400px;
+  height: 200px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.remove-video-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+  align-self: center;
+}
+
+.remove-video-btn:hover {
+  background: #dc2626;
+}
+
+/* Preview Grid */
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.preview-item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f3f4f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.preview-item:hover {
+  transform: translateY(-2px);
+}
+
+.preview-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-video {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: rgba(220, 38, 38, 1);
+}
+
+/* Error Messages */
+.error-text {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+.cancel-btn,
+.submit-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.star {
+  font-size: 28px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.star.filled {
+  color: #f59e0b;
+  filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4));
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.star.empty {
+  color: #d1d5db;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1f3d1a 0%, #2d5a27 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(45, 90, 39, 0.3);
+}
+
+.submit-btn:disabled,
+.cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .review-form-container {
+    padding: 20px;
+    margin: 16px 0;
+  }
+  
+  .form-title {
+    font-size: 1.5rem;
+  }
+  
+  .stars {
+    gap: 4px;
+  }
+  
+  .star {
+    font-size: 24px;
+  }
+  
+  .preview-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  
+  .preview-image,
+  .preview-video {
+    height: 120px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .cancel-btn,
+  .submit-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .review-form-header h3 {
+    font-size: 1.25rem;
+  }
+  
+  .star {
+    font-size: 20px;
+  }
+  
+  .upload-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}

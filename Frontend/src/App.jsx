@@ -36,7 +36,7 @@ function AuthRedirect() {
 }
 
 
-import { CATEGORIES } from './products'
+import { CATEGORIES, ALL_PRODUCTS } from './products'
 import { getAllProducts, searchProducts } from './services/productService'
 
 function StarRating({ value }) {
@@ -964,8 +964,9 @@ function App() {
         setProducts(fetchedProducts);
       } catch (error) {
         console.error('Error loading products:', error);
-        // Fallback to empty array if API fails
-        setProducts([]);
+        // Fallback to static products if API fails
+        console.log('Falling back to static products data');
+        setProducts(ALL_PRODUCTS);
       } finally {
         setProductsLoading(false);
       }
