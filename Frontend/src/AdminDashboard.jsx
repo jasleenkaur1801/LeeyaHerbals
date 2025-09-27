@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import './AdminDashboard.css';
 import { CATEGORIES } from './products.js';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { GiHamburgerMenu } from 'react-icons/gi';
+import { MdClose } from 'react-icons/md';
 
 function AdminDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -10,6 +12,7 @@ function AdminDashboard({ user, onLogout }) {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const API_BASE = 'http://localhost:8080';
 
@@ -239,6 +242,7 @@ function AdminDashboard({ user, onLogout }) {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+    setIsMobileMenuOpen(false); // Close mobile menu when tab changes
     if (tab === 'users') {
       fetchUsers();
     } else if (tab === 'orders') {
@@ -251,6 +255,10 @@ function AdminDashboard({ user, onLogout }) {
       fetchUsers();
       fetchProducts();
     }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   if (user?.role !== 'admin') {
@@ -266,9 +274,18 @@ function AdminDashboard({ user, onLogout }) {
     <div className="admin-dashboard">
       {/* Top Header */}
       <header className="admin-top-header">
-        <div className="header-brand">
-          <span className="brand-icon">🌿</span>
-          <span className="brand-text">Leeya Herbals Admin</span>
+        <div className="header-left">
+          <button 
+            className="mobile-menu-toggle"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? <MdClose size={24} /> : <GiHamburgerMenu size={24} />}
+          </button>
+          <div className="header-brand">
+            <span className="brand-icon">🌿</span>
+            <span className="brand-text">Leeya Herbals Admin</span>
+          </div>
         </div>
         <div className="header-actions">
           <span className="welcome-text">Welcome, {user.name}</span>
@@ -278,7 +295,7 @@ function AdminDashboard({ user, onLogout }) {
 
       <div className="admin-layout">
         {/* Sidebar Navigation */}
-        <aside className="admin-sidebar">
+        <aside className={`admin-sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
           <div className="sidebar-header">
             <h3>Admin Dashboard</h3>
           </div>
@@ -286,6 +303,7 @@ function AdminDashboard({ user, onLogout }) {
             <button 
               className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
               onClick={() => handleTabChange('dashboard')}
+              title="Dashboard Overview"
             >
               <span className="nav-icon">📊</span>
               <span className="nav-text">Overview</span>
@@ -293,6 +311,7 @@ function AdminDashboard({ user, onLogout }) {
             <button 
               className={`nav-item ${activeTab === 'users' ? 'active' : ''}`}
               onClick={() => handleTabChange('users')}
+              title="User Management"
             >
               <span className="nav-icon">👥</span>
               <span className="nav-text">User Management</span>
@@ -300,6 +319,7 @@ function AdminDashboard({ user, onLogout }) {
             <button 
               className={`nav-item ${activeTab === 'orders' ? 'active' : ''}`}
               onClick={() => handleTabChange('orders')}
+              title="Order Management"
             >
               <span className="nav-icon">📦</span>
               <span className="nav-text">Order Management</span>
@@ -307,12 +327,21 @@ function AdminDashboard({ user, onLogout }) {
             <button 
               className={`nav-item ${activeTab === 'products' ? 'active' : ''}`}
               onClick={() => handleTabChange('products')}
+              title="Product Management"
             >
               <span className="nav-icon">🛍️</span>
               <span className="nav-text">Product Management</span>
             </button>
           </nav>
         </aside>
+        
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div 
+            className="mobile-menu-overlay"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
 
         {/* Main Content Area */}
         <main className="admin-main">
@@ -752,7 +781,8 @@ function UserManagement({ users, loading, onDeleteUser }) {
       <h2>User Management</h2>
       <p className="section-subtitle">Total Users: {users.length}</p>
       
-      <div className="users-table-container">
+      {/* Desktop Table View */}
+      <div className="users-table-container desktop-only">
         <table className="users-table">
           <thead>
             <tr>
@@ -784,6 +814,41 @@ function UserManagement({ users, loading, onDeleteUser }) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="users-cards-container mobile-only">
+        {users.map(user => (
+          <div key={user._id} className="user-card">
+            <div className="user-card-header">
+              <h3 className="user-name">{user.name}</h3>
+              <button 
+                onClick={() => onDeleteUser(user._id)}
+                className="delete-btn mobile-delete-btn"
+              >
+                🗑️
+              </button>
+            </div>
+            <div className="user-card-body">
+              <div className="user-info-item">
+                <span className="label">Email:</span>
+                <span className="value">{user.email}</span>
+              </div>
+              <div className="user-info-item">
+                <span className="label">Phone:</span>
+                <span className="value">{user.phone || 'N/A'}</span>
+              </div>
+              <div className="user-info-item">
+                <span className="label">Joined:</span>
+                <span className="value">{new Date(user.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="user-info-item">
+                <span className="label">Last Login:</span>
+                <span className="value">{new Date(user.lastLogin).toLocaleDateString()}</span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
