@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ReviewForm from './ReviewForm';
+import ReviewForm from '../forms/ReviewForm';
 import ReviewList from './ReviewList';
 import './ProductReviews.css';
 

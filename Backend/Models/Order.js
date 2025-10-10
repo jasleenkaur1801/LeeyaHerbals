@@ -136,6 +136,33 @@ const OrderSchema = new mongoose.Schema({
   orderDate: {
     type: Date,
     default: Date.now
+  },
+  // Coupon fields
+  appliedCoupon: {
+    couponId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Coupon'
+    },
+    code: {
+      type: String,
+      uppercase: true
+    },
+    discountType: {
+      type: String,
+      enum: ['PERCENT', 'FLAT']
+    },
+    discountValue: {
+      type: Number
+    },
+    discountAmount: {
+      type: Number,
+      default: 0
+    }
+  },
+  discount: {
+    type: Number,
+    default: 0,
+    description: 'Total discount applied from coupon'
   }
 }, {
   timestamps: true

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './App.css';
-import AddToCartButton from './components/AddToCartButton';
+import '../styles/global/App.css';
+import AddToCartButton from '../components/ui/AddToCartButton';
 
 function StarRating({ value }) {
   const fullStars = Math.round(value)
@@ -60,29 +60,18 @@ function ProductCard({ product, onWishlist, isInWishlist, isAuthenticated, onSho
   )
 }
 
-function SkinCarePage({ products = [], cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
+function FaceWashGelPage({ products = [], cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth }) {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState('relevance');
   const [priceRange, setPriceRange] = useState('all');
 
-  // Filter products for Skin Care category
-  const skinCareProducts = products.filter(product => 
-    product.category === 'serum' ||
-    product.category === 'cleanser' ||
-    product.category === 'toner' ||
-    product.category === 'facewash' ||
-    product.category === 'facemask' ||
-    product.category === 'acneoilgel' ||
-    product.category === 'eyegel' ||
-    product.category === 'bleachcream' ||
-    product.category === 'skinconditioner' ||
-    product.category === 'sunscreenlotion' ||
-    product.category === 'cream' ||
-    product.category === 'rosewater'
+  // Filter products for Face Wash Gel category
+  const faceWashGelProducts = products.filter(product => 
+    product.category === 'facewashgel'
   );
 
   // Apply price filter
-  const filteredProducts = skinCareProducts.filter(product => {
+  const filteredProducts = faceWashGelProducts.filter(product => {
     let matchesPrice = true
     if (priceRange === 'under500') matchesPrice = product.price < 500
     else if (priceRange === '500to1000') matchesPrice = product.price >= 500 && product.price <= 1000
@@ -131,8 +120,8 @@ function SkinCarePage({ products = [], cart, setCart, wishlist, setWishlist, isA
     <div className="search-results-page">
       <div className="container">
         <div className="search-header">
-          <h1>Skin Care Collection</h1>
-          <p>Showing {sortedProducts.length} skin care products</p>
+          <h1>Face Wash Gels</h1>
+          <p>Showing {sortedProducts.length} face wash gel products</p>
         </div>
 
         <div className="search-layout">
@@ -180,7 +169,7 @@ function SkinCarePage({ products = [], cart, setCart, wishlist, setWishlist, isA
           <main className="search-results">
             {sortedProducts.length === 0 ? (
               <div className="no-results">
-                <h2>No skin care products found</h2>
+                <h2>No face wash gel products found</h2>
                 <p>Try adjusting your filters</p>
                 <button className="btn primary" onClick={clearAllFilters}>
                   Clear all filters
@@ -209,4 +198,4 @@ function SkinCarePage({ products = [], cart, setCart, wishlist, setWishlist, isA
   );
 }
 
-export default SkinCarePage;
+export default FaceWashGelPage;

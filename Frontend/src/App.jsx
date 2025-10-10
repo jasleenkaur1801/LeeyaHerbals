@@ -1,30 +1,36 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
-import './App.css'
-import './ContactUs.css'
-import './responsive.css'
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
-import ProductPage from './ProductPage'
-import SearchResultsPage from './SearchResultsPage'
-import AuthModal from './AuthModal'
-import UserProfile from './UserProfile'
-import Chatbot from './Chatbot'
-import Reviews from './Reviews'
-import SkincareFlipCards from './SkincareFlipCards'
-import CartPage from './CartPage'
-import OrdersPage from './OrdersPage'
-import PaymentSuccess from './PaymentSuccess'
-import CheckoutPage from './CheckoutPage';
-import AdminDashboard from './AdminDashboard'
-import ProfilePage from './ProfilePage'
-import CategoriesPage from './CategoriesPage'
-import BathBodyPage from './BathBodyPage'
-import SkinCarePage from './SkinCarePage'
-import CollectionsPage from './CollectionsPage';
-import AboutPage from './AboutPage';
-import ContactPage from './ContactPage';
-import VisitUsPage from './VisitUsPage';
-import FAQPage from './FAQPage';
-import FaceWashGelPage from './FaceWashGelPage';
+
+// Styles
+import './styles/global/App.css'
+import './styles/pages/ContactUs.css'
+import './styles/global/responsive.css'
+
+// Pages
+import ProductPage from './pages/ProductPage'
+import SearchResultsPage from './pages/SearchResultsPage'
+import CartPage from './pages/CartPage'
+import OrdersPage from './pages/OrdersPage'
+import PaymentSuccess from './pages/PaymentSuccess'
+import CheckoutPage from './pages/CheckoutPage'
+import AdminDashboard from './pages/AdminDashboard'
+import ProfilePage from './pages/ProfilePage'
+import CategoriesPage from './pages/CategoriesPage'
+import BathBodyPage from './pages/BathBodyPage'
+
+// Components
+import AuthModal from './components/forms/AuthModal'
+import UserProfile from './pages/UserProfile'
+import Chatbot from './components/ui/Chatbot'
+import Reviews from './pages/Reviews'
+import SkincareFlipCards from './pages/SkincareFlipCards'
+import SkinCarePage from './pages/SkinCarePage'
+import CollectionsPage from './pages/CollectionsPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import VisitUsPage from './pages/VisitUsPage';
+import FAQPage from './pages/FAQPage';
+import FaceWashGelPage from './pages/FaceWashGelPage';
 
 function AuthRedirect() {
   const navigate = useNavigate();
@@ -36,7 +42,7 @@ function AuthRedirect() {
 }
 
 
-import { CATEGORIES, ALL_PRODUCTS } from './products'
+import { CATEGORIES, ALL_PRODUCTS } from './data/products'
 import { getAllProducts, searchProducts } from './services/productService'
 
 function StarRating({ value }) {
@@ -180,7 +186,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
             aria-label="Toggle Menu" 
             aria-expanded={showMenu}
             aria-controls="mobile-menu"
-            onClick={() => setShowMenu(!showMenu)}
+            onClick={onToggleMenu}
           >
             <span className="hamburger-icon">
               <span className={`hamburger-line ${showMenu ? 'open' : ''}`}></span>
@@ -337,7 +343,7 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
     aria-label="Toggle Menu" 
     aria-expanded={showMenu}
     aria-controls="mobile-menu"
-    onClick={() => setShowMenu(!showMenu)}
+    onClick={onToggleMenu}
   >
     <span className="hamburger-icon">
       <span className={`hamburger-line ${showMenu ? 'open' : ''}`}></span>
@@ -410,48 +416,6 @@ function Navbar({ active, search, onSearch, onOpenCart, onOpenWishlist, onOpenAu
       </>
     )}
   </nav>
-
-  {/* Mobile Menu Overlay */}
-  {showMenu && (
-    <div className={`mobile-menu-overlay ${showMenu ? 'open' : ''}`} onClick={() => setShowMenu(false)}>
-      <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
-        <div className="mobile-menu-header">
-          <h3>Menu</h3>
-          <button className="mobile-menu-close" onClick={() => setShowMenu(false)}>×</button>
-        </div>
-        <nav className="mobile-nav-links">
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/'); setShowMenu(false); }}>🏠 Home</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/profile'); setShowMenu(false); }}>👤 Profile</a>
-          
-          <div className="mobile-nav-section">
-            <h4>Categories</h4>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=serum'); setShowMenu(false); }}>💧 Serums</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=cleanser'); setShowMenu(false); }}>🫧 Cleansers</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=toner'); setShowMenu(false); }}>🌸 Toners</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=facemask'); setShowMenu(false); }}>🎭 Face Masks</a>
-          </div>
-          
-          <div className="mobile-nav-section">
-            <h4>Bath & Body</h4>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=body wash'); setShowMenu(false); }}>🛁 Body Wash</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=body lotion'); setShowMenu(false); }}>🧴 Body Lotion</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=scrubs'); setShowMenu(false); }}>🧽 Body Scrubs</a>
-          </div>
-          
-          <div className="mobile-nav-section">
-            <h4>Skin Care</h4>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=moisturizers'); setShowMenu(false); }}>🧴 Moisturizers</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=sunscreen'); setShowMenu(false); }}>🌞 Sun Protection</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate('/search?q=treatments'); setShowMenu(false); }}>🪄 Treatments</a>
-          </div>
-          
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/collections'); setShowMenu(false); }}>🌿 Collections</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/about'); setShowMenu(false); }}>ℹ️ About Us</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate('/contact'); setShowMenu(false); }}>✉️ Contact</a>
-        </nav>
-      </div>
-    </div>
-  )}
 </div>
       </div>
     </header>
@@ -472,7 +436,7 @@ function Hero() {
         </div>
         <div className="hero-art" aria-hidden>
           <div className="hero-image-wrap">
-            <img 
+            <img
               src="/image1.jpeg" 
               alt="Herbal skincare" 
               className="hero-img" 
@@ -545,7 +509,7 @@ function CategoryPills({ selected, onSelect }) {
   )
 }
 
-import AddToCartButton from './components/AddToCartButton';
+import AddToCartButton from './components/ui/AddToCartButton';
 
 function ProductCard({ product, onAdd, onWishlist, isInWishlist, isAuthenticated, onShowAuth, cart, setCart }) {
   // Add touch interaction state
@@ -1178,6 +1142,52 @@ function App() {
           showMenu={showMenu}
           products={products}
         />
+      )}
+      
+      {/* Mobile Menu Sidebar - Admin Dashboard Style */}
+      {location.pathname !== '/admin' && (
+        <>
+          {showMenu && <div className="mobile-sidebar-overlay" onClick={() => setShowMenu(false)}></div>}
+          <div className={`mobile-sidebar ${showMenu ? 'mobile-open' : ''}`}>
+            <div className="sidebar-header-main">
+              <h3>Leeya Herbals</h3>
+            </div>
+            <nav className="sidebar-nav-main">
+              <button className="nav-item-main" onClick={() => { navigate('/'); setShowMenu(false); }}>
+                <span className="nav-icon">🏠</span>
+                <span className="nav-label">Home</span>
+              </button>
+              <button className="nav-item-main" onClick={() => { navigate('/profile'); setShowMenu(false); }}>
+                <span className="nav-icon">👤</span>
+                <span className="nav-label">Profile</span>
+              </button>
+              <button className="nav-item-main" onClick={() => { navigate('/categories'); setShowMenu(false); }}>
+                <span className="nav-icon">📂</span>
+                <span className="nav-label">Categories</span>
+              </button>
+              <button className="nav-item-main" onClick={() => { navigate('/categories/bath-body'); setShowMenu(false); }}>
+                <span className="nav-icon">🛁</span>
+                <span className="nav-label">Bath & Body</span>
+              </button>
+              <button className="nav-item-main" onClick={() => { navigate('/categories/skin-care'); setShowMenu(false); }}>
+                <span className="nav-icon">✨</span>
+                <span className="nav-label">Skin Care</span>
+              </button>
+              <button className="nav-item-main" onClick={() => { navigate('/collections'); setShowMenu(false); }}>
+                <span className="nav-icon">🌿</span>
+                <span className="nav-label">Collections</span>
+              </button>
+              <button className="nav-item-main" onClick={() => { navigate('/about'); setShowMenu(false); }}>
+                <span className="nav-icon">ℹ️</span>
+                <span className="nav-label">About Us</span>
+              </button>
+              <button className="nav-item-main" onClick={() => { navigate('/contact'); setShowMenu(false); }}>
+                <span className="nav-icon">✉️</span>
+                <span className="nav-label">Contact</span>
+              </button>
+            </nav>
+          </div>
+        </>
       )}
       
       {/* Cart Success Message */}

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './App.css';
-import AddToCartButton from './components/AddToCartButton';
+import AddToCartButton from "../components/ui/AddToCartButton";
 
 function StarRating({ value }) {
   const fullStars = Math.round(value)
@@ -13,7 +12,6 @@ function StarRating({ value }) {
     </div>
   )
 }
-
 function ProductCard({ product, onWishlist, isInWishlist, isAuthenticated, onShowAuth, cart, setCart }) {
   const navigate = useNavigate()
 

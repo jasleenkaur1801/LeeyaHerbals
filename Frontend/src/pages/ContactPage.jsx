@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './ContactUs.css';
+import '../styles/pages/ContactUs.css';
 
 function ContactPage() {
   const navigate = useNavigate();

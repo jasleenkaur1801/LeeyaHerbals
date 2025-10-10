@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import './App.css'
-import { ALL_PRODUCTS, CATEGORIES } from './products'
-import AddToCartButton from './components/AddToCartButton'
+import '../styles/global/App.css'
+import { ALL_PRODUCTS, CATEGORIES } from '../data/products'
+import AddToCartButton from '../components/ui/AddToCartButton'
 
 function StarRating({ value }) {
   const fullStars = Math.round(value)

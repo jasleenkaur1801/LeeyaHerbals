@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import './AdminDashboard.css';
-import { CATEGORIES } from './products.js';
+import "../styles/pages/AdminDashboard.css";
+import { CATEGORIES } from "../data/products.js";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { MdClose } from 'react-icons/md';

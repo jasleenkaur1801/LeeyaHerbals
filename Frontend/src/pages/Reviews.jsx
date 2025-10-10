@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import './App.css'
+import "../styles/global/App.css";
 
 function StarInput({ value, onChange }) {
   return (

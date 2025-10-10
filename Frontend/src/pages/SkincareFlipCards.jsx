@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './SkincareFlipCards.css';
+import '../styles/pages/SkincareFlipCards.css';
 
 const SkincareFlipCards = () => {
   const [flippedCards, setFlippedCards] = useState({});

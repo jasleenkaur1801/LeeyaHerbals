@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CartPage.css';
+import '../styles/pages/CartPage.css';
 
 const CartPage = ({ cart, setCart }) => {
   const navigate = useNavigate();

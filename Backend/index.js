@@ -19,6 +19,8 @@ const AdminRouter = require('./Routes/AdminRouter');
 const PaymentRouter = require('./Routes/PaymentRouter');
 const OTPRouter = require('./Routes/OTPRouter');
 const ProductReviewRouter = require('./Routes/ProductReviewRouter');
+const CouponRouter = require('./Routes/CouponRouter');
+const AdminCouponRouter = require('./Routes/AdminCouponRouter');
 
 const PORT = process.env.PORT || 8080;
 require('./Models/db');
@@ -49,6 +51,8 @@ app.use('/products', ProductRouter);
 app.use('/admin', AdminRouter);
 app.use('/api/payment', PaymentRouter);
 app.use('/api/otp', OTPRouter);
+app.use('/api/coupons', CouponRouter);
+app.use('/admin/coupons', AdminCouponRouter);
 
 // Import ProductReview model
 const ProductReview = require('./Models/ProductReview');

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AddToCartButton from './components/AddToCartButton';
+import AddToCartButton from '../components/ui/AddToCartButton';
 
 function CollectionsPage({ products = [], cart, setCart, wishlist, setWishlist, isAuthenticated, onOpenAuth, showCartSuccessMessage }) {
   const navigate = useNavigate();

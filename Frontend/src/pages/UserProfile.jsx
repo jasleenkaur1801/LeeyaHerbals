@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './UserProfile.css';
+import '../styles/pages/UserProfile.css';
 
 const UserProfile = ({ user, onLogout }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

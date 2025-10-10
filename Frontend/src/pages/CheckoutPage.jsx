@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CheckoutPage.css';
-import { downloadInvoice } from './utils/invoiceUtils';
+import '../styles/pages/CheckoutPage.css';
+import { downloadInvoice } from '../utils/invoiceUtils';
 
 // Load Razorpay script
 const loadRazorpayScript = () => {
@@ -34,11 +34,62 @@ const CheckoutPage = () => {
   const [cardPaymentCompleted, setCardPaymentCompleted] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+  
+  // Coupon states
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [availableCoupons, setAvailableCoupons] = useState([]);
+  const [showCoupons, setShowCoupons] = useState(false);
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const shipping = 0;
-  const discount = 0;
+  const discount = couponDiscount; // Use coupon discount
   const total = subtotal + shipping - discount;
+
+  // Fetch available coupons
+  useEffect(() => {
+    const fetchAvailableCoupons = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        let userId = user._id || user.id || user.userId;
+        
+        // If not found, decode JWT token
+        if (!userId && token) {
+          try {
+            const tokenParts = token.split('.');
+            if (tokenParts.length === 3) {
+              const payload = JSON.parse(atob(tokenParts[1]));
+              userId = payload._id || payload.id || payload.userId || payload.sub;
+            }
+          } catch (e) {
+            console.error('Failed to decode token for fetching coupons:', e);
+          }
+        }
+        
+        if (!token || !userId) return;
+        
+        const response = await fetch(`http://localhost:8080/api/coupons/user/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        const data = await response.json();
+        if (data.success && data.coupons) {
+          setAvailableCoupons(data.coupons);
+        }
+      } catch (error) {
+        console.error('Failed to fetch coupons:', error);
+      }
+    };
+    
+    fetchAvailableCoupons();
+  }, []);
 
   useEffect(() => {
     // Load cart data
@@ -211,6 +262,14 @@ const CheckoutPage = () => {
                   userName: userData.name,
                   paymentMethod: 'online',
                   paymentStatus: 'prepaid',
+                  discount: couponDiscount,
+                  appliedCoupon: appliedCoupon ? {
+                    couponId: appliedCoupon.couponId,
+                    code: appliedCoupon.couponCode,
+                    discountType: appliedCoupon.discountType,
+                    discountValue: appliedCoupon.discountValue,
+                    discountAmount: appliedCoupon.discountAmount
+                  } : null,
                   items: cart.map(item => ({
                     productId: item.id || item.productId,
                     name: item.name,
@@ -230,6 +289,54 @@ const CheckoutPage = () => {
             console.log('Verification response:', verifyData);
 
             if (verifyData.success) {
+              // Record coupon usage if coupon was applied
+              if (appliedCoupon) {
+                try {
+                  const token = localStorage.getItem('token');
+                  const userId = userData._id || userData.id;
+                  await fetch('http://localhost:8080/api/coupons/record-usage', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                      userId: userId,
+                      couponId: appliedCoupon.couponId,
+                      orderId: verifyData.orderId,
+                      discountAmount: couponDiscount
+                    })
+                  });
+                } catch (error) {
+                  console.error('Failed to record coupon usage:', error);
+                }
+              }
+              
+              // Check for auto-generated coupons
+              try {
+                const token = localStorage.getItem('token');
+                const userId = userData._id || userData.id;
+                const response = await fetch('http://localhost:8080/api/coupons/generate', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({
+                    userId: userId,
+                    orderAmount: subtotal,
+                    orderId: verifyData.orderId
+                  })
+                });
+                
+                const data = await response.json();
+                if (data.success && data.couponsGenerated?.length > 0) {
+                  console.log('🎉 User earned new coupons:', data.couponsGenerated);
+                }
+              } catch (error) {
+                console.error('Failed to generate coupons:', error);
+              }
+              
               // Clear cart from localStorage
               localStorage.removeItem('cart');
               localStorage.removeItem('checkoutCart');
@@ -319,6 +426,14 @@ const CheckoutPage = () => {
         subtotal,
         shipping,
         total,
+        discount: couponDiscount,
+        appliedCoupon: appliedCoupon ? {
+          couponId: appliedCoupon.couponId,
+          code: appliedCoupon.couponCode,
+          discountType: appliedCoupon.discountType,
+          discountValue: appliedCoupon.discountValue,
+          discountAmount: appliedCoupon.discountAmount
+        } : null,
         items: cart.map(item => ({
           productId: item.id || item.productId,
           name: item.name,
@@ -384,6 +499,61 @@ const CheckoutPage = () => {
       }
 
       if (orderCreated) {
+        // Record coupon usage if coupon was applied
+        if (appliedCoupon) {
+          try {
+            const token = localStorage.getItem('token');
+            const lastOrderId = localStorage.getItem('lastOrderId');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = user._id || user.id;
+            
+            await fetch('http://localhost:8080/api/coupons/record-usage', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                userId: userId,
+                couponId: appliedCoupon.couponId,
+                orderId: lastOrderId,
+                discountAmount: couponDiscount
+              })
+            });
+          } catch (error) {
+            console.error('Failed to record coupon usage:', error);
+          }
+        }
+        
+        // Check for auto-generated coupons
+        try {
+          const token = localStorage.getItem('token');
+          const lastOrderId = localStorage.getItem('lastOrderId');
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          const userId = user._id || user.id;
+          
+          const response = await fetch('http://localhost:8080/api/coupons/generate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              userId: userId,
+              orderAmount: subtotal, // Use original amount before discount
+              orderId: lastOrderId
+            })
+          });
+          
+          const data = await response.json();
+          if (data.success && data.couponsGenerated?.length > 0) {
+            console.log('🎉 User earned new coupons:', data.couponsGenerated);
+            // You could show a special notification here
+          }
+        } catch (error) {
+          console.error('Failed to generate coupons:', error);
+        }
+        
         // Clear cart and temporary data
         localStorage.removeItem('cart');
         localStorage.removeItem('checkoutCart');
@@ -636,6 +806,256 @@ const CheckoutPage = () => {
                 ))}
               </div>
               
+              {/* Coupon Section - MUST BE VISIBLE */}
+              <div className="coupon-section" style={{
+                padding: '15px',
+                background: '#f8f9fa',
+                borderRadius: '8px',
+                marginBottom: '15px'
+              }}>
+                <h4 style={{ marginBottom: '10px', fontSize: '14px', color: '#333' }}>Add Gift Card or Promo Code</h4>
+                
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => {
+                      setCouponCode(e.target.value.toUpperCase());
+                      setCouponError('');
+                    }}
+                    placeholder="Enter Code"
+                    disabled={applyingCoupon || appliedCoupon}
+                    style={{
+                      flex: 1,
+                      padding: '10px',
+                      border: couponError ? '2px solid #dc3545' : '2px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      textTransform: 'uppercase'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!couponCode.trim()) {
+                        setCouponError('Please enter a coupon code');
+                        return;
+                      }
+                      
+                      setApplyingCoupon(true);
+                      setCouponError('');
+                      setCouponSuccess('');
+                      
+                      try {
+                        const token = localStorage.getItem('token');
+                        const user = JSON.parse(localStorage.getItem('user') || '{}');
+                        
+                        // Try to get userId from multiple sources
+                        let userId = user._id || user.id || user.userId;
+                        
+                        // If not found, decode JWT token to get user ID
+                        if (!userId && token) {
+                          try {
+                            const tokenParts = token.split('.');
+                            if (tokenParts.length === 3) {
+                              const payload = JSON.parse(atob(tokenParts[1]));
+                              userId = payload._id || payload.id || payload.userId || payload.sub;
+                              console.log('🔍 Extracted userId from token:', userId);
+                            }
+                          } catch (e) {
+                            console.error('Failed to decode token:', e);
+                          }
+                        }
+                        
+                        console.log('🔍 Debug - Token:', token ? 'EXISTS' : 'MISSING');
+                        console.log('🔍 Debug - User:', user);
+                        console.log('🔍 Debug - UserID:', userId);
+                        
+                        if (!token) {
+                          setCouponError('Please login to apply coupon - No token found');
+                          return;
+                        }
+                        
+                        if (!userId) {
+                          setCouponError('User ID not found. Please log out and log in again.');
+                          return;
+                        }
+                        
+                        const response = await fetch('http://localhost:8080/api/coupons/apply', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                          },
+                          body: JSON.stringify({
+                            userId: userId,
+                            couponCode: couponCode.toUpperCase(),
+                            orderAmount: subtotal
+                          })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                          setAppliedCoupon(data.data);
+                          setCouponDiscount(data.data.discountAmount);
+                          setCouponSuccess(`✅ ${data.message}`);
+                          setCouponCode('');
+                        } else {
+                          setCouponError(data.message || 'Invalid coupon code');
+                        }
+                      } catch (error) {
+                        setCouponError('Failed to apply coupon');
+                      } finally {
+                        setApplyingCoupon(false);
+                      }
+                    }}
+                    disabled={applyingCoupon || appliedCoupon}
+                    style={{
+                      padding: '10px 24px',
+                      background: appliedCoupon ? '#6c757d' : '#1dbf73',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: (applyingCoupon || appliedCoupon) ? 'not-allowed' : 'pointer',
+                      fontWeight: '600',
+                      fontSize: '14px'
+                    }}
+                  >
+                    {applyingCoupon ? 'Applying...' : 'Apply'}
+                  </button>
+                </div>
+                
+                {/* Error Message */}
+                {couponError && (
+                  <div style={{
+                    color: '#dc3545',
+                    background: '#f8d7da',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    fontSize: '13px',
+                    marginBottom: '8px'
+                  }}>
+                    ❌ {couponError}
+                  </div>
+                )}
+                
+                {/* Success Message */}
+                {couponSuccess && (
+                  <div style={{
+                    color: '#155724',
+                    background: '#d4edda',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    fontSize: '13px',
+                    marginBottom: '8px'
+                  }}>
+                    {couponSuccess}
+                  </div>
+                )}
+                
+                {/* Applied Coupon Display */}
+                {appliedCoupon && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, #1dbf73, #16a085)',
+                    color: 'white',
+                    padding: '12px',
+                    borderRadius: '6px',
+                    marginBottom: '8px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                          🎉 {appliedCoupon.couponCode} Applied!
+                        </div>
+                        <div style={{ fontSize: '12px', opacity: 0.9 }}>
+                          You saved ₹{appliedCoupon.discountAmount}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAppliedCoupon(null);
+                          setCouponDiscount(0);
+                          setCouponSuccess('');
+                          setCouponCode('');
+                        }}
+                        style={{
+                          background: 'rgba(255,255,255,0.2)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '4px 8px',
+                          cursor: 'pointer',
+                          fontSize: '12px'
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Available Coupons */}
+                {availableCoupons.length > 0 && !appliedCoupon && (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setShowCoupons(!showCoupons)}
+                      style={{
+                        background: 'none',
+                        border: '2px dashed #1dbf73',
+                        color: '#1dbf73',
+                        padding: '8px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        width: '100%',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        marginTop: '8px'
+                      }}
+                    >
+                      {showCoupons ? '▼' : '▶'} View Available Coupons ({availableCoupons.length})
+                    </button>
+                    
+                    {showCoupons && (
+                      <div style={{ marginTop: '10px', maxHeight: '200px', overflowY: 'auto' }}>
+                        {availableCoupons.map((coupon) => (
+                          <div
+                            key={coupon._id}
+                            onClick={() => {
+                              setCouponCode(coupon.code);
+                              setShowCoupons(false);
+                            }}
+                            style={{
+                              background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                              color: 'white',
+                              padding: '10px',
+                              borderRadius: '6px',
+                              marginBottom: '8px',
+                              cursor: 'pointer',
+                              transition: 'transform 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)' }
+                          >
+                            <div style={{ fontWeight: 'bold', marginBottom: '4px', fontSize: '14px' }}>
+                              {coupon.code}
+                            </div>
+                            <div style={{ fontSize: '12px', opacity: 0.9, marginBottom: '4px' }}>
+                              {coupon.description || (coupon.discountType === 'PERCENT' ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue} OFF`)}
+                            </div>
+                            <div style={{ fontSize: '11px', opacity: 0.8 }}>
+                              Min order: ₹{coupon.minOrderValue}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div className="summary-totals">
                 <div className="summary-row">
                   <span>Subtotal ({cart.reduce((sum, item) => sum + item.qty, 0)} items):</span>
@@ -645,16 +1065,30 @@ const CheckoutPage = () => {
                   <span>Shipping:</span>
                   <span className="free-shipping">FREE</span>
                 </div>
-                {paymentMethod === 'card' && discount > 0 && (
-                  <div className="summary-row discount">
-                    <span>Online Payment Discount (10%):</span>
-                    <span className="discount-amount">-₹{Math.round(discount)}</span>
+                {appliedCoupon && (
+                  <div className="summary-row discount" style={{ color: '#1dbf73', fontWeight: '600' }}>
+                    <span>Discount ({appliedCoupon.couponCode}):</span>
+                    <span className="discount-amount">-₹{Math.round(couponDiscount)}</span>
                   </div>
                 )}
                 <div className="summary-row total">
                   <span>Order Total:</span>
                   <span>₹{Math.round(total)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div style={{
+                    background: '#d4edda',
+                    color: '#155724',
+                    padding: '10px',
+                    borderRadius: '6px',
+                    textAlign: 'center',
+                    fontWeight: '600',
+                    marginTop: '10px',
+                    fontSize: '14px'
+                  }}>
+                    🎉 You saved ₹{Math.round(couponDiscount)}!
+                  </div>
+                )}
               </div>
 
               <button 

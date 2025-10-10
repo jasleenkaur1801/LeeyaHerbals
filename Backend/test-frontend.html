@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leeya Herbals - Coupon Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .coupon-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .coupon-input-group input {
+            flex: 1;
+            text-transform: uppercase;
+        }
+
+        .coupon-input-group button {
+            width: auto;
+            padding: 12px 30px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .coupons-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .coupon-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .coupon-code {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .coupon-description {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .coupon-details {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .summary-row.total {
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: none;
+            margin-top: 10px;
+        }
+
+        .discount {
+            color: #28a745;
+        }
+
+        .savings {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎟️ Leeya Herbals - Coupon Tester</h1>
+            <p>Test your coupon system in the browser</p>
+        </div>
+
+        <!-- Step 1: Login -->
+        <div class="card" id="loginCard">
+            <h2>Step 1: Login</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" value="test@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" value="test123">
+            </div>
+            <button onclick="login()">Login</button>
+            <div id="loginMessage"></div>
+        </div>
+
+        <!-- Step 2: Available Coupons -->
+        <div class="card hidden" id="couponsCard">
+            <h2>Step 2: Available Coupons</h2>
+            <button onclick="fetchCoupons()">Load Available Coupons</button>
+            <div id="couponsList"></div>
+        </div>
+
+        <!-- Step 3: Apply Coupon -->
+        <div class="card hidden" id="applyCard">
+            <h2>Step 3: Apply Coupon</h2>
+            <div class="form-group">
+                <label>Cart Total (₹)</label>
+                <input type="number" id="cartTotal" value="1500">
+            </div>
+            <div class="form-group">
+                <label>Coupon Code</label>
+                <div class="coupon-input-group">
+                    <input type="text" id="couponCode" placeholder="Enter code (e.g., WELCOME10)">
+                    <button onclick="applyCoupon()">Apply</button>
+                </div>
+            </div>
+            <div id="applyMessage"></div>
+            
+            <!-- Order Summary -->
+            <div class="order-summary hidden" id="orderSummary">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">₹0</span>
+                </div>
+                <div class="summary-row discount">
+                    <span>Discount (<span id="appliedCode"></span>):</span>
+                    <span id="discountAmount">-₹0</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span id="finalTotal">₹0</span>
+                </div>
+                <div class="savings" id="savingsMsg"></div>
+            </div>
+        </div>
+
+        <!-- Step 4: Test Auto-Generation -->
+        <div class="card hidden" id="generateCard">
+            <h2>Step 4: Test Auto-Generation (THANKYOU200)</h2>
+            <p style="color: #666; margin-bottom: 15px;">
+                Simulate an order of ₹2000+ to earn THANKYOU200 coupon
+            </p>
+            <div class="form-group">
+                <label>Order Amount (₹)</label>
+                <input type="number" id="generateAmount" value="2500">
+            </div>
+            <button onclick="generateCoupon()">Place Order & Generate Coupon</button>
+            <div id="generateMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+        let authToken = '';
+        let userId = '';
+
+        // Login
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            showMessage('loginMessage', 'Logging in...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.token) {
+                    authToken = data.token;
+                    userId = data._id;
+                    
+                    showMessage('loginMessage', `✅ Logged in as: ${data.name}`, 'success');
+                    
+                    // Show other cards
+                    document.getElementById('couponsCard').classList.remove('hidden');
+                    document.getElementById('applyCard').classList.remove('hidden');
+                    document.getElementById('generateCard').classList.remove('hidden');
+                    
+                    // Auto-load coupons
+                    setTimeout(fetchCoupons, 1000);
+                } else {
+                    showMessage('loginMessage', `❌ ${data.message || 'Login failed'}`, 'error');
+                }
+            } catch (error) {
+                showMessage('loginMessage', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Fetch Available Coupons
+        async function fetchCoupons() {
+            if (!authToken) {
+                showMessage('couponsList', '❌ Please login first', 'error');
+                return;
+            }
+            
+            document.getElementById('couponsList').innerHTML = '<div class="loading">Loading coupons...</div>';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/coupons/user/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.coupons) {
+                    displayCoupons(data.coupons);
+                } else {
+                    showMessage('couponsList', `❌ ${data.message || 'Failed to fetch coupons'}`, 'error');
+                }
+            } catch (error) {
+                showMessage('couponsList', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Display Coupons
+        function displayCoupons(coupons) {
+            const container = document.getElementById('couponsList');
+            
+            if (coupons.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">No coupons available</div>';
+                return;
+            }
+            
+            let html = `<div class="alert alert-success">✅ Found ${coupons.length} coupon(s)</div><div class="coupons-list">`;
+            
+            coupons.forEach(coupon => {
+                html += `
+                    <div class="coupon-card" onclick="selectCoupon('${coupon.code}')">
+                        <div class="coupon-code">${coupon.code}</div>
+                        <div class="coupon-description">
+                            ${coupon.description || (coupon.discountType === 'PERCENT' ? coupon.discountValue + '% OFF' : '₹' + coupon.discountValue + ' OFF')}
+                        </div>
+                        <div class="coupon-details">
+                            Min order: ₹${coupon.minOrderValue} | Click to use
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Select Coupon
+        function selectCoupon(code) {
+            document.getElementById('couponCode').value = code;
+            window.scrollTo({ top: document.getElementById('applyCard').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        // Apply Coupon
+        async function applyCoupon() {
+            const code = document.getElementById('couponCode').value;
+            const total = parseFloat(document.getElementById('cartTotal').value);
+            
+            if (!code || !total) {
+                showMessage('applyMessage', '❌ Please enter coupon code and cart total', 'error');
+                return;
+            }
+            
+            showMessage('applyMessage', 'Applying coupon...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/coupons/apply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        userId,
+                        couponCode: code.toUpperCase(),
+                        orderAmount: total
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('applyMessage', `✅ ${data.message}`, 'success');
+                    displayOrderSummary(data.data);
+                } else {
+                    showMessage('applyMessage', `❌ ${data.message}`, 'error');
+                    document.getElementById('orderSummary').classList.add('hidden');
+                }
+            } catch (error) {
+                showMessage('applyMessage', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Display Order Summary
+        function displayOrderSummary(data) {
+            document.getElementById('subtotal').textContent = `₹${data.originalAmount}`;
+            document.getElementById('appliedCode').textContent = data.couponCode;
+            document.getElementById('discountAmount').textContent = `-₹${data.discountAmount}`;
+            document.getElementById('finalTotal').textContent = `₹${data.finalAmount}`;
+            document.getElementById('savingsMsg').textContent = `🎉 You saved ₹${data.discountAmount}!`;
+            
+            document.getElementById('orderSummary').classList.remove('hidden');
+        }
+
+        // Generate Coupon
+        async function generateCoupon() {
+            const amount = parseFloat(document.getElementById('generateAmount').value);
+            
+            showMessage('generateMessage', 'Generating coupon...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/coupons/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        userId,
+                        orderAmount: amount,
+                        orderId: 'TEST_' + Date.now()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.couponsGenerated.length > 0) {
+                        let msg = `🎉 ${data.message}<br><br>`;
+                        data.couponsGenerated.forEach(c => {
+                            msg += `<strong>${c.code}</strong> - ₹${c.discountValue} OFF (Min: ₹${c.minOrderValue})<br>`;
+                        });
+                        showMessage('generateMessage', msg, 'success');
+                        
+                        // Refresh coupons list
+                        setTimeout(fetchCoupons, 1000);
+                    } else {
+                        showMessage('generateMessage', '✅ ' + data.message, 'success');
+                    }
+                } else {
+                    showMessage('generateMessage', `❌ ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('generateMessage', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Helper: Show Message
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+    </script>
+</body>
+</html>

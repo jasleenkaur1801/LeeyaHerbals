@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './AuthModal.css';
-import OTPDialog from './components/OTPDialog';
+import OTPDialog from "./OTPDialog";
 
 const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
